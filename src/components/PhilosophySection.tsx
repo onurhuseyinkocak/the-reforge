@@ -49,7 +49,7 @@ const PhilosophySection = () => {
           className="text-center mb-24"
         >
           <h2 className="font-display text-5xl md:text-7xl text-foreground mb-4">
-            ÇEKİÇ SESİ
+            THE HAMMER
           </h2>
           <div className="w-24 h-[2px] bg-primary mx-auto" />
         </motion.div>
