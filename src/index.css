@@ -1,96 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* THE FORGE Design System - Dark, Masculine, Disciplined */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Core Forge Colors - Dark Foundation */
+    --background: 0 0% 3%;
+    --foreground: 0 0% 95%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    /* Card - Slightly lighter than background */
+    --card: 0 0% 6%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    /* Popover */
+    --popover: 0 0% 6%;
+    --popover-foreground: 0 0% 95%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary - Ember Orange/Red */
+    --primary: 16 100% 50%;
+    --primary-foreground: 0 0% 3%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary - Steel Gray */
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 85%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Muted - Charcoal */
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 55%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Accent - Ember Glow */
+    --accent: 16 100% 50%;
+    --accent-foreground: 0 0% 3%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Destructive */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Border & Input */
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 16 100% 50%;
 
-    --radius: 0.5rem;
+    --radius: 0.25rem;
 
-    --sidebar-background: 0 0% 98%;
+    /* Custom Forge Variables */
+    --ember: 16 100% 50%;
+    --ember-dark: 0 85% 45%;
+    --ember-glow: 24 100% 55%;
+    --charcoal: 0 0% 8%;
+    --steel: 0 0% 45%;
+    --smoke: 0 0% 75%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Gradients */
+    --gradient-ember: linear-gradient(135deg, hsl(16 100% 50%), hsl(0 85% 45%));
+    --gradient-heat: linear-gradient(180deg, hsl(16 100% 50% / 0.3), transparent);
+    
+    /* Shadows */
+    --shadow-ember: 0 0 30px hsl(16 100% 50% / 0.4);
+    --shadow-glow: 0 0 60px hsl(16 100% 50% / 0.3);
   }
 }
 
@@ -99,7 +70,106 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
-  body {
-    @apply bg-background text-foreground;
+  html {
+    scroll-behavior: smooth;
   }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.05em;
+  }
+}
+
+@layer utilities {
+  /* Ember Glow Effect */
+  .ember-glow {
+    text-shadow: 0 0 20px hsl(var(--ember) / 0.6),
+                 0 0 40px hsl(var(--ember) / 0.4),
+                 0 0 60px hsl(var(--ember) / 0.2);
+  }
+
+  .ember-glow-strong {
+    text-shadow: 0 0 10px hsl(var(--ember)),
+                 0 0 30px hsl(var(--ember) / 0.8),
+                 0 0 50px hsl(var(--ember) / 0.6),
+                 0 0 80px hsl(var(--ember) / 0.4);
+  }
+
+  /* Box Glow */
+  .box-glow {
+    box-shadow: 0 0 20px hsl(var(--ember) / 0.3),
+                0 0 40px hsl(var(--ember) / 0.2);
+  }
+
+  .box-glow-strong {
+    box-shadow: 0 0 30px hsl(var(--ember) / 0.5),
+                0 0 60px hsl(var(--ember) / 0.3),
+                0 0 90px hsl(var(--ember) / 0.2);
+  }
+
+  /* Heat distortion placeholder */
+  .heat-shimmer {
+    animation: shimmer 3s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0%, 100% { filter: blur(0px); }
+    50% { filter: blur(0.5px); }
+  }
+
+  /* Scroll snap */
+  .snap-section {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  /* Horizontal scroll container */
+  .horizontal-scroll {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .horizontal-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Text gradient */
+  .text-gradient-ember {
+    background: linear-gradient(135deg, hsl(var(--ember-glow)), hsl(var(--ember)), hsl(var(--ember-dark)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Border glow */
+  .border-glow {
+    border: 1px solid hsl(var(--ember) / 0.3);
+    box-shadow: inset 0 0 20px hsl(var(--ember) / 0.1),
+                0 0 20px hsl(var(--ember) / 0.1);
+  }
+}
+
+/* Custom scrollbar for the page */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--ember) / 0.5);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--ember) / 0.7);
 }

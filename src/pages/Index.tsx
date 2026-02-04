@@ -1,12 +1,40 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import EmberParticles from "@/components/EmberParticles";
+import HeroSection from "@/components/HeroSection";
+import ProblemSection from "@/components/ProblemSection";
+import PhilosophySection from "@/components/PhilosophySection";
+import ProgramSection from "@/components/ProgramSection";
+import BrotherhoodSection from "@/components/BrotherhoodSection";
+import TestimonialsSection from "@/components/TestimonialsSection";
+import CTASection from "@/components/CTASection";
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="relative min-h-screen bg-background overflow-x-hidden">
+      {/* Global Ember Particles */}
+      <EmberParticles />
+
+      {/* Main Content */}
+      <main className="relative z-0">
+        <HeroSection />
+        <ProblemSection />
+        <PhilosophySection />
+        <ProgramSection />
+        <BrotherhoodSection />
+        <TestimonialsSection />
+        <CTASection />
+      </main>
+
+      {/* Footer */}
+      <footer className="relative z-20 py-8 border-t border-border/30">
+        <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="font-display text-xl text-primary tracking-wider">
+            THE FORGE
+          </p>
+          <p className="text-sm text-muted-foreground">
+            © 2024 THE FORGE. Tüm hakları saklıdır.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 };
