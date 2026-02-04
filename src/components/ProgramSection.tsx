@@ -5,7 +5,7 @@ import { Dumbbell, Brain, Briefcase, Heart } from "lucide-react";
 const pillars = [
   {
     id: 1,
-    title: "FİZİKSEL",
+    title: "PHYSICAL",
     icon: Dumbbell,
     description: "Bedenini bir savaşçı gibi inşa et. Güç, dayanıklılık, disiplin.",
     details: ["Kişiselleştirilmiş antrenman programı", "Beslenme planı", "Uyku optimizasyonu", "Düzenli check-in'ler"],
@@ -19,14 +19,14 @@ const pillars = [
   },
   {
     id: 3,
-    title: "KARİYER",
+    title: "CAREER",
     icon: Briefcase,
     description: "Profesyonel yaşamında iz bırak. Liderlik, strateji, icra.",
     details: ["Kariyer yol haritası", "Networking stratejileri", "Sunum becerileri", "Finansal planlama"],
   },
   {
     id: 4,
-    title: "İLİŞKİLER",
+    title: "RELATIONSHIPS",
     icon: Heart,
     description: "Derin, anlamlı bağlar kur. Saygı, güven, etki.",
     details: ["İletişim becerileri", "Sınır koyma", "Sosyal dinamikler", "Liderlik aurası"],
@@ -59,10 +59,10 @@ const ProgramSection = () => {
           className="text-center mb-8"
         >
           <h2 className="font-display text-5xl md:text-7xl text-foreground mb-4">
-            24 HAFTA
+            24 WEEKS
           </h2>
           <p className="text-xl text-muted-foreground">
-            Birebir mentor eşliğinde dönüşüm
+            One-on-one mentorship transformation
           </p>
         </motion.div>
 
@@ -81,8 +81,8 @@ const ProgramSection = () => {
 
         {/* Transformation Labels */}
         <div className="flex justify-between max-w-2xl mx-auto mb-20 px-4">
-          <span className="text-sm text-muted-foreground">Ham Demir</span>
-          <span className="text-sm text-primary font-medium">Keskin Çelik</span>
+          <span className="text-sm text-muted-foreground">Raw Iron</span>
+          <span className="text-sm text-primary font-medium">Sharp Steel</span>
         </div>
 
         {/* Four Pillars Grid */}
@@ -172,7 +172,7 @@ const ProgramSection = () => {
           <div className="inline-flex items-center gap-3 px-6 py-3 bg-primary/10 border border-primary/30 rounded-sm">
             <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
             <span className="text-sm text-primary tracking-wider uppercase">
-              Her adımda yanında bir mentor
+              A mentor by your side at every step
             </span>
           </div>
         </motion.div>

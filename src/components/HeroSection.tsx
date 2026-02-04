@@ -36,7 +36,7 @@ const HeroSection = () => {
           transition={{ duration: 0.8, delay: 0.5 }}
           className="font-display text-2xl md:text-4xl text-primary tracking-widest mb-12"
         >
-          DİSİPLİN ATEŞTİR.
+          DISCIPLINE IS FIRE.
         </motion.p>
 
         {/* Manifesto Line */}
@@ -63,7 +63,6 @@ const HeroSection = () => {
         />
       </div>
 
-      {/* Scroll indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -72,7 +71,7 @@ const HeroSection = () => {
       >
         <div className="flex flex-col items-center gap-3 cursor-pointer group">
           <span className="text-sm text-muted-foreground tracking-widest uppercase group-hover:text-primary transition-colors">
-            Aşağı in. Ateşe adım at.
+            Scroll down. Step into the fire.
           </span>
           <motion.div
             animate={{ y: [0, 8, 0] }}

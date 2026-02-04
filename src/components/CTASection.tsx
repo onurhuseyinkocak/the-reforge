@@ -106,7 +106,7 @@ const CTASection = () => {
           viewport={{ once: true }}
           className="mt-8 text-sm text-muted-foreground"
         >
-          24 haftalık dönüşüm programına başvur
+          Apply for the 24-week transformation program
         </motion.p>
 
         {/* Trust indicators */}
@@ -119,15 +119,15 @@ const CTASection = () => {
         >
           <span className="flex items-center gap-2">
             <span className="w-2 h-2 bg-primary/50 rounded-full" />
-            Sınırlı kontenjan
+            Limited spots
           </span>
           <span className="flex items-center gap-2">
             <span className="w-2 h-2 bg-primary/50 rounded-full" />
-            Birebir mentor
+            One-on-one mentor
           </span>
           <span className="flex items-center gap-2">
             <span className="w-2 h-2 bg-primary/50 rounded-full" />
-            Sonuç garantisi
+            Results guaranteed
           </span>
         </motion.div>
       </div>
@@ -141,7 +141,7 @@ const CTASection = () => {
         className="absolute bottom-8 left-0 right-0 text-center"
       >
         <p className="font-display text-primary/50 tracking-[0.3em] text-sm">
-          DİSİPLİN ATEŞTİR
+          DISCIPLINE IS FIRE
         </p>
       </motion.div>
     </section>
