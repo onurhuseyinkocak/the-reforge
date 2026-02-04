@@ -34,7 +34,7 @@ const BrotherhoodSection = () => {
             BROTHERHOOD
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Forged in the Same Fire
+            Aynı Ateşte Dövülenler
           </p>
         </motion.div>
 
@@ -118,9 +118,9 @@ const BrotherhoodSection = () => {
           className="flex flex-wrap justify-center gap-8 md:gap-16"
         >
           {[
-            { label: "Active Members", value: "250+" },
-            { label: "Completed Transformations", value: "180+" },
-            { label: "Countries", value: "12" },
+            { label: "Aktif Üye", value: "250+" },
+            { label: "Tamamlanan Dönüşüm", value: "180+" },
+            { label: "Ülke", value: "12" },
           ].map((stat, index) => (
             <div key={index} className="text-center">
               <p className="font-display text-4xl md:text-5xl text-primary mb-1">

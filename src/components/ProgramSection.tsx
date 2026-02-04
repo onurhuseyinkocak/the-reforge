@@ -62,7 +62,7 @@ const ProgramSection = () => {
             24 WEEKS
           </h2>
           <p className="text-xl text-muted-foreground">
-            One-on-one mentorship transformation
+            Birebir mentorluk ile dönüşüm
           </p>
         </motion.div>
 
@@ -172,7 +172,7 @@ const ProgramSection = () => {
           <div className="inline-flex items-center gap-3 px-6 py-3 bg-primary/10 border border-primary/30 rounded-sm">
             <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
             <span className="text-sm text-primary tracking-wider uppercase">
-              A mentor by your side at every step
+              Her adımda yanında bir mentor
             </span>
           </div>
         </motion.div>

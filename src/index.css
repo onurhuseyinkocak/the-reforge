@@ -86,18 +86,57 @@
 }
 
 @layer utilities {
-  /* Ember Glow Effect */
+  /* Ember Glow Effect - Standard */
   .ember-glow {
-    text-shadow: 0 0 20px hsl(var(--ember) / 0.6),
-                 0 0 40px hsl(var(--ember) / 0.4),
-                 0 0 60px hsl(var(--ember) / 0.2);
+    text-shadow: 0 0 10px hsl(var(--ember) / 0.4),
+                 0 0 20px hsl(var(--ember) / 0.3),
+                 0 0 30px hsl(var(--ember) / 0.2);
+  }
+
+  /* Premium Glow - Realistic Hot Metal */
+  .ember-glow-premium {
+    text-shadow: 
+      0 0 2px #fffaf0,
+      0 0 4px #fff8dc,
+      0 0 8px #ffd700,
+      0 0 16px #ff8c00,
+      0 0 32px #ff4500,
+      0 0 48px rgba(255, 69, 0, 0.6),
+      0 0 64px rgba(204, 34, 0, 0.4);
+    animation: heat-pulse 4s ease-in-out infinite;
   }
 
   .ember-glow-strong {
-    text-shadow: 0 0 10px hsl(var(--ember)),
-                 0 0 30px hsl(var(--ember) / 0.8),
-                 0 0 50px hsl(var(--ember) / 0.6),
-                 0 0 80px hsl(var(--ember) / 0.4);
+    text-shadow: 
+      0 0 1px #fff,
+      0 0 3px #fffacd,
+      0 0 6px #ffd700,
+      0 0 12px #ff8c00,
+      0 0 24px #ff4500,
+      0 0 36px rgba(255, 69, 0, 0.5);
+  }
+
+  @keyframes heat-pulse {
+    0%, 100% {
+      text-shadow: 
+        0 0 2px #fffaf0,
+        0 0 4px #fff8dc,
+        0 0 8px #ffd700,
+        0 0 16px #ff8c00,
+        0 0 32px #ff4500,
+        0 0 48px rgba(255, 69, 0, 0.6),
+        0 0 64px rgba(204, 34, 0, 0.4);
+    }
+    50% {
+      text-shadow: 
+        0 0 4px #fff,
+        0 0 8px #fffacd,
+        0 0 16px #ffd700,
+        0 0 24px #ff8c00,
+        0 0 40px #ff4500,
+        0 0 60px rgba(255, 69, 0, 0.7),
+        0 0 80px rgba(204, 34, 0, 0.5);
+    }
   }
 
   /* Box Glow */

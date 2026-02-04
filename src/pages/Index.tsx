@@ -6,12 +6,16 @@ import ProgramSection from "@/components/ProgramSection";
 import BrotherhoodSection from "@/components/BrotherhoodSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import CTASection from "@/components/CTASection";
+import AmbientSound from "@/components/AmbientSound";
 
 const Index = () => {
   return (
     <div className="relative min-h-screen bg-background overflow-x-hidden">
       {/* Global Ember Particles */}
       <EmberParticles />
+      
+      {/* Ambient Forge Sound */}
+      <AmbientSound />
 
       {/* Main Content */}
       <main className="relative z-0">
