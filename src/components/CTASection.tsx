@@ -61,7 +61,7 @@ const CTASection = () => {
         >
           OCAĞA
           <br />
-          <span className="text-gradient-ember ember-glow-strong">GİRMEYE</span>
+          <span className="text-primary ember-glow-premium">GİRMEYE</span>
           <br />
           HAZIR MISIN?
         </motion.h2>
@@ -106,7 +106,7 @@ const CTASection = () => {
           viewport={{ once: true }}
           className="mt-8 text-sm text-muted-foreground"
         >
-          Apply for the 24-week transformation program
+          24 haftalık dönüşüm programına başvur
         </motion.p>
 
         {/* Trust indicators */}
@@ -119,15 +119,15 @@ const CTASection = () => {
         >
           <span className="flex items-center gap-2">
             <span className="w-2 h-2 bg-primary/50 rounded-full" />
-            Limited spots
+            Sınırlı kontenjan
           </span>
           <span className="flex items-center gap-2">
             <span className="w-2 h-2 bg-primary/50 rounded-full" />
-            One-on-one mentor
+            Birebir mentorluk
           </span>
           <span className="flex items-center gap-2">
             <span className="w-2 h-2 bg-primary/50 rounded-full" />
-            Results guaranteed
+            Sonuç garantili
           </span>
         </motion.div>
       </div>

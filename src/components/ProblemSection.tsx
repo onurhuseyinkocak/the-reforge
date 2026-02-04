@@ -26,7 +26,7 @@ const ProblemSection = () => {
         className="text-center mb-20 px-4"
       >
         <h2 className="font-display text-5xl md:text-7xl text-foreground mb-4">
-          BROKEN IRON
+          UNTEMPERED STEEL
         </h2>
         <p className="text-xl text-muted-foreground">
           Motivasyon endüstrisinin sana sattığı yalanlar
@@ -82,10 +82,10 @@ const ProblemSection = () => {
           >
             <div className="h-64 border-2 border-primary/50 rounded-sm p-8 flex flex-col items-center justify-center text-center box-glow">
               <p className="font-display text-3xl md:text-4xl text-primary mb-4">
-                BUT YOU
+                YET YOU
               </p>
               <p className="text-xl text-foreground">
-                are still raw material.
+                remain unforged.
               </p>
               <div className="w-16 h-[2px] bg-primary mt-6" />
             </div>

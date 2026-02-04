@@ -24,7 +24,7 @@ const HeroSection = () => {
           transition={{ duration: 1, ease: "easeOut" }}
           className="mb-8"
         >
-          <h1 className="font-display text-7xl md:text-9xl lg:text-[12rem] tracking-wider ember-glow-strong text-gradient-ember">
+          <h1 className="font-display text-7xl md:text-9xl lg:text-[12rem] tracking-wider ember-glow-premium text-primary">
             THE FORGE
           </h1>
         </motion.div>
@@ -71,7 +71,7 @@ const HeroSection = () => {
       >
         <div className="flex flex-col items-center gap-3 cursor-pointer group">
           <span className="text-sm text-muted-foreground tracking-widest uppercase group-hover:text-primary transition-colors">
-            Scroll down. Step into the fire.
+            Aşağı kaydır. Ateşe adım at.
           </span>
           <motion.div
             animate={{ y: [0, 8, 0] }}

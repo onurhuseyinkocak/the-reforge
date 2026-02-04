@@ -38,10 +38,10 @@ const TestimonialsSection = () => {
           className="text-center mb-20"
         >
           <h2 className="font-display text-5xl md:text-7xl text-foreground mb-4">
-            TRANSFORMATION
+            REFORGED
           </h2>
           <p className="text-xl text-muted-foreground">
-            Iron Takes Shape
+            Steel Becomes Blade
           </p>
         </motion.div>
 
