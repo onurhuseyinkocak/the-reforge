@@ -1,90 +1,134 @@
 
+# THE FORGE — Premium Upgrade Plan
 
-# THE FORGE — Landing Page Tasarım Planı
+## 1. Terminoloji Güncellemesi (Daha Prestijli İngilizce Terimler)
 
-## Marka Kimliği
+| Mevcut (Dandik) | Yeni (Premium) |
+|----------------|----------------|
+| BROKEN IRON | **UNTEMPERED STEEL** |
+| THE HAMMER | **THE ANVIL** |
+| "BUT YOU are still raw material" | **"YET YOU remain unforged."** |
+| TRANSFORMATION | **REFORGED** |
+| "Iron Takes Shape" | **"Steel Becomes Blade"** |
 
-**Renk Paleti:**
-- Ana Zemin: Derin siyah ve kömür grisi (ocağın karanlığı)
-- Vurgu: Kor turuncu/kızıl (#FF4500 → #DC2626) — kızdırılmış demirin rengi
-- Detay: Çelik grisi ve duman beyazı
+## 2. Dil Düzeltmeleri (Türkçe Olması Gerekenler)
 
-**Tipografi:**
-- Başlıklar: Kalın, condensed, endüstriyel (güç ve disiplini yansıtan)
-- Gövde: Temiz, keskin, okunaklı
+**Hero Section:**
+- "Scroll down. Step into the fire." → "Aşağı kaydır. Ateşe adım at."
 
-**Motto:** "DİSİPLİN ATEŞTİR."
+**Program Section:**
+- "One-on-one mentorship transformation" → "Birebir mentorluk ile dönüşüm"
+- "A mentor by your side at every step" → "Her adımda yanında bir mentor"
 
----
+**CTA Section:**
+- "Apply for the 24-week transformation program" → "24 haftalık dönüşüm programına başvur"
+- "Limited spots" → "Sınırlı kontenjan"
+- "One-on-one mentor" → "Birebir mentorluk"
+- "Results guaranteed" → "Sonuç garantili"
 
-## Sayfa Yapısı ve Deneyim Akışı
+**Brotherhood Section:**
+- "Active Members" → "Aktif Üye"
+- "Completed Transformations" → "Tamamlanan Dönüşüm"
+- "Countries" → "Ülke"
+- "Forged in the Same Fire" → "Aynı Ateşte Dövülenler"
 
-### 1. HERO — "Ocağa Giriş"
-- Tam ekran karanlık sahne, ateş/kor partikülleri havada süzülüyor
-- Manifesto'nun en güçlü cümlesi: *"Motivasyon bir yalan. Disiplin tek gerçek."*
-- THE FORGE logosu kızdırılmış demir efektiyle parlıyor
-- Scroll tetikleyici: "Aşağı in. Ateşe adım at."
+## 3. Premium Glow Efektleri (Gerçekçi Sıcak Metal)
 
-### 2. PROBLEM — "Kırık Demir"
-- Horizontal scroll deneyimi (normal sitelerden farklı)
-- Motivasyon endüstrisinin yalanları karanlık kartlarda beliriyor
-- Her kart scroll'la "kırılıyor" ve dağılıyor
-- Sonunda: *"Ama sen hâlâ ham maddesin."*
+**Mevcut Problem:** Neon tarzı, ucuz görünümlü text-shadow
 
-### 3. FELSEFE — "Çekiç Sesi"
-- Parallax derinlik efekti — scroll'la katmanlar hareket ediyor
-- Her scroll'da bir manifesto cümlesi "damgalanıyor" ekrana
-- Arka planda çekiç sesi ve ateş ambient görselleri
-- *"Demirci demiri sevdiği için dövmez. Çekiç vurmadan demir şekil almaz."*
+**Çözüm:**
+- Daha yumuşak, kademeli ışıma katmanları
+- Gerçek kızdırılmış metal gibi gradient (sarı çekirdek → turuncu → koyu kırmızı kenar)
+- Animasyonlu "nabız" efekti ile canlı his
+- "THE FORGE" ve "GİRMEYE" için özel premium sınıf
 
-### 4. PROGRAM — "24 Hafta"
-- 3D timeline görünümü
-- Fiziksel, mental, kariyer, ilişkiler — 4 sütun
-- Her alan scroll'la "açılıyor" ve içerik reveal oluyor
-- Birebir mentor eşliği vurgusu
-- Progress bar animasyonu: Ham demir → Keskin çelik
+```css
+.ember-glow-premium {
+  /* Daha fazla katman, daha yumuşak geçişler */
+  text-shadow: 
+    0 0 2px #fff,           /* Beyaz çekirdek */
+    0 0 8px #ffcc00,        /* Sarı iç katman */
+    0 0 20px #ff8800,       /* Turuncu orta */
+    0 0 40px #ff4400,       /* Kırmızı-turuncu */
+    0 0 60px #cc220088;     /* Koyu kırmızı dış */
+  animation: heat-pulse 3s ease-in-out infinite;
+}
+```
 
-### 5. KARDEŞLİK — "Aynı Ateşten Geçenler"
-- Karanlık grid, üzerine gelince kor efektiyle aydınlanan profiller
-- *"Yalnız değilsin. Aynı ocakta dövülen bir kardeşlik seni bekliyor."*
-- Community hissiyatı veren dinamik görseller
+## 4. Geliştirilmiş Ember Particles (4K Hyper-Realistic)
 
-### 6. DÖNÜŞÜM — "Şekil Alan Demir"
-- Before/After konsepti ama klişe değil
-- Testimonial'lar karanlık kartlarda, scroll'la ateşle aydınlanıyor
-- Güçlü, kısa, vurucu hikayeler
+**Güncellemeler:**
+- Partikül sayısı: 50 → 80 (daha yoğun atmosfer)
+- Boyut varyasyonu: Küçük kıvılcımdan büyük köze kadar
+- Fizik iyileştirmesi: Gerçekçi termal konveksiyon hareketi
+- Renk derinliği: Beyaz-sarı çekirdek, turuncu hale, kırmızı kenar
+- Opacity varyasyonu: Doğal titreşim efekti
+- Yaşam döngüsü: Doğuş → parlak yanma → sönme animasyonu
+- Duman izi: Her partikülün arkasında hafif iz
 
-### 7. CTA — "Ocağa Gir"
-- Full screen, sadece tek buton
-- Ateş partikülleri butona doğru akıyor
-- *"Bahanelerin burada bitiyor."*
-- Buton: "OCAĞA GİR" — hover'da kızdırılmış demir efekti
+**Teknik Detaylar:**
+```text
+┌─────────────────────────────────────┐
+│          Partikül Yapısı            │
+├─────────────────────────────────────┤
+│  ○ Beyaz çekirdek (en parlak)       │
+│  ◐ Sarı iç hale                     │
+│  ◑ Turuncu orta hale                │
+│  ○ Kırmızı dış glow (en geniş)      │
+│  ... Hafif duman izi                │
+└─────────────────────────────────────┘
+```
 
----
+## 5. Ambient Forge Sesi
 
-## İnovatif UI Özellikleri
+**Özellikler:**
+- Ateş çıtırtısı (continuous crackling)
+- Odun yanma sesi (subtle wood burn)
+- Aralıklı demir dövme sesi (occasional hammer strike)
+- Düşük volüm, immersive ama rahatsız etmeyen
+- Sonsuz loop, kesintisiz geçiş
 
-1. **Ember Particle System** — Sayfanın her yerinde süzülen kor partikülleri
-2. **Scroll-triggered Brand Reveal** — Scroll'la metinler "damgalanıyor"
-3. **Horizontal + Vertical Scroll Hybrid** — Farklı bölümlerde farklı scroll yönleri
-4. **Parallax Depth Layers** — 3-4 katmanlı derinlik hissi
-5. **Glow & Heat Effects** — Elementlere yaklaşınca "ısınma" efekti
-6. **Sound Design Ready** — Çekiç sesi, ateş ambient için altyapı
-7. **Smooth Page Transitions** — Bölümler arası sinematik geçişler
+**Teknik Uygulama:**
+- `AmbientSound` component oluşturulacak
+- Freesound.org veya benzeri kaynaktan royalty-free ses
+- Audio API ile loop ve volume kontrolü
+- Autoplay kısıtlaması için kullanıcı etkileşimi tetikleyici
+- Sağ alt köşede sessiz/sesli toggle butonu
 
----
+**Ses Akışı:**
+```text
+Sayfa Yüklenir → Ses Hazır (muted)
+      ↓
+Kullanıcı Scroll/Click → Ses Başlar (fade-in)
+      ↓
+Navigasyon Değişirse → Ses Fade-out
+```
 
-## Teknik Yaklaşım
-- Framer Motion ile gelişmiş animasyonlar
-- Intersection Observer ile scroll-triggered efektler
-- CSS custom properties ile dinamik glow efektleri
-- Canvas veya CSS particles ile kor partikülleri
-- Smooth scroll ve snap points
+## 6. Dosya Değişiklikleri
 
----
+| Dosya | Değişiklik |
+|-------|------------|
+| `src/index.css` | Premium glow sınıfları, heat-pulse animasyonu |
+| `src/components/EmberParticles.tsx` | Gelişmiş partikül sistemi |
+| `src/components/HeroSection.tsx` | Premium glow, Türkçe scroll text |
+| `src/components/ProblemSection.tsx` | "UNTEMPERED STEEL" terminolojisi |
+| `src/components/PhilosophySection.tsx` | "THE ANVIL" terminolojisi |
+| `src/components/ProgramSection.tsx` | Türkçe açıklamalar |
+| `src/components/BrotherhoodSection.tsx` | Türkçe istatistik etiketleri |
+| `src/components/TestimonialsSection.tsx` | "REFORGED" terminolojisi |
+| `src/components/CTASection.tsx` | Premium glow, Türkçe metinler |
+| `src/components/AmbientSound.tsx` | **YENİ** - Ses component'i |
+| `src/pages/Index.tsx` | AmbientSound entegrasyonu |
+| `public/sounds/forge-ambient.mp3` | **YENİ** - Ambient ses dosyası |
 
-## Sonuç
-Bu site bir broşür değil — bir deneyim. İlk saniyeden itibaren ziyaretçi THE FORGE'un ruhunu hissedecek: karanlık, güçlü, disiplinli ve dönüştürücü. Normal landing page'lerden radikal şekilde farklı, ama aynı zamanda profesyonel ve güvenilir.
+## 7. Sonuç
 
-*"Yağmur yağıyor olabilir, moralin bozuk olabilir — ama önemli değil. Yap."*
+Bu değişikliklerle site:
+- ✓ Daha prestijli ve saygı uyandıran terminoloji
+- ✓ Doğru dil kullanımı (terimler İngilizce, UI Türkçe)
+- ✓ Gerçekçi, sinematik ışıma efektleri
+- ✓ 4K kalitesinde partikül sistemi
+- ✓ Immersive forge atmosferi (ses ile)
+- ✓ Premium, milyon dolarlık şirket kalitesi
 
+**Aura seviyesi: MAKSIMUM** 🔥
