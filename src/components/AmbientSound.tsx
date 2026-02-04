@@ -2,21 +2,55 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Medieval forge ambient sounds - Mixkit CDN (working URLs)
+const AUDIO_SOURCES = [
+  // Campfire crackles (24 sec loop) - perfect for forge ambience
+  "https://assets.mixkit.co/active_storage/sfx/1330/1330-preview.mp3",
+  // Campfire night wind (30 sec) - with crackling and wind
+  "https://assets.mixkit.co/active_storage/sfx/1736/1736-preview.mp3",
+  // SoundBible crackling fireplace (fallback)
+  "https://soundbible.com/grab.php?id=2178&type=mp3",
+];
+
 const AmbientSound = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
   const [showHint, setShowHint] = useState(true);
+  const [audioLoaded, setAudioLoaded] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const currentSourceIndex = useRef(0);
 
-  // Initialize audio
-  useEffect(() => {
-    const audio = new Audio(
-      "https://cdn.freesound.org/previews/507/507891_3162170-lq.mp3"
-    );
+  // Try to load audio from available sources
+  const loadAudio = useCallback(() => {
+    if (currentSourceIndex.current >= AUDIO_SOURCES.length) {
+      console.warn("All audio sources failed to load");
+      return;
+    }
+
+    const audio = new Audio();
     audio.loop = true;
-    audio.volume = 0.15; // Low volume for ambience
+    audio.volume = 0.15;
     audio.preload = "auto";
-    audioRef.current = audio;
+    audio.crossOrigin = "anonymous";
+
+    audio.addEventListener("canplaythrough", () => {
+      setAudioLoaded(true);
+      audioRef.current = audio;
+    });
+
+    audio.addEventListener("error", () => {
+      console.warn(`Audio source ${currentSourceIndex.current} failed, trying next...`);
+      currentSourceIndex.current++;
+      loadAudio();
+    });
+
+    audio.src = AUDIO_SOURCES[currentSourceIndex.current];
+    audio.load();
+  }, []);
+
+  // Initialize audio on mount
+  useEffect(() => {
+    loadAudio();
 
     return () => {
       if (audioRef.current) {
@@ -24,7 +58,7 @@ const AmbientSound = () => {
         audioRef.current = null;
       }
     };
-  }, []);
+  }, [loadAudio]);
 
   // Fade in/out audio
   const fadeAudio = useCallback((fadeIn: boolean) => {
@@ -48,7 +82,10 @@ const AmbientSound = () => {
   // Handle play/pause
   const toggleSound = useCallback(() => {
     const audio = audioRef.current;
-    if (!audio) return;
+    if (!audio || !audioLoaded) {
+      console.log("Audio not ready yet");
+      return;
+    }
 
     if (!hasInteracted) {
       setHasInteracted(true);
@@ -63,12 +100,16 @@ const AmbientSound = () => {
       audio.play().then(() => {
         fadeAudio(true);
         setIsPlaying(true);
-      }).catch(console.error);
+      }).catch((err) => {
+        console.error("Audio play failed:", err);
+      });
     }
-  }, [isPlaying, hasInteracted, fadeAudio]);
+  }, [isPlaying, hasInteracted, fadeAudio, audioLoaded]);
 
-  // Auto-start on first scroll/click
+  // Auto-start on first scroll/click (only if audio is loaded)
   useEffect(() => {
+    if (!audioLoaded) return;
+
     const handleFirstInteraction = () => {
       if (!hasInteracted && audioRef.current) {
         setHasInteracted(true);
@@ -97,7 +138,7 @@ const AmbientSound = () => {
       );
       clearTimeout(hintTimer);
     };
-  }, [hasInteracted, fadeAudio]);
+  }, [hasInteracted, fadeAudio, audioLoaded]);
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3">
