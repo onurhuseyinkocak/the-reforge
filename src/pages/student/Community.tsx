@@ -17,7 +17,7 @@ const Community = () => {
   const [loading, setLoading] = useState(false);
 
   const fetchPosts = async () => {
-    const { data } = await supabase.from("community_posts").select("*, profiles!community_posts_user_id_fkey(full_name, current_phase)")
+    const { data } = await supabase.from("community_posts").select("*, profiles!community_posts_profile_fkey(full_name, current_phase)")
       .order("created_at", { ascending: false }).limit(50);
     setPosts(data || []);
   };

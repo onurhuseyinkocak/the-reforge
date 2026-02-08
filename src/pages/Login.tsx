@@ -87,7 +87,7 @@ const Login = () => {
 
         <p className="text-center mt-4 text-sm text-muted-foreground">
           Hesabın yok mu?{" "}
-          <Link to="/register" className="text-primary hover:underline">Kayıt ol</Link>
+          <Link to="/apply" className="text-primary hover:underline">Başvur</Link>
         </p>
       </div>
     </div>
