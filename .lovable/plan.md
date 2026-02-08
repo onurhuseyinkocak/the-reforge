@@ -1,134 +1,172 @@
 
-# THE FORGE — Premium Upgrade Plan
 
-## 1. Terminoloji Güncellemesi (Daha Prestijli İngilizce Terimler)
+# THE FORGE - Complete Rebuild Plan
 
-| Mevcut (Dandik) | Yeni (Premium) |
-|----------------|----------------|
-| BROKEN IRON | **UNTEMPERED STEEL** |
-| THE HAMMER | **THE ANVIL** |
-| "BUT YOU are still raw material" | **"YET YOU remain unforged."** |
-| TRANSFORMATION | **REFORGED** |
-| "Iron Takes Shape" | **"Steel Becomes Blade"** |
+## Admin Promotion Done
+test@test.com has been successfully promoted to admin.
 
-## 2. Dil Düzeltmeleri (Türkçe Olması Gerekenler)
+---
 
-**Hero Section:**
-- "Scroll down. Step into the fire." → "Aşağı kaydır. Ateşe adım at."
+## What Already Exists (Will Be Updated)
+- Auth system (login, register, forgot-password, AuthContext, ProtectedRoute)
+- Dashboard layout with sidebar navigation
+- Student pages: Dashboard, Check-in, Tasks, Progress, Messages, Profile
+- Admin pages: Dashboard, Students, StudentDetail, Tasks, Messages, Payments
+- Database tables: profiles, checkins, tasks, student_tasks, messages, payments, admin_notes, mentor_sessions, user_roles
+- Forge theme (ember/dark) with design tokens
 
-**Program Section:**
-- "One-on-one mentorship transformation" → "Birebir mentorluk ile dönüşüm"
-- "A mentor by your side at every step" → "Her adımda yanında bir mentor"
+## What's New (To Be Built)
 
-**CTA Section:**
-- "Apply for the 24-week transformation program" → "24 haftalık dönüşüm programına başvur"
-- "Limited spots" → "Sınırlı kontenjan"
-- "One-on-one mentor" → "Birebir mentorluk"
-- "Results guaranteed" → "Sonuç garantili"
+### 1. Application Flow (Major New Feature)
+- **/apply** - Multi-step public form (no login required)
+  - Step 1: Basic info (name, email, phone, age)
+  - Step 2: Current situation rating 1-10 across life areas
+  - Step 3: Commitment/motivation questions
+  - Submit leads to "Application Under Review" page
+- **/admin/applications** - Admin review queue (approve/reject)
+- New `applications` database table
+- Remove `/register` (enrollment is now application-based, not self-signup)
 
-**Brotherhood Section:**
-- "Active Members" → "Aktif Üye"
-- "Completed Transformations" → "Tamamlanan Dönüşüm"
-- "Countries" → "Ülke"
-- "Forged in the Same Fire" → "Aynı Ateşte Dövülenler"
+### 2. Life Areas Tracking (New Page)
+- **/life-areas** - 7 tabs: Physical, Mental, Style, Environment, Social, Career, Finance
+- Each tab tracks specific metrics (weight, mood, habits, goals, etc.)
+- New `life_area_entries` database table
 
-## 3. Premium Glow Efektleri (Gerçekçi Sıcak Metal)
+### 3. Resources Library (New Page)
+- **/resources** - Phase-locked content library
+- New `resources` database table with phase requirements
 
-**Mevcut Problem:** Neon tarzı, ucuz görünümlü text-shadow
+### 4. Community Feed (New Page)
+- **/community** - Student feed, phase groups
+- New `community_posts` database table
 
-**Çözüm:**
-- Daha yumuşak, kademeli ışıma katmanları
-- Gerçek kızdırılmış metal gibi gradient (sarı çekirdek → turuncu → koyu kırmızı kenar)
-- Animasyonlu "nabız" efekti ile canlı his
-- "THE FORGE" ve "GİRMEYE" için özel premium sınıf
+### 5. Enhanced Evening Check-in
+- Add: day rating, priority review, gratitude fields
+- Update existing `checkins` table with new columns
 
-```css
-.ember-glow-premium {
-  /* Daha fazla katman, daha yumuşak geçişler */
-  text-shadow: 
-    0 0 2px #fff,           /* Beyaz çekirdek */
-    0 0 8px #ffcc00,        /* Sarı iç katman */
-    0 0 20px #ff8800,       /* Turuncu orta */
-    0 0 40px #ff4400,       /* Kırmızı-turuncu */
-    0 0 60px #cc220088;     /* Koyu kırmızı dış */
-  animation: heat-pulse 3s ease-in-out infinite;
-}
-```
+### 6. Enhanced Admin Features
+- Admin broadcast messaging
+- Application review with email notifications
+- At-risk alerts (3+ days no check-in)
 
-## 4. Geliştirilmiş Ember Particles (4K Hyper-Realistic)
+---
 
-**Güncellemeler:**
-- Partikül sayısı: 50 → 80 (daha yoğun atmosfer)
-- Boyut varyasyonu: Küçük kıvılcımdan büyük köze kadar
-- Fizik iyileştirmesi: Gerçekçi termal konveksiyon hareketi
-- Renk derinliği: Beyaz-sarı çekirdek, turuncu hale, kırmızı kenar
-- Opacity varyasyonu: Doğal titreşim efekti
-- Yaşam döngüsü: Doğuş → parlak yanma → sönme animasyonu
-- Duman izi: Her partikülün arkasında hafif iz
+## Implementation Phases
 
-**Teknik Detaylar:**
+### Phase 1: Database Schema Updates
+Create migration for new tables and columns:
+- `applications` table (name, email, phone, age, ratings JSON, commitment answers, status, created_at)
+- `life_area_entries` table (user_id, area type enum, metrics JSON, date)
+- `resources` table (title, description, url, type, phase_required, created_by)
+- `community_posts` table (user_id, content, phase_group, likes, created_at)
+- Add columns to `checkins`: `day_rating`, `priority_review`, `gratitude`
+- RLS policies for all new tables
+
+### Phase 2: Application Flow
+- Create `/apply` page with 3-step form wizard
+- Create "Application Under Review" confirmation page
+- Create `/admin/applications` review page
+- Update routing: remove `/register`, add `/apply`
+- Edge function for sending approval emails (optional, can be deferred)
+
+### Phase 3: Update Existing Pages
+- Update DashboardLayout sidebar with new links (Life Areas, Resources, Community)
+- Enhance student Dashboard with day counter
+- Enhance Check-in evening form with new fields
+- Update admin Dashboard with at-risk alerts (3+ days no check-in query)
+
+### Phase 4: New Student Pages
+- Build `/life-areas` with 7-tab interface and data entry forms
+- Build `/resources` with phase-locked content cards
+- Build `/community` with post feed and phase groups
+
+### Phase 5: Admin Enhancements
+- Add broadcast feature to `/admin/messages`
+- Enhance `/admin/students` with better at-risk detection
+
+### Phase 6: Re-seed Demo Data
+- Update seed edge function with new table data (applications, life area entries, resources, community posts)
+
+---
+
+## Technical Details
+
+### New Database Tables
+
 ```text
-┌─────────────────────────────────────┐
-│          Partikül Yapısı            │
-├─────────────────────────────────────┤
-│  ○ Beyaz çekirdek (en parlak)       │
-│  ◐ Sarı iç hale                     │
-│  ◑ Turuncu orta hale                │
-│  ○ Kırmızı dış glow (en geniş)      │
-│  ... Hafif duman izi                │
-└─────────────────────────────────────┘
+applications
++------------------+-------------------+
+| Column           | Type              |
++------------------+-------------------+
+| id               | uuid PK           |
+| full_name        | text              |
+| email            | text              |
+| phone            | text              |
+| age              | integer           |
+| situation_ratings| jsonb             |
+| commitment_answers| jsonb            |
+| status           | text (pending/    |
+|                  | approved/rejected)|
+| reviewed_by      | uuid nullable     |
+| reviewed_at      | timestamptz null  |
+| created_at       | timestamptz       |
++------------------+-------------------+
+
+life_area_entries
++------------------+-------------------+
+| Column           | Type              |
++------------------+-------------------+
+| id               | uuid PK           |
+| user_id          | uuid              |
+| area             | text (physical/   |
+|                  | mental/style/etc) |
+| metrics          | jsonb             |
+| entry_date       | date              |
+| created_at       | timestamptz       |
++------------------+-------------------+
+
+resources
++------------------+-------------------+
+| Column           | Type              |
++------------------+-------------------+
+| id               | uuid PK           |
+| title            | text              |
+| description      | text              |
+| content_url      | text              |
+| content_type     | text              |
+| phase_required   | integer           |
+| created_by       | uuid              |
+| created_at       | timestamptz       |
++------------------+-------------------+
+
+community_posts
++------------------+-------------------+
+| Column           | Type              |
++------------------+-------------------+
+| id               | uuid PK           |
+| user_id          | uuid              |
+| content          | text              |
+| phase_group      | integer           |
+| created_at       | timestamptz       |
++------------------+-------------------+
 ```
 
-## 5. Ambient Forge Sesi
+### New/Updated Files
+- `src/pages/Apply.tsx` (new - multi-step form)
+- `src/pages/ApplicationSubmitted.tsx` (new - confirmation)
+- `src/pages/student/LifeAreas.tsx` (new)
+- `src/pages/student/Resources.tsx` (new)
+- `src/pages/student/Community.tsx` (new)
+- `src/pages/admin/AdminApplications.tsx` (new)
+- Updated: `src/App.tsx` (new routes)
+- Updated: `src/components/dashboard/DashboardLayout.tsx` (new sidebar links)
+- Updated: `src/pages/student/CheckIn.tsx` (new evening fields)
+- Updated: `src/pages/student/Dashboard.tsx` (day counter)
+- Updated: `src/pages/admin/AdminDashboard.tsx` (at-risk alerts)
+- Updated: `src/pages/admin/AdminMessages.tsx` (broadcast)
+- Updated: `supabase/functions/seed-demo-data/index.ts` (new demo data)
 
-**Özellikler:**
-- Ateş çıtırtısı (continuous crackling)
-- Odun yanma sesi (subtle wood burn)
-- Aralıklı demir dövme sesi (occasional hammer strike)
-- Düşük volüm, immersive ama rahatsız etmeyen
-- Sonsuz loop, kesintisiz geçiş
+### Route Changes
+- Remove: `/register`
+- Add: `/apply`, `/application-submitted`, `/life-areas`, `/resources`, `/community`, `/admin/applications`
 
-**Teknik Uygulama:**
-- `AmbientSound` component oluşturulacak
-- Freesound.org veya benzeri kaynaktan royalty-free ses
-- Audio API ile loop ve volume kontrolü
-- Autoplay kısıtlaması için kullanıcı etkileşimi tetikleyici
-- Sağ alt köşede sessiz/sesli toggle butonu
-
-**Ses Akışı:**
-```text
-Sayfa Yüklenir → Ses Hazır (muted)
-      ↓
-Kullanıcı Scroll/Click → Ses Başlar (fade-in)
-      ↓
-Navigasyon Değişirse → Ses Fade-out
-```
-
-## 6. Dosya Değişiklikleri
-
-| Dosya | Değişiklik |
-|-------|------------|
-| `src/index.css` | Premium glow sınıfları, heat-pulse animasyonu |
-| `src/components/EmberParticles.tsx` | Gelişmiş partikül sistemi |
-| `src/components/HeroSection.tsx` | Premium glow, Türkçe scroll text |
-| `src/components/ProblemSection.tsx` | "UNTEMPERED STEEL" terminolojisi |
-| `src/components/PhilosophySection.tsx` | "THE ANVIL" terminolojisi |
-| `src/components/ProgramSection.tsx` | Türkçe açıklamalar |
-| `src/components/BrotherhoodSection.tsx` | Türkçe istatistik etiketleri |
-| `src/components/TestimonialsSection.tsx` | "REFORGED" terminolojisi |
-| `src/components/CTASection.tsx` | Premium glow, Türkçe metinler |
-| `src/components/AmbientSound.tsx` | **YENİ** - Ses component'i |
-| `src/pages/Index.tsx` | AmbientSound entegrasyonu |
-| `public/sounds/forge-ambient.mp3` | **YENİ** - Ambient ses dosyası |
-
-## 7. Sonuç
-
-Bu değişikliklerle site:
-- ✓ Daha prestijli ve saygı uyandıran terminoloji
-- ✓ Doğru dil kullanımı (terimler İngilizce, UI Türkçe)
-- ✓ Gerçekçi, sinematik ışıma efektleri
-- ✓ 4K kalitesinde partikül sistemi
-- ✓ Immersive forge atmosferi (ses ile)
-- ✓ Premium, milyon dolarlık şirket kalitesi
-
-**Aura seviyesi: MAKSIMUM** 🔥
