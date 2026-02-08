@@ -2,11 +2,40 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
+import ProtectedRoute from "./components/ProtectedRoute";
+import DashboardLayout from "./components/dashboard/DashboardLayout";
+
+// Student pages
+import StudentDashboard from "./pages/student/Dashboard";
+import CheckIn from "./pages/student/CheckIn";
+import Tasks from "./pages/student/Tasks";
+import ProgressPage from "./pages/student/ProgressPage";
+import Messages from "./pages/student/Messages";
+import Profile from "./pages/student/Profile";
+
+// Admin pages
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminStudents from "./pages/admin/AdminStudents";
+import AdminStudentDetail from "./pages/admin/AdminStudentDetail";
+import AdminTasks from "./pages/admin/AdminTasks";
+import AdminMessages from "./pages/admin/AdminMessages";
+import AdminPayments from "./pages/admin/AdminPayments";
 
 const queryClient = new QueryClient();
+
+const AuthRedirect = () => {
+  const { user, loading, role } = useAuth();
+  if (loading) return null;
+  if (!user) return <Navigate to="/login" replace />;
+  return <Navigate to={role === "admin" ? "/admin" : "/dashboard"} replace />;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -14,11 +43,37 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            {/* Public */}
+            <Route path="/" element={<Index />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+
+            {/* Student routes */}
+            <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
+              <Route path="/dashboard" element={<StudentDashboard />} />
+              <Route path="/check-in" element={<CheckIn />} />
+              <Route path="/tasks" element={<Tasks />} />
+              <Route path="/progress" element={<ProgressPage />} />
+              <Route path="/messages" element={<Messages />} />
+              <Route path="/profile" element={<Profile />} />
+            </Route>
+
+            {/* Admin routes */}
+            <Route element={<ProtectedRoute requiredRole="admin"><DashboardLayout /></ProtectedRoute>}>
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/students" element={<AdminStudents />} />
+              <Route path="/admin/students/:id" element={<AdminStudentDetail />} />
+              <Route path="/admin/tasks" element={<AdminTasks />} />
+              <Route path="/admin/messages" element={<AdminMessages />} />
+              <Route path="/admin/payments" element={<AdminPayments />} />
+            </Route>
+
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
