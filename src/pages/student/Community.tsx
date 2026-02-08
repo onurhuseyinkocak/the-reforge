@@ -44,7 +44,15 @@ const Community = () => {
 
   const fetchComments = async (postId: string) => {
     const { data } = await supabase.from("community_comments")
-      .select("*, profiles:user_id(full_name)").eq("post_id", postId).order("created_at", { ascending: true });
+      .select("*").eq("post_id", postId).order("created_at", { ascending: true }) as any;
+    // Fetch commenter names
+    if (data && data.length > 0) {
+      const userIds = [...new Set(data.map((c: any) => c.user_id))] as string[];
+      const { data: profiles } = await supabase.from("profiles").select("user_id, full_name").in("user_id", userIds);
+      const nameMap: Record<string, string> = {};
+      (profiles || []).forEach((p: any) => { nameMap[p.user_id] = p.full_name; });
+      data.forEach((c: any) => { c.profiles = { full_name: nameMap[c.user_id] || "Kullanıcı" }; });
+    }
     setComments(prev => ({ ...prev, [postId]: data || [] }));
   };
 
