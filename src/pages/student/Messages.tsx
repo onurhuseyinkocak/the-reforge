@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, Clock } from "lucide-react";
+import { Send, Clock, CheckCheck } from "lucide-react";
 import { toast } from "sonner";
 import { format, formatDistanceToNow } from "date-fns";
 import { tr } from "date-fns/locale";
@@ -16,7 +16,6 @@ const Messages = () => {
   const [sending, setSending] = useState(false);
   const [nextSession, setNextSession] = useState<any>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
-
   const mentorId = profile?.mentor_id;
 
   const fetchMessages = async () => {
@@ -26,6 +25,13 @@ const Messages = () => {
       .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
       .order("created_at", { ascending: true });
     setMessages(data || []);
+    // Mark unread messages as read
+    if (data) {
+      const unread = data.filter(m => m.receiver_id === user.id && !m.is_read);
+      if (unread.length > 0) {
+        await supabase.from("messages").update({ is_read: true }).in("id", unread.map(m => m.id));
+      }
+    }
   };
 
   useEffect(() => {
@@ -35,6 +41,17 @@ const Messages = () => {
         .gte("scheduled_at", new Date().toISOString()).order("scheduled_at", { ascending: true }).limit(1)
         .then(({ data }) => setNextSession(data?.[0]));
     }
+
+    // Realtime messages
+    const channel = supabase.channel("messages_realtime")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, (payload) => {
+        const msg = payload.new as any;
+        if (msg.sender_id === user?.id || msg.receiver_id === user?.id) {
+          fetchMessages();
+        }
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
   }, [user]);
 
   useEffect(() => {
@@ -50,7 +67,7 @@ const Messages = () => {
     });
     setSending(false);
     if (error) toast.error("Mesaj gönderilemedi");
-    else { setNewMessage(""); fetchMessages(); }
+    else { setNewMessage(""); }
   };
 
   return (
@@ -75,9 +92,14 @@ const Messages = () => {
               <div key={msg.id} className={`flex ${isMine ? "justify-end" : "justify-start"}`}>
                 <div className={`max-w-[75%] rounded-xl px-4 py-2.5 ${isMine ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground"}`}>
                   <p className="text-sm">{msg.content}</p>
-                  <p className={`text-xs mt-1 ${isMine ? "text-primary-foreground/60" : "text-muted-foreground"}`}>
-                    {format(new Date(msg.created_at), "HH:mm")}
-                  </p>
+                  <div className={`flex items-center gap-1 mt-1 ${isMine ? "justify-end" : ""}`}>
+                    <p className={`text-xs ${isMine ? "text-primary-foreground/60" : "text-muted-foreground"}`}>
+                      {format(new Date(msg.created_at), "HH:mm")}
+                    </p>
+                    {isMine && (
+                      <CheckCheck className={`w-3 h-3 ${msg.is_read ? "text-primary-foreground" : "text-primary-foreground/40"}`} />
+                    )}
+                  </div>
                 </div>
               </div>
             );
