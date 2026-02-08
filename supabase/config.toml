@@ -1,1 +1,4 @@
 project_id = "tkxpgedcvrtjjzzklsvc"
+
+[functions.promote-admin]
+verify_jwt = false
