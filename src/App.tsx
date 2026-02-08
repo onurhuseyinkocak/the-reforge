@@ -7,7 +7,8 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
-import Register from "./pages/Register";
+import Apply from "./pages/Apply";
+import ApplicationSubmitted from "./pages/ApplicationSubmitted";
 import ForgotPassword from "./pages/ForgotPassword";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./components/dashboard/DashboardLayout";
@@ -19,6 +20,9 @@ import Tasks from "./pages/student/Tasks";
 import ProgressPage from "./pages/student/ProgressPage";
 import Messages from "./pages/student/Messages";
 import Profile from "./pages/student/Profile";
+import LifeAreas from "./pages/student/LifeAreas";
+import Resources from "./pages/student/Resources";
+import Community from "./pages/student/Community";
 
 // Admin pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -27,6 +31,7 @@ import AdminStudentDetail from "./pages/admin/AdminStudentDetail";
 import AdminTasks from "./pages/admin/AdminTasks";
 import AdminMessages from "./pages/admin/AdminMessages";
 import AdminPayments from "./pages/admin/AdminPayments";
+import AdminApplications from "./pages/admin/AdminApplications";
 
 const queryClient = new QueryClient();
 
@@ -48,7 +53,8 @@ const App = () => (
             {/* Public */}
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+            <Route path="/apply" element={<Apply />} />
+            <Route path="/application-submitted" element={<ApplicationSubmitted />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
 
             {/* Student routes */}
@@ -59,6 +65,9 @@ const App = () => (
               <Route path="/progress" element={<ProgressPage />} />
               <Route path="/messages" element={<Messages />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/life-areas" element={<LifeAreas />} />
+              <Route path="/resources" element={<Resources />} />
+              <Route path="/community" element={<Community />} />
             </Route>
 
             {/* Admin routes */}
@@ -69,6 +78,7 @@ const App = () => (
               <Route path="/admin/tasks" element={<AdminTasks />} />
               <Route path="/admin/messages" element={<AdminMessages />} />
               <Route path="/admin/payments" element={<AdminPayments />} />
+              <Route path="/admin/applications" element={<AdminApplications />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />

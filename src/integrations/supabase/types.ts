@@ -38,15 +38,60 @@ export type Database = {
         }
         Relationships: []
       }
+      applications: {
+        Row: {
+          age: number | null
+          commitment_answers: Json | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          phone: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          situation_ratings: Json | null
+          status: string
+        }
+        Insert: {
+          age?: number | null
+          commitment_answers?: Json | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          phone?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          situation_ratings?: Json | null
+          status?: string
+        }
+        Update: {
+          age?: number | null
+          commitment_answers?: Json | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          phone?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          situation_ratings?: Json | null
+          status?: string
+        }
+        Relationships: []
+      }
       checkins: {
         Row: {
           checkin_date: string
           checkin_type: string
           created_at: string
+          day_rating: number | null
           energy_rating: number | null
+          gratitude: string | null
           id: string
           nutrition_rating: number | null
           priorities: string[] | null
+          priority_review: string | null
           reflection: string | null
           routine_done: boolean | null
           sleep_rating: number | null
@@ -58,10 +103,13 @@ export type Database = {
           checkin_date?: string
           checkin_type: string
           created_at?: string
+          day_rating?: number | null
           energy_rating?: number | null
+          gratitude?: string | null
           id?: string
           nutrition_rating?: number | null
           priorities?: string[] | null
+          priority_review?: string | null
           reflection?: string | null
           routine_done?: boolean | null
           sleep_rating?: number | null
@@ -73,16 +121,70 @@ export type Database = {
           checkin_date?: string
           checkin_type?: string
           created_at?: string
+          day_rating?: number | null
           energy_rating?: number | null
+          gratitude?: string | null
           id?: string
           nutrition_rating?: number | null
           priorities?: string[] | null
+          priority_review?: string | null
           reflection?: string | null
           routine_done?: boolean | null
           sleep_rating?: number | null
           user_id?: string
           wake_time?: string | null
           workout_done?: boolean | null
+        }
+        Relationships: []
+      }
+      community_posts: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          phase_group: number
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          phase_group?: number
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          phase_group?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      life_area_entries: {
+        Row: {
+          area: string
+          created_at: string
+          entry_date: string
+          id: string
+          metrics: Json | null
+          user_id: string
+        }
+        Insert: {
+          area: string
+          created_at?: string
+          entry_date?: string
+          id?: string
+          metrics?: Json | null
+          user_id: string
+        }
+        Update: {
+          area?: string
+          created_at?: string
+          entry_date?: string
+          id?: string
+          metrics?: Json | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -230,6 +332,39 @@ export type Database = {
           streak?: number
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      resources: {
+        Row: {
+          content_type: string
+          content_url: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          phase_required: number
+          title: string
+        }
+        Insert: {
+          content_type?: string
+          content_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          phase_required?: number
+          title: string
+        }
+        Update: {
+          content_type?: string
+          content_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          phase_required?: number
+          title?: string
         }
         Relationships: []
       }
