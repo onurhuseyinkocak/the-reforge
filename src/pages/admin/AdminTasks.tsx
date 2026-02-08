@@ -34,9 +34,7 @@ const AdminTasks = () => {
   const createTask = async () => {
     if (!title.trim()) { toast.error("Başlık gerekli"); return; }
     setCreating(true);
-    const { error } = await supabase.from("tasks").insert({
-      title: title.trim(), description: description.trim(), phase, week, created_by: user?.id,
-    });
+    const { error } = await supabase.from("tasks").insert({ title: title.trim(), description: description.trim(), phase, week, created_by: user?.id });
     setCreating(false);
     if (error) toast.error("Hata");
     else { toast.success("Görev oluşturuldu!"); setTitle(""); setDescription(""); fetchData(); }
@@ -44,8 +42,7 @@ const AdminTasks = () => {
 
   const reviewSubmission = async (id: string, approve: boolean, notes?: string) => {
     const { error } = await supabase.from("student_tasks").update({
-      status: approve ? "approved" : "rejected",
-      reviewed_at: new Date().toISOString(),
+      status: approve ? "approved" : "rejected", reviewed_at: new Date().toISOString(),
       reviewer_notes: notes || (approve ? "Onaylandı ✓" : "Tekrar gönder"),
     }).eq("id", id);
     if (error) toast.error("Hata");
@@ -55,35 +52,35 @@ const AdminTasks = () => {
   return (
     <div className="space-y-6">
       <Tabs defaultValue="create">
-        <TabsList className="bg-[#0D1B2A] border border-white/10">
-          <TabsTrigger value="create" className="data-[state=active]:bg-[#00A3FF]/20 data-[state=active]:text-[#00A3FF]">Görev Oluştur</TabsTrigger>
-          <TabsTrigger value="queue" className="data-[state=active]:bg-[#00A3FF]/20 data-[state=active]:text-[#00A3FF]">
+        <TabsList className="bg-card border border-border/30">
+          <TabsTrigger value="create" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">Görev Oluştur</TabsTrigger>
+          <TabsTrigger value="queue" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
             Onay Bekleyen ({pendingSubmissions.length})
           </TabsTrigger>
-          <TabsTrigger value="all" className="data-[state=active]:bg-[#00A3FF]/20 data-[state=active]:text-[#00A3FF]">Tüm Görevler</TabsTrigger>
+          <TabsTrigger value="all" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">Tüm Görevler</TabsTrigger>
         </TabsList>
 
         <TabsContent value="create">
-          <Card className="bg-[#0D1B2A] border-white/10 p-6 space-y-4">
+          <Card className="bg-card border-border/30 p-6 space-y-4">
             <div>
-              <Label className="text-[#F0F4F8]/80">Görev Başlığı</Label>
-              <Input value={title} onChange={e => setTitle(e.target.value)} className="bg-[#0A1628] border-white/10 text-white mt-1" />
+              <Label className="text-foreground/80">Görev Başlığı</Label>
+              <Input value={title} onChange={e => setTitle(e.target.value)} className="bg-background border-border/30 text-foreground mt-1" />
             </div>
             <div>
-              <Label className="text-[#F0F4F8]/80">Açıklama</Label>
-              <Textarea value={description} onChange={e => setDescription(e.target.value)} className="bg-[#0A1628] border-white/10 text-white mt-1" rows={3} />
+              <Label className="text-foreground/80">Açıklama</Label>
+              <Textarea value={description} onChange={e => setDescription(e.target.value)} className="bg-background border-border/30 text-foreground mt-1" rows={3} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-[#F0F4F8]/80">Faz</Label>
-                <Input type="number" min={1} max={3} value={phase} onChange={e => setPhase(Number(e.target.value))} className="bg-[#0A1628] border-white/10 text-white mt-1" />
+                <Label className="text-foreground/80">Faz</Label>
+                <Input type="number" min={1} max={3} value={phase} onChange={e => setPhase(Number(e.target.value))} className="bg-background border-border/30 text-foreground mt-1" />
               </div>
               <div>
-                <Label className="text-[#F0F4F8]/80">Hafta</Label>
-                <Input type="number" min={1} max={24} value={week} onChange={e => setWeek(Number(e.target.value))} className="bg-[#0A1628] border-white/10 text-white mt-1" />
+                <Label className="text-foreground/80">Hafta</Label>
+                <Input type="number" min={1} max={24} value={week} onChange={e => setWeek(Number(e.target.value))} className="bg-background border-border/30 text-foreground mt-1" />
               </div>
             </div>
-            <Button onClick={createTask} disabled={creating} className="bg-[#00A3FF] hover:bg-[#00A3FF]/90 text-white">
+            <Button onClick={createTask} disabled={creating} className="bg-primary hover:bg-primary/90 text-primary-foreground">
               <Plus className="w-4 h-4 mr-2" /> {creating ? "Oluşturuluyor..." : "Görev Oluştur"}
             </Button>
           </Card>
@@ -91,15 +88,15 @@ const AdminTasks = () => {
 
         <TabsContent value="queue">
           {pendingSubmissions.length === 0 ? (
-            <Card className="bg-[#0D1B2A] border-white/10 p-8 text-center"><p className="text-[#F0F4F8]/40">Onay bekleyen görev yok</p></Card>
+            <Card className="bg-card border-border/30 p-8 text-center"><p className="text-muted-foreground">Onay bekleyen görev yok</p></Card>
           ) : (
             <div className="space-y-3">
               {pendingSubmissions.map(s => (
-                <Card key={s.id} className="bg-[#0D1B2A] border-white/10 p-4">
+                <Card key={s.id} className="bg-card border-border/30 p-4">
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <p className="text-white font-medium">{s.tasks?.title}</p>
-                      <p className="text-sm text-[#F0F4F8]/50">{(s as any).profiles?.full_name || "Öğrenci"}</p>
+                      <p className="text-foreground font-medium">{s.tasks?.title}</p>
+                      <p className="text-sm text-muted-foreground">{(s as any).profiles?.full_name || "Öğrenci"}</p>
                     </div>
                     <div className="flex gap-2">
                       <Button size="sm" onClick={() => reviewSubmission(s.id, true)} className="bg-green-600 hover:bg-green-700 text-white">
@@ -119,10 +116,10 @@ const AdminTasks = () => {
         <TabsContent value="all">
           <div className="space-y-2">
             {tasks.map(t => (
-              <Card key={t.id} className="bg-[#0D1B2A] border-white/10 p-4 flex items-center justify-between">
+              <Card key={t.id} className="bg-card border-border/30 p-4 flex items-center justify-between">
                 <div>
-                  <p className="text-white">{t.title}</p>
-                  <p className="text-xs text-[#F0F4F8]/40">Faz {t.phase} · Hafta {t.week}</p>
+                  <p className="text-foreground">{t.title}</p>
+                  <p className="text-xs text-muted-foreground">Faz {t.phase} · Hafta {t.week}</p>
                 </div>
               </Card>
             ))}

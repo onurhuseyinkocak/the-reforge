@@ -40,7 +40,7 @@ const DashboardLayout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A1628] flex">
+    <div className="min-h-screen bg-background flex">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black/60 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
@@ -48,17 +48,17 @@ const DashboardLayout = () => {
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed lg:static inset-y-0 left-0 z-50 w-64 bg-[#0D1B2A] border-r border-white/10 flex flex-col transition-transform duration-300",
+        "fixed lg:static inset-y-0 left-0 z-50 w-64 bg-card border-r border-border/30 flex flex-col transition-transform duration-300",
         sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
         {/* Logo */}
-        <div className="p-6 border-b border-white/10">
+        <div className="p-6 border-b border-border/30">
           <Link to="/" className="flex items-center gap-2">
-            <Flame className="w-6 h-6 text-[#00A3FF]" />
-            <span className="font-display text-xl text-white tracking-wider">THE FORGE</span>
+            <Flame className="w-6 h-6 text-primary" />
+            <span className="font-display text-xl text-foreground tracking-wider">THE FORGE</span>
           </Link>
           {role === "admin" && (
-            <span className="mt-2 inline-flex items-center gap-1 text-xs text-[#00A3FF] bg-[#00A3FF]/10 px-2 py-1 rounded">
+            <span className="mt-2 inline-flex items-center gap-1 text-xs text-primary bg-primary/10 px-2 py-1 rounded">
               <Shield className="w-3 h-3" /> Admin
             </span>
           )}
@@ -77,8 +77,8 @@ const DashboardLayout = () => {
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                   isActive
-                    ? "bg-[#00A3FF]/15 text-[#00A3FF]"
-                    : "text-[#F0F4F8]/60 hover:text-[#F0F4F8] hover:bg-white/5"
+                    ? "bg-primary/15 text-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary"
                 )}
               >
                 <link.icon className="w-4 h-4" />
@@ -89,20 +89,20 @@ const DashboardLayout = () => {
         </nav>
 
         {/* User info */}
-        <div className="p-4 border-t border-white/10">
+        <div className="p-4 border-t border-border/30">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 rounded-full bg-[#00A3FF]/20 flex items-center justify-center text-[#00A3FF] text-sm font-bold">
+            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary text-sm font-bold">
               {profile?.full_name?.charAt(0)?.toUpperCase() || "U"}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-white truncate">{profile?.full_name || "Kullanıcı"}</p>
-              <p className="text-xs text-[#F0F4F8]/40 truncate">{user?.email}</p>
+              <p className="text-sm text-foreground truncate">{profile?.full_name || "Kullanıcı"}</p>
+              <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
             </div>
           </div>
           <Button
             variant="ghost"
             size="sm"
-            className="w-full justify-start text-[#F0F4F8]/60 hover:text-red-400 hover:bg-red-400/10"
+            className="w-full justify-start text-muted-foreground hover:text-red-400 hover:bg-red-400/10"
             onClick={handleSignOut}
           >
             <LogOut className="w-4 h-4 mr-2" /> Çıkış Yap
@@ -113,11 +113,11 @@ const DashboardLayout = () => {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
-        <header className="h-14 bg-[#0D1B2A]/80 backdrop-blur border-b border-white/10 flex items-center px-4 lg:px-6 sticky top-0 z-30">
-          <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-white mr-4">
+        <header className="h-14 bg-card/80 backdrop-blur border-b border-border/30 flex items-center px-4 lg:px-6 sticky top-0 z-30">
+          <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-foreground mr-4">
             <Menu className="w-5 h-5" />
           </button>
-          <h1 className="font-display text-lg text-white tracking-wide">
+          <h1 className="font-display text-lg text-foreground tracking-wide">
             {links.find(l => location.pathname === l.to || (l.to !== "/dashboard" && l.to !== "/admin" && location.pathname.startsWith(l.to)))?.label || "Dashboard"}
           </h1>
         </header>

@@ -46,43 +46,43 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A1628] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-4">
-            <Flame className="w-8 h-8 text-[#00A3FF]" />
-            <span className="font-display text-3xl text-white tracking-wider">THE FORGE</span>
+            <Flame className="w-8 h-8 text-primary" />
+            <span className="font-display text-3xl text-foreground tracking-wider">THE FORGE</span>
           </Link>
-          <p className="text-[#F0F4F8]/60">Yeni hesap oluştur</p>
+          <p className="text-muted-foreground">Yeni hesap oluştur</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-[#0D1B2A] border border-white/10 rounded-xl p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="bg-card border border-border/30 rounded-xl p-6 space-y-4">
           <div>
-            <Label className="text-[#F0F4F8]/80">Ad Soyad</Label>
-            <Input value={fullName} onChange={(e) => setFullName(e.target.value)} className="bg-[#0A1628] border-white/10 text-white mt-1" placeholder="Ahmet Yılmaz" />
+            <Label className="text-foreground/80">Ad Soyad</Label>
+            <Input value={fullName} onChange={(e) => setFullName(e.target.value)} className="bg-background border-border/30 text-foreground mt-1" placeholder="Ahmet Yılmaz" />
           </div>
           <div>
-            <Label className="text-[#F0F4F8]/80">Email</Label>
-            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-[#0A1628] border-white/10 text-white mt-1" placeholder="ornek@email.com" />
+            <Label className="text-foreground/80">Email</Label>
+            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-background border-border/30 text-foreground mt-1" placeholder="ornek@email.com" />
           </div>
           <div>
-            <Label className="text-[#F0F4F8]/80">Şifre</Label>
+            <Label className="text-foreground/80">Şifre</Label>
             <div className="relative mt-1">
-              <Input type={showPw ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} className="bg-[#0A1628] border-white/10 text-white pr-10" placeholder="••••••••" />
-              <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#F0F4F8]/40">
+              <Input type={showPw ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} className="bg-background border-border/30 text-foreground pr-10" placeholder="••••••••" />
+              <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                 {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
           </div>
 
-          <Button type="submit" disabled={loading} className="w-full bg-[#00A3FF] hover:bg-[#00A3FF]/90 text-white font-medium">
+          <Button type="submit" disabled={loading} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium">
             {loading ? "Kayıt yapılıyor..." : "Kayıt Ol"}
           </Button>
         </form>
 
-        <p className="text-center mt-4 text-sm text-[#F0F4F8]/50">
+        <p className="text-center mt-4 text-sm text-muted-foreground">
           Zaten hesabın var mı?{" "}
-          <Link to="/login" className="text-[#00A3FF] hover:underline">Giriş yap</Link>
+          <Link to="/login" className="text-primary hover:underline">Giriş yap</Link>
         </p>
       </div>
     </div>

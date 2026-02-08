@@ -44,97 +44,97 @@ const Dashboard = () => {
     <div className="space-y-6">
       {/* Welcome */}
       <div>
-        <h2 className="font-display text-2xl text-white tracking-wide">
-          Hoş geldin, <span className="text-[#00A3FF]">{profile?.full_name || "Savaşçı"}</span>
+        <h2 className="font-display text-2xl text-foreground tracking-wide">
+          Hoş geldin, <span className="text-primary">{profile?.full_name || "Savaşçı"}</span>
         </h2>
-        <p className="text-[#F0F4F8]/50 text-sm mt-1">
+        <p className="text-muted-foreground text-sm mt-1">
           {format(new Date(), "d MMMM yyyy, EEEE", { locale: tr })}
         </p>
       </div>
 
       {/* Stats Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-[#0D1B2A] border-white/10 p-4">
+        <Card className="bg-card border-border/30 p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center">
-              <Flame className="w-5 h-5 text-orange-400" />
+            <div className="w-10 h-10 rounded-lg bg-ember/20 flex items-center justify-center">
+              <Flame className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-white">{profile?.streak || 0}</p>
-              <p className="text-xs text-[#F0F4F8]/50">Gün Serisi 🔥</p>
+              <p className="text-2xl font-bold text-foreground">{profile?.streak || 0}</p>
+              <p className="text-xs text-muted-foreground">Gün Serisi 🔥</p>
             </div>
           </div>
         </Card>
 
-        <Card className="bg-[#0D1B2A] border-white/10 p-4">
+        <Card className="bg-card border-border/30 p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-[#00A3FF]/20 flex items-center justify-center">
-              <Target className="w-5 h-5 text-[#00A3FF]" />
+            <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+              <Target className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-white">Faz {currentPhase}</p>
-              <p className="text-xs text-[#F0F4F8]/50">{phaseNames[currentPhase - 1]}</p>
+              <p className="text-2xl font-bold text-foreground">Faz {currentPhase}</p>
+              <p className="text-xs text-muted-foreground">{phaseNames[currentPhase - 1]}</p>
             </div>
           </div>
         </Card>
 
-        <Card className="bg-[#0D1B2A] border-white/10 p-4">
+        <Card className="bg-card border-border/30 p-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
               <CheckCircle2 className="w-5 h-5 text-green-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-white">Hafta {currentWeek}</p>
-              <p className="text-xs text-[#F0F4F8]/50">/ {totalWeeks} hafta</p>
+              <p className="text-2xl font-bold text-foreground">Hafta {currentWeek}</p>
+              <p className="text-xs text-muted-foreground">/ {totalWeeks} hafta</p>
             </div>
           </div>
         </Card>
 
-        <Card className="bg-[#0D1B2A] border-white/10 p-4">
+        <Card className="bg-card border-border/30 p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
-              <Clock className="w-5 h-5 text-purple-400" />
+            <div className="w-10 h-10 rounded-lg bg-ember-glow/20 flex items-center justify-center">
+              <Clock className="w-5 h-5 text-ember-glow" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-white">{pendingTasks.length}</p>
-              <p className="text-xs text-[#F0F4F8]/50">Bekleyen Görev</p>
+              <p className="text-2xl font-bold text-foreground">{pendingTasks.length}</p>
+              <p className="text-xs text-muted-foreground">Bekleyen Görev</p>
             </div>
           </div>
         </Card>
       </div>
 
       {/* Progress Bar */}
-      <Card className="bg-[#0D1B2A] border-white/10 p-5">
+      <Card className="bg-card border-border/30 p-5">
         <div className="flex justify-between items-center mb-2">
-          <p className="text-sm text-[#F0F4F8]/70">Genel İlerleme</p>
-          <p className="text-sm text-[#00A3FF] font-medium">{progressPercent}%</p>
+          <p className="text-sm text-foreground/70">Genel İlerleme</p>
+          <p className="text-sm text-primary font-medium">{progressPercent}%</p>
         </div>
-        <Progress value={progressPercent} className="h-2 bg-white/10" />
-        <div className="flex justify-between mt-2 text-xs text-[#F0F4F8]/40">
+        <Progress value={progressPercent} className="h-2 bg-secondary" />
+        <div className="flex justify-between mt-2 text-xs text-muted-foreground">
           <span>Faz 1</span><span>Faz 2</span><span>Faz 3</span>
         </div>
       </Card>
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Today's Check-in */}
-        <Card className="bg-[#0D1B2A] border-white/10 p-5">
-          <h3 className="font-display text-lg text-white mb-4">Bugünün Check-in Durumu</h3>
+        <Card className="bg-card border-border/30 p-5">
+          <h3 className="font-display text-lg text-foreground mb-4">Bugünün Check-in Durumu</h3>
           <div className="space-y-3">
-            <Link to="/check-in" className="flex items-center justify-between p-3 rounded-lg bg-white/5 hover:bg-white/10 transition">
+            <Link to="/check-in" className="flex items-center justify-between p-3 rounded-lg bg-secondary hover:bg-secondary/80 transition">
               <div className="flex items-center gap-3">
-                <CheckCircle2 className={`w-5 h-5 ${hasMorning ? "text-green-400" : "text-[#F0F4F8]/30"}`} />
-                <span className="text-sm text-white">Sabah Check-in</span>
+                <CheckCircle2 className={`w-5 h-5 ${hasMorning ? "text-green-400" : "text-muted-foreground"}`} />
+                <span className="text-sm text-foreground">Sabah Check-in</span>
               </div>
-              <span className={`text-xs px-2 py-1 rounded ${hasMorning ? "bg-green-500/20 text-green-400" : "bg-white/10 text-[#F0F4F8]/50"}`}>
+              <span className={`text-xs px-2 py-1 rounded ${hasMorning ? "bg-green-500/20 text-green-400" : "bg-secondary text-muted-foreground"}`}>
                 {hasMorning ? "Tamamlandı" : "Bekliyor"}
               </span>
             </Link>
-            <Link to="/check-in" className="flex items-center justify-between p-3 rounded-lg bg-white/5 hover:bg-white/10 transition">
+            <Link to="/check-in" className="flex items-center justify-between p-3 rounded-lg bg-secondary hover:bg-secondary/80 transition">
               <div className="flex items-center gap-3">
-                <CheckCircle2 className={`w-5 h-5 ${hasEvening ? "text-green-400" : "text-[#F0F4F8]/30"}`} />
-                <span className="text-sm text-white">Akşam Check-in</span>
+                <CheckCircle2 className={`w-5 h-5 ${hasEvening ? "text-green-400" : "text-muted-foreground"}`} />
+                <span className="text-sm text-foreground">Akşam Check-in</span>
               </div>
-              <span className={`text-xs px-2 py-1 rounded ${hasEvening ? "bg-green-500/20 text-green-400" : "bg-white/10 text-[#F0F4F8]/50"}`}>
+              <span className={`text-xs px-2 py-1 rounded ${hasEvening ? "bg-green-500/20 text-green-400" : "bg-secondary text-muted-foreground"}`}>
                 {hasEvening ? "Tamamlandı" : "Bekliyor"}
               </span>
             </Link>
@@ -142,20 +142,20 @@ const Dashboard = () => {
         </Card>
 
         {/* Upcoming Tasks */}
-        <Card className="bg-[#0D1B2A] border-white/10 p-5">
+        <Card className="bg-card border-border/30 p-5">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="font-display text-lg text-white">Yaklaşan Görevler</h3>
-            <Link to="/tasks" className="text-xs text-[#00A3FF] hover:underline">Tümünü Gör</Link>
+            <h3 className="font-display text-lg text-foreground">Yaklaşan Görevler</h3>
+            <Link to="/tasks" className="text-xs text-primary hover:underline">Tümünü Gör</Link>
           </div>
           {pendingTasks.length === 0 ? (
-            <p className="text-sm text-[#F0F4F8]/40">Bekleyen görev yok 🎉</p>
+            <p className="text-sm text-muted-foreground">Bekleyen görev yok 🎉</p>
           ) : (
             <div className="space-y-2">
               {pendingTasks.slice(0, 4).map((st) => (
-                <div key={st.id} className="flex items-center gap-3 p-3 rounded-lg bg-white/5">
-                  <div className="w-2 h-2 rounded-full bg-[#00A3FF]" />
-                  <span className="text-sm text-white flex-1 truncate">{st.tasks?.title || "Görev"}</span>
-                  <span className="text-xs text-[#F0F4F8]/40">{st.status === "pending" ? "Bekliyor" : "Devam Ediyor"}</span>
+                <div key={st.id} className="flex items-center gap-3 p-3 rounded-lg bg-secondary">
+                  <div className="w-2 h-2 rounded-full bg-primary" />
+                  <span className="text-sm text-foreground flex-1 truncate">{st.tasks?.title || "Görev"}</span>
+                  <span className="text-xs text-muted-foreground">{st.status === "pending" ? "Bekliyor" : "Devam Ediyor"}</span>
                 </div>
               ))}
             </div>
@@ -165,13 +165,13 @@ const Dashboard = () => {
 
       {/* Mentor Message Preview */}
       {latestMessage && (
-        <Card className="bg-[#0D1B2A] border-white/10 p-5">
+        <Card className="bg-card border-border/30 p-5">
           <div className="flex items-center gap-3 mb-3">
-            <MessageSquare className="w-5 h-5 text-[#00A3FF]" />
-            <h3 className="font-display text-lg text-white">Son Mentor Mesajı</h3>
+            <MessageSquare className="w-5 h-5 text-primary" />
+            <h3 className="font-display text-lg text-foreground">Son Mentor Mesajı</h3>
           </div>
-          <p className="text-sm text-[#F0F4F8]/70 line-clamp-2">{latestMessage.content}</p>
-          <Link to="/messages" className="text-xs text-[#00A3FF] hover:underline mt-2 inline-block">Mesajlara Git →</Link>
+          <p className="text-sm text-foreground/70 line-clamp-2">{latestMessage.content}</p>
+          <Link to="/messages" className="text-xs text-primary hover:underline mt-2 inline-block">Mesajlara Git →</Link>
         </Card>
       )}
     </div>

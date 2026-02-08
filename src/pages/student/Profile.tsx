@@ -16,7 +16,6 @@ const Profile = () => {
   const [bio, setBio] = useState(profile?.bio || "");
   const [goals, setGoals] = useState(profile?.goals || "");
   const [saving, setSaving] = useState(false);
-
   const [newPassword, setNewPassword] = useState("");
   const [changingPw, setChangingPw] = useState(false);
 
@@ -24,10 +23,7 @@ const Profile = () => {
     if (!user) return;
     setSaving(true);
     const { error } = await supabase.from("profiles").update({
-      full_name: fullName.trim(),
-      phone: phone.trim(),
-      bio: bio.trim(),
-      goals: goals.trim(),
+      full_name: fullName.trim(), phone: phone.trim(), bio: bio.trim(), goals: goals.trim(),
     }).eq("user_id", user.id);
     setSaving(false);
     if (error) toast.error("Hata: " + error.message);
@@ -45,52 +41,50 @@ const Profile = () => {
 
   return (
     <div className="max-w-2xl space-y-6">
-      {/* Avatar & Info */}
-      <Card className="bg-[#0D1B2A] border-white/10 p-6">
+      <Card className="bg-card border-border/30 p-6">
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-16 h-16 rounded-full bg-[#00A3FF]/20 flex items-center justify-center">
-            <User className="w-8 h-8 text-[#00A3FF]" />
+          <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
+            <User className="w-8 h-8 text-primary" />
           </div>
           <div>
-            <h2 className="font-display text-xl text-white">{profile?.full_name || "Kullanıcı"}</h2>
-            <p className="text-sm text-[#F0F4F8]/50">{user?.email}</p>
+            <h2 className="font-display text-xl text-foreground">{profile?.full_name || "Kullanıcı"}</h2>
+            <p className="text-sm text-muted-foreground">{user?.email}</p>
           </div>
         </div>
 
         <div className="space-y-4">
           <div>
-            <Label className="text-[#F0F4F8]/80">Ad Soyad</Label>
-            <Input value={fullName} onChange={e => setFullName(e.target.value)} className="bg-[#0A1628] border-white/10 text-white mt-1" />
+            <Label className="text-foreground/80">Ad Soyad</Label>
+            <Input value={fullName} onChange={e => setFullName(e.target.value)} className="bg-background border-border/30 text-foreground mt-1" />
           </div>
           <div>
-            <Label className="text-[#F0F4F8]/80">Telefon</Label>
-            <Input value={phone} onChange={e => setPhone(e.target.value)} className="bg-[#0A1628] border-white/10 text-white mt-1" placeholder="+90 555 123 4567" />
+            <Label className="text-foreground/80">Telefon</Label>
+            <Input value={phone} onChange={e => setPhone(e.target.value)} className="bg-background border-border/30 text-foreground mt-1" placeholder="+90 555 123 4567" />
           </div>
           <div>
-            <Label className="text-[#F0F4F8]/80">Hakkında</Label>
-            <Textarea value={bio} onChange={e => setBio(e.target.value)} className="bg-[#0A1628] border-white/10 text-white mt-1" rows={3} />
+            <Label className="text-foreground/80">Hakkında</Label>
+            <Textarea value={bio} onChange={e => setBio(e.target.value)} className="bg-background border-border/30 text-foreground mt-1" rows={3} />
           </div>
           <div>
-            <Label className="text-[#F0F4F8]/80">Hedefler</Label>
-            <Textarea value={goals} onChange={e => setGoals(e.target.value)} className="bg-[#0A1628] border-white/10 text-white mt-1" rows={3} placeholder="Programdan ne elde etmek istiyorsun?" />
+            <Label className="text-foreground/80">Hedefler</Label>
+            <Textarea value={goals} onChange={e => setGoals(e.target.value)} className="bg-background border-border/30 text-foreground mt-1" rows={3} placeholder="Programdan ne elde etmek istiyorsun?" />
           </div>
-          <Button onClick={handleSave} disabled={saving} className="bg-[#00A3FF] hover:bg-[#00A3FF]/90 text-white">
+          <Button onClick={handleSave} disabled={saving} className="bg-primary hover:bg-primary/90 text-primary-foreground">
             {saving ? "Kaydediliyor..." : "Profili Kaydet"}
           </Button>
         </div>
       </Card>
 
-      {/* Password Change */}
-      <Card className="bg-[#0D1B2A] border-white/10 p-6">
-        <h3 className="font-display text-lg text-white mb-4 flex items-center gap-2">
+      <Card className="bg-card border-border/30 p-6">
+        <h3 className="font-display text-lg text-foreground mb-4 flex items-center gap-2">
           <Lock className="w-5 h-5" /> Şifre Değiştir
         </h3>
         <div className="space-y-4">
           <div>
-            <Label className="text-[#F0F4F8]/80">Yeni Şifre</Label>
-            <Input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} className="bg-[#0A1628] border-white/10 text-white mt-1" placeholder="••••••••" />
+            <Label className="text-foreground/80">Yeni Şifre</Label>
+            <Input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} className="bg-background border-border/30 text-foreground mt-1" placeholder="••••••••" />
           </div>
-          <Button onClick={handlePasswordChange} disabled={changingPw} variant="outline" className="border-white/10 text-white hover:bg-white/10">
+          <Button onClick={handlePasswordChange} disabled={changingPw} variant="outline" className="border-border/30 text-foreground hover:bg-secondary">
             {changingPw ? "Değiştiriliyor..." : "Şifreyi Güncelle"}
           </Button>
         </div>

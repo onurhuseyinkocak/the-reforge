@@ -21,14 +21,12 @@ const CheckIn = () => {
   const [history, setHistory] = useState<any[]>([]);
   const [checkedDates, setCheckedDates] = useState<Date[]>([]);
 
-  // Morning form
   const [wakeTime, setWakeTime] = useState("06:00");
   const [sleepRating, setSleepRating] = useState(7);
   const [energyRating, setEnergyRating] = useState(7);
   const [routineDone, setRoutineDone] = useState(false);
   const [priorities, setPriorities] = useState(["", "", ""]);
 
-  // Evening form
   const [workoutDone, setWorkoutDone] = useState(false);
   const [nutritionRating, setNutritionRating] = useState(7);
   const [reflection, setReflection] = useState("");
@@ -46,14 +44,9 @@ const CheckIn = () => {
     if (!user) return;
     setLoading(true);
     const { error } = await supabase.from("checkins").upsert({
-      user_id: user.id,
-      checkin_date: format(new Date(), "yyyy-MM-dd"),
-      checkin_type: "morning",
-      wake_time: wakeTime,
-      sleep_rating: sleepRating,
-      energy_rating: energyRating,
-      routine_done: routineDone,
-      priorities: priorities.filter(p => p.trim()),
+      user_id: user.id, checkin_date: format(new Date(), "yyyy-MM-dd"), checkin_type: "morning",
+      wake_time: wakeTime, sleep_rating: sleepRating, energy_rating: energyRating,
+      routine_done: routineDone, priorities: priorities.filter(p => p.trim()),
     }, { onConflict: "user_id,checkin_date,checkin_type" });
     setLoading(false);
     if (error) toast.error("Hata: " + error.message);
@@ -64,12 +57,8 @@ const CheckIn = () => {
     if (!user) return;
     setLoading(true);
     const { error } = await supabase.from("checkins").upsert({
-      user_id: user.id,
-      checkin_date: format(new Date(), "yyyy-MM-dd"),
-      checkin_type: "evening",
-      workout_done: workoutDone,
-      nutrition_rating: nutritionRating,
-      reflection,
+      user_id: user.id, checkin_date: format(new Date(), "yyyy-MM-dd"), checkin_type: "evening",
+      workout_done: workoutDone, nutrition_rating: nutritionRating, reflection,
     }, { onConflict: "user_id,checkin_date,checkin_type" });
     setLoading(false);
     if (error) toast.error("Hata: " + error.message);
@@ -79,92 +68,92 @@ const CheckIn = () => {
   const RatingSlider = ({ value, onChange, label }: { value: number; onChange: (v: number) => void; label: string }) => (
     <div>
       <div className="flex justify-between mb-1">
-        <Label className="text-[#F0F4F8]/80">{label}</Label>
-        <span className="text-[#00A3FF] font-bold">{value}/10</span>
+        <Label className="text-foreground/80">{label}</Label>
+        <span className="text-primary font-bold">{value}/10</span>
       </div>
       <input type="range" min={1} max={10} value={value} onChange={e => onChange(Number(e.target.value))}
-        className="w-full h-2 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#00A3FF]" />
+        className="w-full h-2 bg-secondary rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary" />
     </div>
   );
 
   return (
     <div className="space-y-6">
       <Tabs value={tab} onValueChange={setTab}>
-        <TabsList className="bg-[#0D1B2A] border border-white/10">
-          <TabsTrigger value="morning" className="data-[state=active]:bg-[#00A3FF]/20 data-[state=active]:text-[#00A3FF]">
+        <TabsList className="bg-card border border-border/30">
+          <TabsTrigger value="morning" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
             <Sun className="w-4 h-4 mr-2" /> Sabah
           </TabsTrigger>
-          <TabsTrigger value="evening" className="data-[state=active]:bg-[#00A3FF]/20 data-[state=active]:text-[#00A3FF]">
+          <TabsTrigger value="evening" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
             <Moon className="w-4 h-4 mr-2" /> Akşam
           </TabsTrigger>
-          <TabsTrigger value="history" className="data-[state=active]:bg-[#00A3FF]/20 data-[state=active]:text-[#00A3FF]">
+          <TabsTrigger value="history" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
             Geçmiş
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="morning">
-          <Card className="bg-[#0D1B2A] border-white/10 p-6 space-y-5">
-            <h3 className="font-display text-xl text-white">☀️ Sabah Check-in</h3>
+          <Card className="bg-card border-border/30 p-6 space-y-5">
+            <h3 className="font-display text-xl text-foreground">☀️ Sabah Check-in</h3>
             <div>
-              <Label className="text-[#F0F4F8]/80">Uyanma Saati</Label>
-              <Input type="time" value={wakeTime} onChange={e => setWakeTime(e.target.value)} className="bg-[#0A1628] border-white/10 text-white mt-1 w-40" />
+              <Label className="text-foreground/80">Uyanma Saati</Label>
+              <Input type="time" value={wakeTime} onChange={e => setWakeTime(e.target.value)} className="bg-background border-border/30 text-foreground mt-1 w-40" />
             </div>
             <RatingSlider value={sleepRating} onChange={setSleepRating} label="Uyku Kalitesi" />
             <RatingSlider value={energyRating} onChange={setEnergyRating} label="Enerji Seviyesi" />
             <div className="flex items-center justify-between">
-              <Label className="text-[#F0F4F8]/80">Sabah Rutini Tamamlandı mı?</Label>
+              <Label className="text-foreground/80">Sabah Rutini Tamamlandı mı?</Label>
               <Switch checked={routineDone} onCheckedChange={setRoutineDone} />
             </div>
             <div>
-              <Label className="text-[#F0F4F8]/80 mb-2 block">Bugünün 3 Önceliği</Label>
+              <Label className="text-foreground/80 mb-2 block">Bugünün 3 Önceliği</Label>
               {priorities.map((p, i) => (
                 <Input key={i} value={p} onChange={e => { const np = [...priorities]; np[i] = e.target.value; setPriorities(np); }}
-                  className="bg-[#0A1628] border-white/10 text-white mb-2" placeholder={`Öncelik ${i + 1}`} />
+                  className="bg-background border-border/30 text-foreground mb-2" placeholder={`Öncelik ${i + 1}`} />
               ))}
             </div>
-            <Button onClick={handleMorningSubmit} disabled={loading} className="w-full bg-[#00A3FF] hover:bg-[#00A3FF]/90 text-white">
+            <Button onClick={handleMorningSubmit} disabled={loading} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
               {loading ? "Kaydediliyor..." : "Sabah Check-in Kaydet"}
             </Button>
           </Card>
         </TabsContent>
 
         <TabsContent value="evening">
-          <Card className="bg-[#0D1B2A] border-white/10 p-6 space-y-5">
-            <h3 className="font-display text-xl text-white">🌙 Akşam Check-in</h3>
+          <Card className="bg-card border-border/30 p-6 space-y-5">
+            <h3 className="font-display text-xl text-foreground">🌙 Akşam Check-in</h3>
             <div className="flex items-center justify-between">
-              <Label className="text-[#F0F4F8]/80">Antrenman Yapıldı mı?</Label>
+              <Label className="text-foreground/80">Antrenman Yapıldı mı?</Label>
               <Switch checked={workoutDone} onCheckedChange={setWorkoutDone} />
             </div>
             <RatingSlider value={nutritionRating} onChange={setNutritionRating} label="Beslenme Kalitesi" />
             <div>
-              <Label className="text-[#F0F4F8]/80">Günün Değerlendirmesi</Label>
+              <Label className="text-foreground/80">Günün Değerlendirmesi</Label>
               <Textarea value={reflection} onChange={e => setReflection(e.target.value)}
-                className="bg-[#0A1628] border-white/10 text-white mt-1" rows={4} placeholder="Bugün neler öğrendin? Neler geliştirebilirsin?" />
+                className="bg-background border-border/30 text-foreground mt-1" rows={4} placeholder="Bugün neler öğrendin? Neler geliştirebilirsin?" />
             </div>
-            <Button onClick={handleEveningSubmit} disabled={loading} className="w-full bg-[#00A3FF] hover:bg-[#00A3FF]/90 text-white">
+            <Button onClick={handleEveningSubmit} disabled={loading} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
               {loading ? "Kaydediliyor..." : "Akşam Check-in Kaydet"}
             </Button>
           </Card>
         </TabsContent>
 
         <TabsContent value="history">
-          <Card className="bg-[#0D1B2A] border-white/10 p-6">
-            <h3 className="font-display text-xl text-white mb-4">Check-in Geçmişi</h3>
+          <Card className="bg-card border-border/30 p-6">
+            <h3 className="font-display text-xl text-foreground mb-4">Check-in Geçmişi</h3>
             <div className="flex justify-center">
               <Calendar
                 mode="multiple"
                 selected={checkedDates}
-                className="text-white"
-                modifiersStyles={{ selected: { backgroundColor: "#00A3FF", color: "white" } }}
+                className="text-foreground"
+                modifiersStyles={{ selected: { backgroundColor: "hsl(var(--primary))", color: "hsl(var(--primary-foreground))" } }}
               />
             </div>
             <div className="mt-4 space-y-2 max-h-60 overflow-y-auto">
               {history.slice(0, 14).map(c => (
-                <div key={c.id} className="flex items-center gap-3 p-2 rounded bg-white/5 text-sm">
+                <div key={c.id} className="flex items-center gap-3 p-2 rounded bg-secondary text-sm">
                   <CheckCircle2 className="w-4 h-4 text-green-400" />
-                  <span className="text-white">{format(new Date(c.checkin_date), "d MMM", { locale: tr })}</span>
-                  <span className="text-[#00A3FF]">{c.checkin_type === "morning" ? "Sabah" : "Akşam"}</span>
-                  {c.energy_rating && <span className="text-[#F0F4F8]/40">Enerji: {c.energy_rating}/10</span>}
+                  <span className="text-foreground">{format(new Date(c.checkin_date), "d MMM", { locale: tr })}</span>
+                  <span className="text-primary">{c.checkin_type === "morning" ? "Sabah" : "Akşam"}</span>
+                  {c.energy_rating && <span className="text-muted-foreground">Enerji: {c.energy_rating}/10</span>}
                 </div>
               ))}
             </div>

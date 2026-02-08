@@ -8,16 +8,13 @@ import { Search, ChevronRight } from "lucide-react";
 
 const statusStyles: Record<string, string> = {
   active: "bg-green-500/20 text-green-400",
-  "at-risk": "bg-orange-500/20 text-orange-400",
+  "at-risk": "bg-ember/20 text-ember",
   inactive: "bg-red-500/20 text-red-400",
-  completed: "bg-[#00A3FF]/20 text-[#00A3FF]",
+  completed: "bg-primary/20 text-primary",
 };
 
 const statusLabels: Record<string, string> = {
-  active: "Aktif",
-  "at-risk": "Risk",
-  inactive: "Pasif",
-  completed: "Tamamladı",
+  active: "Aktif", "at-risk": "Risk", inactive: "Pasif", completed: "Tamamladı",
 };
 
 const AdminStudents = () => {
@@ -26,9 +23,7 @@ const AdminStudents = () => {
   const [filter, setFilter] = useState("all");
 
   useEffect(() => {
-    supabase.from("profiles").select("*").order("created_at", { ascending: false }).then(({ data }) => {
-      setStudents(data || []);
-    });
+    supabase.from("profiles").select("*").order("created_at", { ascending: false }).then(({ data }) => setStudents(data || []));
   }, []);
 
   const filtered = students.filter(s => {
@@ -39,48 +34,44 @@ const AdminStudents = () => {
 
   return (
     <div className="space-y-4">
-      {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#F0F4F8]/40" />
-          <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="İsim ara..." className="bg-[#0D1B2A] border-white/10 text-white pl-10" />
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="İsim ara..." className="bg-card border-border/30 text-foreground pl-10" />
         </div>
         <div className="flex gap-2">
           {["all", "active", "at-risk", "inactive"].map(f => (
             <button key={f} onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${filter === f ? "bg-[#00A3FF] text-white" : "bg-white/5 text-[#F0F4F8]/60 hover:bg-white/10"}`}>
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${filter === f ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground hover:bg-secondary/80"}`}>
               {f === "all" ? "Tümü" : statusLabels[f]}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Table */}
-      <Card className="bg-[#0D1B2A] border-white/10 overflow-hidden">
+      <Card className="bg-card border-border/30 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/10">
-                <th className="text-left p-3 text-[#F0F4F8]/50 font-medium">İsim</th>
-                <th className="text-left p-3 text-[#F0F4F8]/50 font-medium hidden sm:table-cell">Faz</th>
-                <th className="text-left p-3 text-[#F0F4F8]/50 font-medium hidden sm:table-cell">Hafta</th>
-                <th className="text-left p-3 text-[#F0F4F8]/50 font-medium">Seri 🔥</th>
-                <th className="text-left p-3 text-[#F0F4F8]/50 font-medium">Durum</th>
+              <tr className="border-b border-border/30">
+                <th className="text-left p-3 text-muted-foreground font-medium">İsim</th>
+                <th className="text-left p-3 text-muted-foreground font-medium hidden sm:table-cell">Faz</th>
+                <th className="text-left p-3 text-muted-foreground font-medium hidden sm:table-cell">Hafta</th>
+                <th className="text-left p-3 text-muted-foreground font-medium">Seri 🔥</th>
+                <th className="text-left p-3 text-muted-foreground font-medium">Durum</th>
                 <th className="p-3"></th>
               </tr>
             </thead>
             <tbody>
               {filtered.map(s => (
-                <tr key={s.id} className="border-b border-white/5 hover:bg-white/5 transition">
-                  <td className="p-3 text-white font-medium">{s.full_name || "—"}</td>
-                  <td className="p-3 text-[#F0F4F8]/60 hidden sm:table-cell">Faz {s.current_phase}</td>
-                  <td className="p-3 text-[#F0F4F8]/60 hidden sm:table-cell">{s.current_week}/24</td>
-                  <td className="p-3 text-orange-400">{s.streak}</td>
+                <tr key={s.id} className="border-b border-border/10 hover:bg-secondary transition">
+                  <td className="p-3 text-foreground font-medium">{s.full_name || "—"}</td>
+                  <td className="p-3 text-muted-foreground hidden sm:table-cell">Faz {s.current_phase}</td>
+                  <td className="p-3 text-muted-foreground hidden sm:table-cell">{s.current_week}/24</td>
+                  <td className="p-3 text-primary">{s.streak}</td>
+                  <td className="p-3"><Badge className={statusStyles[s.status] || ""}>{statusLabels[s.status] || s.status}</Badge></td>
                   <td className="p-3">
-                    <Badge className={statusStyles[s.status] || ""}>{statusLabels[s.status] || s.status}</Badge>
-                  </td>
-                  <td className="p-3">
-                    <Link to={`/admin/students/${s.user_id}`} className="text-[#00A3FF] hover:text-[#00A3FF]/80">
+                    <Link to={`/admin/students/${s.user_id}`} className="text-primary hover:text-primary/80">
                       <ChevronRight className="w-4 h-4" />
                     </Link>
                   </td>
@@ -89,7 +80,7 @@ const AdminStudents = () => {
             </tbody>
           </table>
         </div>
-        {filtered.length === 0 && <p className="text-center py-8 text-[#F0F4F8]/40">Sonuç bulunamadı</p>}
+        {filtered.length === 0 && <p className="text-center py-8 text-muted-foreground">Sonuç bulunamadı</p>}
       </Card>
     </div>
   );
