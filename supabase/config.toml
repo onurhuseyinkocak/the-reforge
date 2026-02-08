@@ -5,3 +5,12 @@ verify_jwt = false
 
 [functions.seed-demo-data]
 verify_jwt = false
+
+[functions.create-user]
+verify_jwt = false
+
+[functions.analyze-student]
+verify_jwt = false
+
+[functions.analyze-all-students]
+verify_jwt = false
