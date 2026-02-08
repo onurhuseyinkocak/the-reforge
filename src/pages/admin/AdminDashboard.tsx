@@ -5,8 +5,9 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Users, AlertTriangle, CheckSquare, Phone, TrendingUp, Brain, Loader2 } from "lucide-react";
+import { Users, AlertTriangle, CheckSquare, Phone, TrendingUp, Brain, Loader2, DollarSign, Calendar } from "lucide-react";
 import { toast } from "sonner";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 const AdminDashboard = () => {
   const { session } = useAuth();
@@ -16,6 +17,8 @@ const AdminDashboard = () => {
   const [todaySessions, setTodaySessions] = useState<any[]>([]);
   const [aiReports, setAiReports] = useState<any[]>([]);
   const [analyzing, setAnalyzing] = useState(false);
+  const [weeklyCheckins, setWeeklyCheckins] = useState<{ day: string; count: number }[]>([]);
+  const [paymentStats, setPaymentStats] = useState({ total: 0, overdue: 0 });
 
   useEffect(() => {
     supabase.from("profiles").select("*").then(({ data }) => {
@@ -31,11 +34,29 @@ const AdminDashboard = () => {
     supabase.from("mentor_sessions").select("*, profiles!mentor_sessions_student_id_fkey(full_name)")
       .gte("scheduled_at", today + "T00:00:00").lte("scheduled_at", today + "T23:59:59").eq("status", "scheduled")
       .then(({ data }) => setTodaySessions(data || []));
-
-    // Fetch latest AI reports
     supabase.from("ai_analysis_reports").select("*, profiles:user_id(full_name)")
       .order("created_at", { ascending: false }).limit(10)
       .then(({ data }) => setAiReports(data || []));
+
+    // Weekly checkin trend
+    const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
+    supabase.from("checkins").select("checkin_date").gte("checkin_date", weekAgo).then(({ data }) => {
+      const counts: Record<string, number> = {};
+      (data || []).forEach(d => { counts[d.checkin_date] = (counts[d.checkin_date] || 0) + 1; });
+      const days = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(Date.now() - (6 - i) * 86400000);
+        const key = d.toISOString().slice(0, 10);
+        return { day: key.slice(5), count: counts[key] || 0 };
+      });
+      setWeeklyCheckins(days);
+    });
+
+    // Payment stats
+    supabase.from("payments").select("amount, status, due_date").then(({ data }) => {
+      const total = (data || []).filter(p => p.status === "paid").reduce((s, p) => s + Number(p.amount), 0);
+      const overdue = (data || []).filter(p => p.status === "pending" && p.due_date < today).length;
+      setPaymentStats({ total, overdue });
+    });
   }, []);
 
   const runAnalysis = async () => {
@@ -44,15 +65,11 @@ const AdminDashboard = () => {
     try {
       const res = await supabase.functions.invoke("analyze-all-students");
       if (res.error) throw new Error(res.error.message);
-      const result = res.data;
-      toast.success(`${result.analyzed} öğrenci analiz edildi!`);
-      // Refresh reports
+      toast.success(`${res.data.analyzed} öğrenci analiz edildi!`);
       const { data } = await supabase.from("ai_analysis_reports").select("*, profiles:user_id(full_name)")
         .order("created_at", { ascending: false }).limit(10);
       setAiReports(data || []);
-    } catch (e: any) {
-      toast.error("Analiz hatası: " + (e.message || "Bilinmeyen hata"));
-    }
+    } catch (e: any) { toast.error("Analiz hatası: " + (e.message || "Bilinmeyen hata")); }
     setAnalyzing(false);
   };
 
@@ -87,6 +104,37 @@ const AdminDashboard = () => {
         </Card>
       </div>
 
+      {/* Revenue + Overdue */}
+      <div className="grid grid-cols-2 gap-4">
+        <Card className="bg-card border-border/30 p-4 flex items-center gap-3">
+          <DollarSign className="w-5 h-5 text-green-400" />
+          <div>
+            <p className="text-lg font-bold text-foreground">₺{paymentStats.total.toLocaleString()}</p>
+            <p className="text-xs text-muted-foreground">Toplam Gelir</p>
+          </div>
+        </Card>
+        <Card className={`bg-card border-border/30 p-4 flex items-center gap-3 ${paymentStats.overdue > 0 ? "border-destructive/30" : ""}`}>
+          <Calendar className="w-5 h-5 text-destructive" />
+          <div>
+            <p className="text-lg font-bold text-foreground">{paymentStats.overdue}</p>
+            <p className="text-xs text-muted-foreground">Vadesi Geçmiş</p>
+          </div>
+        </Card>
+      </div>
+
+      {/* Weekly Checkin Trend */}
+      <Card className="bg-card border-border/30 p-5">
+        <h3 className="font-display text-lg text-foreground mb-4">Haftalık Check-in Trendi</h3>
+        <ResponsiveContainer width="100%" height={150}>
+          <BarChart data={weeklyCheckins}>
+            <XAxis dataKey="day" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+            <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+            <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, color: "hsl(var(--foreground))" }} />
+            <Bar dataKey="count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </Card>
+
       {/* AI Analysis */}
       <Card className="bg-card border-border/30 p-5">
         <div className="flex items-center justify-between mb-4">
@@ -99,7 +147,7 @@ const AdminDashboard = () => {
           </Button>
         </div>
         {aiReports.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Henüz AI analiz raporu yok. "Tümünü Analiz Et" butonuna tıklayın.</p>
+          <p className="text-sm text-muted-foreground">Henüz AI analiz raporu yok.</p>
         ) : (
           <div className="space-y-2 max-h-72 overflow-y-auto">
             {aiReports.map(r => (
@@ -111,7 +159,6 @@ const AdminDashboard = () => {
                 </div>
                 <div className="flex items-center gap-2 ml-3">
                   <Badge className={`${riskColor(r.risk_level)} text-xs`}>{r.risk_level === "high" ? "Yüksek" : r.risk_level === "medium" ? "Orta" : "Düşük"}</Badge>
-                  <span className="text-[10px] text-muted-foreground whitespace-nowrap">{r.analysis_date}</span>
                 </div>
               </Link>
             ))}

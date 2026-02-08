@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard, CheckSquare, ListTodo, TrendingUp,
   MessageSquare, User, LogOut, Menu, Shield,
@@ -36,8 +37,30 @@ const DashboardLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [unreadMessages, setUnreadMessages] = useState(0);
 
   const links = role === "admin" ? adminLinks : studentLinks;
+
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("messages").select("id", { count: "exact", head: true })
+      .eq("receiver_id", user.id).eq("is_read", false)
+      .then(({ count }) => setUnreadMessages(count || 0));
+
+    // Realtime for unread count
+    const channel = supabase.channel("unread_messages")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages", filter: `receiver_id=eq.${user.id}` }, () => {
+        setUnreadMessages(prev => prev + 1);
+      })
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "messages", filter: `receiver_id=eq.${user.id}` }, () => {
+        // Re-fetch count on update (message marked as read)
+        supabase.from("messages").select("id", { count: "exact", head: true })
+          .eq("receiver_id", user.id).eq("is_read", false)
+          .then(({ count }) => setUnreadMessages(count || 0));
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -46,17 +69,14 @@ const DashboardLayout = () => {
 
   return (
     <div className="min-h-screen bg-background flex">
-      {/* Mobile overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black/60 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
-      {/* Sidebar */}
       <aside className={cn(
         "fixed lg:static inset-y-0 left-0 z-50 w-64 bg-card border-r border-border/30 flex flex-col transition-transform duration-300",
         sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
-        {/* Logo */}
         <div className="p-6 border-b border-border/30">
           <Link to="/" className="flex items-center gap-2">
             <Flame className="w-6 h-6 text-primary" />
@@ -69,18 +89,18 @@ const DashboardLayout = () => {
           )}
         </div>
 
-        {/* Nav */}
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {links.map((link) => {
             const isActive = location.pathname === link.to || 
               (link.to !== "/dashboard" && link.to !== "/admin" && location.pathname.startsWith(link.to));
+            const isMessages = link.to === "/messages" || link.to === "/admin/messages";
             return (
               <Link
                 key={link.to}
                 to={link.to}
                 onClick={() => setSidebarOpen(false)}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors relative",
                   isActive
                     ? "bg-primary/15 text-primary"
                     : "text-muted-foreground hover:text-foreground hover:bg-secondary"
@@ -88,17 +108,25 @@ const DashboardLayout = () => {
               >
                 <link.icon className="w-4 h-4" />
                 {link.label}
+                {isMessages && unreadMessages > 0 && (
+                  <span className="absolute right-3 bg-destructive text-destructive-foreground text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                    {unreadMessages > 9 ? "9+" : unreadMessages}
+                  </span>
+                )}
               </Link>
             );
           })}
         </nav>
 
-        {/* User info */}
         <div className="p-4 border-t border-border/30">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary text-sm font-bold">
-              {profile?.full_name?.charAt(0)?.toUpperCase() || "U"}
-            </div>
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover" />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary text-sm font-bold">
+                {profile?.full_name?.charAt(0)?.toUpperCase() || "U"}
+              </div>
+            )}
             <div className="flex-1 min-w-0">
               <p className="text-sm text-foreground truncate">{profile?.full_name || "Kullanıcı"}</p>
               <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
@@ -115,9 +143,7 @@ const DashboardLayout = () => {
         </div>
       </aside>
 
-      {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top bar */}
         <header className="h-14 bg-card/80 backdrop-blur border-b border-border/30 flex items-center px-4 lg:px-6 sticky top-0 z-30">
           <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-foreground mr-4">
             <Menu className="w-5 h-5" />
@@ -127,7 +153,6 @@ const DashboardLayout = () => {
           </h1>
         </header>
 
-        {/* Page content */}
         <main className="flex-1 p-4 lg:p-6 overflow-y-auto">
           <Outlet />
         </main>
