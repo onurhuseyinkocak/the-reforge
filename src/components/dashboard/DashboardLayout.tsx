@@ -3,8 +3,9 @@ import { Link, useLocation, useNavigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard, CheckSquare, ListTodo, TrendingUp,
-  MessageSquare, User, LogOut, Menu, X, Shield,
-  Users, CreditCard, Flame
+  MessageSquare, User, LogOut, Menu, Shield,
+  Users, CreditCard, Flame, Compass, BookOpen,
+  UsersRound, ClipboardList
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -12,14 +13,18 @@ import { cn } from "@/lib/utils";
 const studentLinks = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/check-in", label: "Check-in", icon: CheckSquare },
+  { to: "/life-areas", label: "Yaşam Alanları", icon: Compass },
   { to: "/tasks", label: "Görevler", icon: ListTodo },
   { to: "/progress", label: "İlerleme", icon: TrendingUp },
+  { to: "/resources", label: "Kaynaklar", icon: BookOpen },
+  { to: "/community", label: "Topluluk", icon: UsersRound },
   { to: "/messages", label: "Mesajlar", icon: MessageSquare },
   { to: "/profile", label: "Profil", icon: User },
 ];
 
 const adminLinks = [
   { to: "/admin", label: "Genel Bakış", icon: LayoutDashboard },
+  { to: "/admin/applications", label: "Başvurular", icon: ClipboardList },
   { to: "/admin/students", label: "Öğrenciler", icon: Users },
   { to: "/admin/tasks", label: "Görevler", icon: ListTodo },
   { to: "/admin/messages", label: "Mesajlar", icon: MessageSquare },
@@ -102,7 +107,7 @@ const DashboardLayout = () => {
           <Button
             variant="ghost"
             size="sm"
-            className="w-full justify-start text-muted-foreground hover:text-red-400 hover:bg-red-400/10"
+            className="w-full justify-start text-muted-foreground hover:text-destructive hover:bg-destructive/10"
             onClick={handleSignOut}
           >
             <LogOut className="w-4 h-4 mr-2" /> Çıkış Yap

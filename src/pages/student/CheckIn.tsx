@@ -30,6 +30,9 @@ const CheckIn = () => {
   const [workoutDone, setWorkoutDone] = useState(false);
   const [nutritionRating, setNutritionRating] = useState(7);
   const [reflection, setReflection] = useState("");
+  const [dayRating, setDayRating] = useState(7);
+  const [priorityReview, setPriorityReview] = useState("");
+  const [gratitude, setGratitude] = useState("");
 
   useEffect(() => {
     if (!user) return;
@@ -59,6 +62,7 @@ const CheckIn = () => {
     const { error } = await supabase.from("checkins").upsert({
       user_id: user.id, checkin_date: format(new Date(), "yyyy-MM-dd"), checkin_type: "evening",
       workout_done: workoutDone, nutrition_rating: nutritionRating, reflection,
+      day_rating: dayRating, priority_review: priorityReview, gratitude,
     }, { onConflict: "user_id,checkin_date,checkin_type" });
     setLoading(false);
     if (error) toast.error("Hata: " + error.message);
@@ -120,15 +124,26 @@ const CheckIn = () => {
         <TabsContent value="evening">
           <Card className="bg-card border-border/30 p-6 space-y-5">
             <h3 className="font-display text-xl text-foreground">🌙 Akşam Check-in</h3>
+            <RatingSlider value={dayRating} onChange={setDayRating} label="Günün Genel Değerlendirmesi" />
             <div className="flex items-center justify-between">
               <Label className="text-foreground/80">Antrenman Yapıldı mı?</Label>
               <Switch checked={workoutDone} onCheckedChange={setWorkoutDone} />
             </div>
             <RatingSlider value={nutritionRating} onChange={setNutritionRating} label="Beslenme Kalitesi" />
             <div>
+              <Label className="text-foreground/80">Önceliklerin Değerlendirmesi</Label>
+              <Textarea value={priorityReview} onChange={e => setPriorityReview(e.target.value)}
+                className="bg-background border-border/30 text-foreground mt-1" rows={2} placeholder="Sabah belirlediğin önceliklerde nasıl performans gösterdin?" />
+            </div>
+            <div>
               <Label className="text-foreground/80">Günün Değerlendirmesi</Label>
               <Textarea value={reflection} onChange={e => setReflection(e.target.value)}
-                className="bg-background border-border/30 text-foreground mt-1" rows={4} placeholder="Bugün neler öğrendin? Neler geliştirebilirsin?" />
+                className="bg-background border-border/30 text-foreground mt-1" rows={3} placeholder="Bugün neler öğrendin? Neler geliştirebilirsin?" />
+            </div>
+            <div>
+              <Label className="text-foreground/80">Minnet / Şükür</Label>
+              <Textarea value={gratitude} onChange={e => setGratitude(e.target.value)}
+                className="bg-background border-border/30 text-foreground mt-1" rows={2} placeholder="Bugün neye minnettarsın?" />
             </div>
             <Button onClick={handleEveningSubmit} disabled={loading} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
               {loading ? "Kaydediliyor..." : "Akşam Check-in Kaydet"}

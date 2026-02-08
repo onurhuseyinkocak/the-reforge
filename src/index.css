@@ -4,64 +4,64 @@
 @tailwind components;
 @tailwind utilities;
 
-/* THE FORGE Design System - Dark, Masculine, Disciplined */
+/* THE FORGE Design System - Navy/Blue/White */
 
 @layer base {
   :root {
-    /* Core Forge Colors - Dark Foundation */
-    --background: 0 0% 3%;
-    --foreground: 0 0% 95%;
+    /* Core - Dark Navy Foundation */
+    --background: 216 60% 7%;
+    --foreground: 210 33% 96%;
 
-    /* Card - Slightly lighter than background */
-    --card: 0 0% 6%;
-    --card-foreground: 0 0% 95%;
+    /* Card */
+    --card: 216 55% 11%;
+    --card-foreground: 210 33% 96%;
 
     /* Popover */
-    --popover: 0 0% 6%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 216 55% 11%;
+    --popover-foreground: 210 33% 96%;
 
-    /* Primary - Ember Orange/Red */
-    --primary: 16 100% 50%;
-    --primary-foreground: 0 0% 3%;
+    /* Primary - Electric Blue */
+    --primary: 204 100% 50%;
+    --primary-foreground: 216 60% 7%;
 
-    /* Secondary - Steel Gray */
-    --secondary: 0 0% 12%;
-    --secondary-foreground: 0 0% 85%;
+    /* Secondary */
+    --secondary: 216 40% 16%;
+    --secondary-foreground: 210 33% 85%;
 
-    /* Muted - Charcoal */
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 55%;
+    /* Muted */
+    --muted: 216 30% 20%;
+    --muted-foreground: 210 15% 55%;
 
-    /* Accent - Ember Glow */
-    --accent: 16 100% 50%;
-    --accent-foreground: 0 0% 3%;
+    /* Accent */
+    --accent: 204 100% 50%;
+    --accent-foreground: 216 60% 7%;
 
     /* Destructive */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
     /* Border & Input */
-    --border: 0 0% 15%;
-    --input: 0 0% 15%;
-    --ring: 16 100% 50%;
+    --border: 216 30% 20%;
+    --input: 216 30% 20%;
+    --ring: 204 100% 50%;
 
-    --radius: 0.25rem;
+    --radius: 0.5rem;
 
-    /* Custom Forge Variables */
-    --ember: 16 100% 50%;
-    --ember-dark: 0 85% 45%;
-    --ember-glow: 24 100% 55%;
-    --charcoal: 0 0% 8%;
-    --steel: 0 0% 45%;
-    --smoke: 0 0% 75%;
+    /* Custom Variables */
+    --forge-blue: 204 100% 50%;
+    --forge-navy: 216 60% 7%;
+    --forge-navy-light: 216 55% 11%;
+    --forge-white: 210 33% 96%;
+    --forge-blue-glow: 204 100% 60%;
+    --forge-steel: 216 15% 45%;
 
     /* Gradients */
-    --gradient-ember: linear-gradient(135deg, hsl(16 100% 50%), hsl(0 85% 45%));
-    --gradient-heat: linear-gradient(180deg, hsl(16 100% 50% / 0.3), transparent);
+    --gradient-blue: linear-gradient(135deg, hsl(204 100% 50%), hsl(204 100% 35%));
+    --gradient-glow: linear-gradient(180deg, hsl(204 100% 50% / 0.3), transparent);
     
     /* Shadows */
-    --shadow-ember: 0 0 30px hsl(16 100% 50% / 0.4);
-    --shadow-glow: 0 0 60px hsl(16 100% 50% / 0.3);
+    --shadow-blue: 0 0 30px hsl(204 100% 50% / 0.3);
+    --shadow-glow: 0 0 60px hsl(204 100% 50% / 0.2);
   }
 }
 
@@ -86,116 +86,36 @@
 }
 
 @layer utilities {
-  /* Ember Glow Effect - Standard */
-  .ember-glow {
-    text-shadow: 0 0 10px hsl(var(--ember) / 0.4),
-                 0 0 20px hsl(var(--ember) / 0.3),
-                 0 0 30px hsl(var(--ember) / 0.2);
+  .forge-glow {
+    text-shadow: 0 0 10px hsl(var(--forge-blue) / 0.5),
+                 0 0 20px hsl(var(--forge-blue) / 0.3);
   }
 
-  /* Premium Glow - Realistic Hot Metal */
-  .ember-glow-premium {
-    text-shadow: 
-      0 0 2px #fffaf0,
-      0 0 4px #fff8dc,
-      0 0 8px #ffd700,
-      0 0 16px #ff8c00,
-      0 0 32px #ff4500,
-      0 0 48px rgba(255, 69, 0, 0.6),
-      0 0 64px rgba(204, 34, 0, 0.4);
-    animation: heat-pulse 4s ease-in-out infinite;
-  }
-
-  .ember-glow-strong {
-    text-shadow: 
-      0 0 1px #fff,
-      0 0 3px #fffacd,
-      0 0 6px #ffd700,
-      0 0 12px #ff8c00,
-      0 0 24px #ff4500,
-      0 0 36px rgba(255, 69, 0, 0.5);
-  }
-
-  @keyframes heat-pulse {
-    0%, 100% {
-      text-shadow: 
-        0 0 2px #fffaf0,
-        0 0 4px #fff8dc,
-        0 0 8px #ffd700,
-        0 0 16px #ff8c00,
-        0 0 32px #ff4500,
-        0 0 48px rgba(255, 69, 0, 0.6),
-        0 0 64px rgba(204, 34, 0, 0.4);
-    }
-    50% {
-      text-shadow: 
-        0 0 4px #fff,
-        0 0 8px #fffacd,
-        0 0 16px #ffd700,
-        0 0 24px #ff8c00,
-        0 0 40px #ff4500,
-        0 0 60px rgba(255, 69, 0, 0.7),
-        0 0 80px rgba(204, 34, 0, 0.5);
-    }
-  }
-
-  /* Box Glow */
   .box-glow {
-    box-shadow: 0 0 20px hsl(var(--ember) / 0.3),
-                0 0 40px hsl(var(--ember) / 0.2);
+    box-shadow: 0 0 20px hsl(var(--forge-blue) / 0.3),
+                0 0 40px hsl(var(--forge-blue) / 0.15);
   }
 
   .box-glow-strong {
-    box-shadow: 0 0 30px hsl(var(--ember) / 0.5),
-                0 0 60px hsl(var(--ember) / 0.3),
-                0 0 90px hsl(var(--ember) / 0.2);
+    box-shadow: 0 0 30px hsl(var(--forge-blue) / 0.4),
+                0 0 60px hsl(var(--forge-blue) / 0.2);
   }
 
-  /* Heat distortion placeholder */
-  .heat-shimmer {
-    animation: shimmer 3s ease-in-out infinite;
-  }
-
-  @keyframes shimmer {
-    0%, 100% { filter: blur(0px); }
-    50% { filter: blur(0.5px); }
-  }
-
-  /* Scroll snap */
-  .snap-section {
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
-  }
-
-  /* Horizontal scroll container */
-  .horizontal-scroll {
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-
-  .horizontal-scroll::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Text gradient */
-  .text-gradient-ember {
-    background: linear-gradient(135deg, hsl(var(--ember-glow)), hsl(var(--ember)), hsl(var(--ember-dark)));
+  .text-gradient-blue {
+    background: linear-gradient(135deg, hsl(var(--forge-blue-glow)), hsl(var(--forge-blue)));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
-  /* Border glow */
   .border-glow {
-    border: 1px solid hsl(var(--ember) / 0.3);
-    box-shadow: inset 0 0 20px hsl(var(--ember) / 0.1),
-                0 0 20px hsl(var(--ember) / 0.1);
+    border: 1px solid hsl(var(--forge-blue) / 0.3);
+    box-shadow: inset 0 0 20px hsl(var(--forge-blue) / 0.05),
+                0 0 20px hsl(var(--forge-blue) / 0.1);
   }
 }
 
-/* Custom scrollbar for the page */
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -205,10 +125,10 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--ember) / 0.5);
+  background: hsl(var(--forge-blue) / 0.4);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--ember) / 0.7);
+  background: hsl(var(--forge-blue) / 0.6);
 }
