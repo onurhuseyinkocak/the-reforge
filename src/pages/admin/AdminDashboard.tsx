@@ -31,12 +31,22 @@ const AdminDashboard = () => {
     });
     supabase.from("student_tasks").select("id").eq("status", "submitted").then(({ data }) => setPendingApprovals(data?.length || 0));
     const today = new Date().toISOString().split("T")[0];
-    supabase.from("mentor_sessions").select("*, profiles!mentor_sessions_student_id_fkey(full_name)")
+    supabase.from("mentor_sessions").select("*")
       .gte("scheduled_at", today + "T00:00:00").lte("scheduled_at", today + "T23:59:59").eq("status", "scheduled")
       .then(({ data }) => setTodaySessions(data || []));
-    supabase.from("ai_analysis_reports").select("*, profiles:user_id(full_name)")
+    supabase.from("ai_analysis_reports").select("*")
       .order("created_at", { ascending: false }).limit(10)
-      .then(({ data }) => setAiReports(data || []));
+      .then(async ({ data }) => {
+        const reports = data || [];
+        if (reports.length > 0) {
+          const userIds = [...new Set(reports.map(r => r.user_id))];
+          const { data: profiles } = await supabase.from("profiles").select("user_id, full_name").in("user_id", userIds);
+          const nameMap: Record<string, string> = {};
+          (profiles || []).forEach(p => { nameMap[p.user_id] = p.full_name; });
+          reports.forEach((r: any) => { r.profiles = { full_name: nameMap[r.user_id] || "Kullanıcı" }; });
+        }
+        setAiReports(reports);
+      });
 
     // Weekly checkin trend
     const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
@@ -66,9 +76,17 @@ const AdminDashboard = () => {
       const res = await supabase.functions.invoke("analyze-all-students");
       if (res.error) throw new Error(res.error.message);
       toast.success(`${res.data.analyzed} öğrenci analiz edildi!`);
-      const { data } = await supabase.from("ai_analysis_reports").select("*, profiles:user_id(full_name)")
+      const { data } = await supabase.from("ai_analysis_reports").select("*")
         .order("created_at", { ascending: false }).limit(10);
-      setAiReports(data || []);
+      const reports = data || [];
+      if (reports.length > 0) {
+        const userIds = [...new Set(reports.map(r => r.user_id))];
+        const { data: profiles } = await supabase.from("profiles").select("user_id, full_name").in("user_id", userIds);
+        const nameMap: Record<string, string> = {};
+        (profiles || []).forEach(p => { nameMap[p.user_id] = p.full_name; });
+        reports.forEach((r: any) => { r.profiles = { full_name: nameMap[r.user_id] || "Kullanıcı" }; });
+      }
+      setAiReports(reports);
     } catch (e: any) { toast.error("Analiz hatası: " + (e.message || "Bilinmeyen hata")); }
     setAnalyzing(false);
   };
