@@ -12,9 +12,42 @@ serve(async (req) => {
   }
 
   try {
+    // Block execution in production
+    const environment = Deno.env.get('ENVIRONMENT') || Deno.env.get('ENV') || '';
+    if (environment.toLowerCase() === 'production' || environment.toLowerCase() === 'prod') {
+      return new Response(JSON.stringify({ error: 'Seed function is disabled in production' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Verify JWT
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Missing authorization' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const supabaseAuth = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_ANON_KEY')!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const { data: { user: caller }, error: authError } = await supabaseAuth.auth.getUser(token);
+    if (authError || !caller) {
+      return new Response(JSON.stringify({ error: 'Invalid token' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
+    // Verify admin role using service role client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
+
+    const { data: roleData } = await supabase.from('user_roles').select('role').eq('user_id', caller.id).single();
+    if (!roleData || roleData.role !== 'admin') {
+      return new Response(JSON.stringify({ error: 'Forbidden: admin role required' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
 
     const demoUsers = [
       { email: 'admin@theforge.com', password: 'forge2024', name: 'Kaan Yıldırım', role: 'admin' },
@@ -31,7 +64,7 @@ serve(async (req) => {
       // Check if user already exists
       const { data: { users: existing } } = await supabase.auth.admin.listUsers();
       const alreadyExists = existing?.find((e: any) => e.email === u.email);
-      
+
       if (alreadyExists) {
         createdUsers.push({ id: alreadyExists.id, email: u.email, role: u.role, name: u.name });
         console.log(`User ${u.email} already exists`);
@@ -173,7 +206,7 @@ serve(async (req) => {
     const { data: tasks } = await supabase.from('tasks').select('id, phase, week').order('week');
     if (tasks && tasks.length > 0) {
       const studentTasks: any[] = [];
-      
+
       // Ahmet - phase 2, most done
       if (students[0]?.id) {
         tasks.forEach((t, idx) => {
@@ -301,11 +334,7 @@ serve(async (req) => {
     return new Response(JSON.stringify({
       success: true,
       message: 'Demo data seeded successfully!',
-      users: createdUsers.map(u => ({ email: u.email, role: u.role })),
-      login_info: {
-        admin: { email: 'admin@theforge.com', password: 'forge2024' },
-        student: { email: 'ahmet@test.com', password: 'test1234' },
-      }
+      users_created: createdUsers.length,
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

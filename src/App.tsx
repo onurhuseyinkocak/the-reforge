@@ -26,6 +26,8 @@ import Community from "./pages/student/Community";
 import Guilds from "./pages/student/Guilds";
 import Rankings from "./pages/student/Rankings";
 import ForgedWall from "./pages/student/ForgedWall";
+import GuildCreate from "./pages/student/GuildCreate";
+import GuildDashboard from "./pages/student/GuildDashboard";
 
 // Admin pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -72,6 +74,8 @@ const App = () => (
               <Route path="/resources" element={<Resources />} />
               <Route path="/community" element={<Community />} />
               <Route path="/guilds" element={<Guilds />} />
+              <Route path="/guilds/create" element={<GuildCreate />} />
+              <Route path="/guild" element={<GuildDashboard />} />
               <Route path="/rankings" element={<Rankings />} />
               <Route path="/forged" element={<ForgedWall />} />
             </Route>
