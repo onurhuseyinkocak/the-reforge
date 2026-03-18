@@ -13,11 +13,11 @@ import { motion } from "framer-motion";
 const container = {
   hidden: { opacity: 0 },
   show: { opacity: 1, transition: { staggerChildren: 0.08 } },
-};
+} as const;
 const item = {
   hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
-};
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } },
+} as const;
 
 const AnimatedCounter = ({ value }: { value: number }) => {
   const [display, setDisplay] = useState(0);

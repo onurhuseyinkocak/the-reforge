@@ -641,7 +641,7 @@ function QuestsSection({ guild }: { guild: Guild }) {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setQuests((data || []) as GuildQuest[]);
+      setQuests(((data || []) as unknown) as GuildQuest[]);
     } catch (err: any) {
       toast.error("Quest'ler yüklenemedi: " + (err.message || ""));
     } finally {
@@ -1313,7 +1313,7 @@ export default function GuildManage() {
     }
 
     try {
-      const { data, error: fetchError } = await supabase
+      const { data, error: fetchError } = await (supabase as any)
         .from("guilds")
         .select("*")
         .eq("slug", slug)

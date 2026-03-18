@@ -38,8 +38,8 @@ export default function Rankings() {
       try {
         setLoading(true);
 
-        const [guildsRes, profilesRes] = await Promise.all([
-          supabase
+          const [guildsRes, profilesRes] = await Promise.all([
+          (supabase as any)
             .from('guilds')
             .select('*')
             .eq('is_active', true)

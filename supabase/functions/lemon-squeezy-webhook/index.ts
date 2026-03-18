@@ -1,12 +1,23 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { createHmac } from "https://deno.land/std@0.168.0/crypto/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-custom-header, content-type, x-signature",
 };
+
+async function verifySignature(secret: string, signature: string, body: string): Promise<boolean> {
+  const encoder = new TextEncoder();
+  const keyData = encoder.encode(secret);
+  const bodyData = encoder.encode(body);
+  const cryptoKey = await crypto.subtle.importKey(
+    "raw", keyData, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]
+  );
+  const sig = await crypto.subtle.sign("HMAC", cryptoKey, bodyData);
+  const digest = Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, "0")).join("");
+  return digest === signature;
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -25,10 +36,8 @@ serve(async (req) => {
     const rawBody = await req.text();
 
     if (secret && signature) {
-      const hmac = createHmac("sha256", secret);
-      hmac.update(rawBody);
-      const digest = hmac.toString();
-      if (digest !== signature) {
+      const valid = await verifySignature(secret, signature, rawBody);
+      if (!valid) {
         return new Response(
           JSON.stringify({ error: "Invalid signature" }),
           { status: 401, headers: corsHeaders }

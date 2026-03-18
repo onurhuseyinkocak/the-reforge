@@ -8,6 +8,12 @@ interface Subscription {
   currentPeriodEnd: string | null;
 }
 
+interface SubscriptionRow {
+  plan: string;
+  status: string;
+  current_period_end: string | null;
+}
+
 export function useSubscription() {
   const { user, profile } = useAuth();
   const [subscription, setSubscription] = useState<Subscription | null>(null);
@@ -19,15 +25,16 @@ export function useSubscription() {
       return;
     }
 
-    supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any)
       .from("subscriptions")
-      .select("*")
+      .select("plan, status, current_period_end")
       .eq("user_id", user.id)
       .eq("status", "active")
       .order("created_at", { ascending: false })
       .limit(1)
       .single()
-      .then(({ data }) => {
+      .then(({ data }: { data: SubscriptionRow | null }) => {
         if (data) {
           setSubscription({
             plan: data.plan,
