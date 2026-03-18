@@ -136,7 +136,6 @@ export type Database = {
       }
       checkins: {
         Row: {
-          biggest_win: string | null
           checkin_date: string
           checkin_type: string
           created_at: string
@@ -150,13 +149,11 @@ export type Database = {
           reflection: string | null
           routine_done: boolean | null
           sleep_rating: number | null
-          tomorrow_improvement: string | null
           user_id: string
           wake_time: string | null
           workout_done: boolean | null
         }
         Insert: {
-          biggest_win?: string | null
           checkin_date?: string
           checkin_type: string
           created_at?: string
@@ -170,13 +167,11 @@ export type Database = {
           reflection?: string | null
           routine_done?: boolean | null
           sleep_rating?: number | null
-          tomorrow_improvement?: string | null
           user_id: string
           wake_time?: string | null
           workout_done?: boolean | null
         }
         Update: {
-          biggest_win?: string | null
           checkin_date?: string
           checkin_type?: string
           created_at?: string
@@ -190,7 +185,6 @@ export type Database = {
           reflection?: string | null
           routine_done?: boolean | null
           sleep_rating?: number | null
-          tomorrow_improvement?: string | null
           user_id?: string
           wake_time?: string | null
           workout_done?: boolean | null
