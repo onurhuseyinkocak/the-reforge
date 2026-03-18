@@ -29,7 +29,7 @@ export default function Guilds() {
     const fetchGuilds = async () => {
       try {
         setLoading(true);
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
           .from('guilds')
           .select('*')
           .eq('is_active', true)
