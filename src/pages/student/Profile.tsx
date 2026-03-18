@@ -334,12 +334,12 @@ const Profile = () => {
                 {changingPw ? (
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Degistiriliyor...
+                    Değiştiriliyor...
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
                     <Shield className="w-4 h-4" />
-                    Sifreyi Guncelle
+                    Şifreyi Güncelle
                   </div>
                 )}
               </Button>

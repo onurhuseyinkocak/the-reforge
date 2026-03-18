@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface Particle {
   x: number;
@@ -28,6 +28,11 @@ const EmberParticles = () => {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    // Detect mobile for performance optimization
+    const isMobile = window.innerWidth < 768 || /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+    const particleCount = isMobile ? 30 : 80;
+    const maxTrailLength = isMobile ? 4 : 8;
+
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -53,8 +58,7 @@ const EmberParticles = () => {
       };
     };
 
-    // Initialize particles - 80 for denser atmosphere
-    const particleCount = 80;
+    // Initialize particles
     particlesRef.current = [];
     for (let i = 0; i < particleCount; i++) {
       const particle = createParticle();
@@ -72,7 +76,7 @@ const EmberParticles = () => {
 
         // Calculate life progress (0 to 1)
         const lifeProgress = particle.life / particle.maxLife;
-        
+
         // Opacity based on life cycle: fade in, burn bright, fade out
         let lifeOpacity = 1;
         if (lifeProgress < 0.1) {
@@ -83,7 +87,7 @@ const EmberParticles = () => {
 
         // Add to trail
         particle.trail.push({ x: particle.x, y: particle.y, opacity: particle.opacity * lifeOpacity * 0.3 });
-        if (particle.trail.length > 8) {
+        if (particle.trail.length > maxTrailLength) {
           particle.trail.shift();
         }
 
@@ -106,7 +110,7 @@ const EmberParticles = () => {
         particle.trail.forEach((point, i) => {
           const trailOpacity = (i / particle.trail.length) * point.opacity * 0.15;
           const trailSize = particle.size * (0.3 + (i / particle.trail.length) * 0.5);
-          
+
           ctx.beginPath();
           ctx.arc(point.x, point.y, trailSize, 0, Math.PI * 2);
           ctx.fillStyle = `rgba(80, 60, 50, ${trailOpacity})`;
@@ -181,7 +185,7 @@ const EmberParticles = () => {
     <canvas
       ref={canvasRef}
       className="fixed inset-0 pointer-events-none z-10"
-      style={{ mixBlendMode: "screen" }}
+      style={{ mixBlendMode: "screen", willChange: "transform" }}
     />
   );
 };

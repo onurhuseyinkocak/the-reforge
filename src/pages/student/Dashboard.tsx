@@ -218,10 +218,10 @@ const Dashboard = () => {
   const greetingHour = new Date().getHours();
   const greeting =
     greetingHour < 12
-      ? "Gunaydin"
+      ? "Günaydın"
       : greetingHour < 18
-        ? "Iyi gunler"
-        : "Iyi aksamlar";
+        ? "İyi günler"
+        : "İyi akşamlar";
 
   return (
     <motion.div

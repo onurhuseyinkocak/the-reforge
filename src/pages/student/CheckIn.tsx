@@ -736,13 +736,13 @@ const CheckIn = () => {
                   <RatingSlider
                     value={dayRating}
                     onChange={setDayRating}
-                    label="Gunun Genel Degerlendirmesi"
+                    label="Günün Genel Değerlendirmesi"
                     icon={Star}
                   />
 
                   <ForgeSwitch
                     icon={Dumbbell}
-                    label="Antrenman Yapildi mi?"
+                    label="Antrenman Yapıldı mı?"
                     checked={workoutDone}
                     onChange={setWorkoutDone}
                   />
@@ -754,32 +754,32 @@ const CheckIn = () => {
                     icon={Apple}
                   />
 
-                  <ForgeInput icon={Trophy} label="Bugunku En Buyuk Basari">
+                  <ForgeInput icon={Trophy} label="Bugünkü En Büyük Başarı">
                     <Input
                       value={biggestWin}
                       onChange={(e) => setBiggestWin(e.target.value)}
                       className={inputClasses}
-                      placeholder="Bugun en cok neyi basardin?"
+                      placeholder="Bugün en çok neyi başardın?"
                     />
                   </ForgeInput>
 
-                  <ForgeInput icon={Target} label="Onceliklerin Degerlendirmesi">
+                  <ForgeInput icon={Target} label="Önceliklerin Değerlendirmesi">
                     <Textarea
                       value={priorityReview}
                       onChange={(e) => setPriorityReview(e.target.value)}
                       className={textareaClasses}
                       rows={2}
-                      placeholder="Sabah belirledigin onceliklerde nasil performans gosterdin?"
+                      placeholder="Sabah belirlediğin önceliklerde nasıl performans gösterdin?"
                     />
                   </ForgeInput>
 
-                  <ForgeInput icon={CheckCircle2} label="Gunun Degerlendirmesi">
+                  <ForgeInput icon={CheckCircle2} label="Günün Değerlendirmesi">
                     <Textarea
                       value={reflection}
                       onChange={(e) => setReflection(e.target.value)}
                       className={textareaClasses}
                       rows={3}
-                      placeholder="Bugun neler ogrendin?"
+                      placeholder="Bugün neler öğrendin?"
                     />
                   </ForgeInput>
 

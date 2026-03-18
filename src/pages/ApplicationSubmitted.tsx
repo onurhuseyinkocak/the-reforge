@@ -206,8 +206,8 @@ const ApplicationSubmitted = () => (
             variants={itemVariants}
             className="text-white/40 text-sm leading-relaxed max-w-sm mx-auto"
           >
-            Basvurun incelemeye alindi. Onaylandiginda e-posta adresine sifre olusturma linki gonderilecek.
-            Bu surec genellikle 24-48 saat icinde tamamlanir.
+            Başvurun incelemeye alındı. Onaylandığında e-posta adresine şifre oluşturma linki gönderilecek.
+            Bu süreç genellikle 24-48 saat içinde tamamlanır.
           </motion.p>
 
           {/* CTA Button */}

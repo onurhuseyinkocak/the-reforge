@@ -10,8 +10,8 @@ import { z } from "zod";
 import { motion } from "framer-motion";
 
 const schema = z.object({
-  email: z.string().trim().email("Gecerli bir email girin"),
-  password: z.string().min(6, "Sifre en az 6 karakter olmali"),
+  email: z.string().trim().email("Geçerli bir email girin"),
+  password: z.string().min(6, "Şifre en az 6 karakter olmalı"),
 });
 
 /* ──────────────────────────────────────────────
@@ -220,7 +220,7 @@ const Login = () => {
             variants={itemVariants}
             className="text-white/30 text-sm mt-3 tracking-wide"
           >
-            Hesabina giris yap
+            Hesabına giriş yap
           </motion.p>
         </motion.div>
 
@@ -280,7 +280,7 @@ const Login = () => {
             {/* Password Field */}
             <motion.div variants={itemVariants} className="space-y-2">
               <Label className="text-xs text-white/40 uppercase tracking-wider font-medium">
-                Sifre
+                Şifre
               </Label>
               <div className="relative group">
                 <div
@@ -337,7 +337,7 @@ const Login = () => {
                 to="/forgot-password"
                 className="text-xs text-white/25 hover:text-[#FF4500]/80 transition-colors duration-300"
               >
-                Sifremi unuttum
+                Şifremi unuttum
               </Link>
             </motion.div>
 
@@ -373,7 +373,7 @@ const Login = () => {
                   />
                 ) : (
                   <span className="flex items-center justify-center gap-2 relative z-10">
-                    Giris Yap
+                    Giriş Yap
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
                   </span>
                 )}

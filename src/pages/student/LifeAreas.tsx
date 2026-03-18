@@ -319,7 +319,7 @@ const LifeAreas = () => {
             }`}
           >
             <Zap className="w-4 h-4" />
-            Hizli Giris
+            Hızlı Giriş
           </button>
           <button
             onClick={() => setQuickMode(false)}
@@ -330,7 +330,7 @@ const LifeAreas = () => {
             }`}
           >
             <ListChecks className="w-4 h-4" />
-            Detayli Giris
+            Detaylı Giriş
           </button>
         </div>
       </motion.div>
@@ -350,8 +350,8 @@ const LifeAreas = () => {
                   <Zap className="w-5 h-5 text-[#FF4500]" />
                 </div>
                 <div>
-                  <h3 className="font-display text-xl text-white tracking-wide">Hizli Giris</h3>
-                  <p className="text-xs text-white/30">Her alan icin 1 puan + opsiyonel not</p>
+                  <h3 className="font-display text-xl text-white tracking-wide">Hızlı Giriş</h3>
+                  <p className="text-xs text-white/30">Her alan için 1 puan + opsiyonel not</p>
                 </div>
               </div>
 
@@ -639,7 +639,7 @@ const LifeAreas = () => {
                 <div className="p-5">
                   <div className="flex items-center gap-2 mb-4">
                     <TrendingUp className="w-4 h-4" style={{ color: colors.hex }} />
-                    <h4 className="font-display text-lg text-white tracking-wide">Son 7 Giris</h4>
+                    <h4 className="font-display text-lg text-white tracking-wide">Son 7 Giriş</h4>
                   </div>
                   <div className="space-y-2">
                     {history.map((h, idx) => (

@@ -243,7 +243,7 @@ const ForgotPassword = () => {
                   to="/login"
                   className="inline-flex items-center gap-2 text-sm text-[#FF4500]/70 hover:text-[#FF4500] transition-colors duration-300 font-medium"
                 >
-                  <ArrowLeft className="w-4 h-4" /> Giris sayfasina don
+                  <ArrowLeft className="w-4 h-4" /> Giriş sayfasına dön
                 </Link>
               </motion.div>
             ) : (
@@ -307,7 +307,7 @@ const ForgotPassword = () => {
                         className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
                       />
                     ) : (
-                      <span className="relative z-10">Sifirlama Linki Gonder</span>
+                      <span className="relative z-10">Sıfırlama Linki Gönder</span>
                     )}
                   </Button>
                 </motion.div>
@@ -323,7 +323,7 @@ const ForgotPassword = () => {
               to="/login"
               className="inline-flex items-center gap-2 text-sm text-white/25 hover:text-[#FF4500]/80 transition-colors duration-300"
             >
-              <ArrowLeft className="w-4 h-4" /> Giris sayfasina don
+              <ArrowLeft className="w-4 h-4" /> Giriş sayfasına dön
             </Link>
           </motion.div>
         )}

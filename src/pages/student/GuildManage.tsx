@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -9,6 +9,7 @@ import {
   ArrowUpDown, Save, X, Check, Lock, RefreshCw,
   Zap, TrendingUp, ShieldCheck, Ban, Gift, Eye,
   Sparkles, Clock, DollarSign, FileText, AlertCircle,
+  Loader2,
 } from "lucide-react";
 import {
   type Guild,
@@ -32,145 +33,14 @@ import RoleBadge from "@/components/guild/RoleBadge";
 import TierBadge from "@/components/guild/TierBadge";
 import HeatMeter from "@/components/guild/HeatMeter";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 
 // ============================================
-// Mock Data
+// Mock Data (kept for Vault & Challenges — separate sprint)
 // ============================================
-
-const MOCK_GUILD: Guild = {
-  id: "1",
-  name: "IRON WOLVES",
-  slug: "iron-wolves",
-  motto: "Sürüden ayrılan kurdu kış yer",
-  description: "Elite lonca. Sadece en disiplinliler kabul edilir.",
-  emblem_url: null,
-  emblem_config: { symbol: "wolf", colors: ["#FF4500", "#FFD700"] },
-  guild_type: "application",
-  rules: [
-    { id: "r1", text: "Haftalık en az 5 gün check-in zorunludur.", created_at: "2025-09-15T10:00:00Z" },
-    { id: "r2", text: "Streak kıranlara 1 hafta uyarı verilir.", created_at: "2025-09-15T10:00:00Z" },
-    { id: "r3", text: "Challenge'larda herkes aktif katılım sağlamalıdır.", created_at: "2025-10-01T10:00:00Z" },
-    { id: "r4", text: "Forge Room'da mentorluk yapmak ek puan kazandırır.", created_at: "2025-11-01T10:00:00Z" },
-  ],
-  level: 7,
-  total_points: 22000,
-  season_points: 4800,
-  treasury_points: 1200,
-  heat_level: 92,
-  tier: "diamond",
-  max_members: 50,
-  member_count: 38,
-  min_streak_requirement: 7,
-  min_phase_requirement: 2,
-  min_score_requirement: 3000,
-  founder_id: "u1",
-  is_active: true,
-  created_at: "2025-09-15T10:00:00Z",
-  updated_at: "2026-03-17T08:00:00Z",
-};
-
-const MOCK_MEMBERS: GuildMember[] = [
-  {
-    id: "m1", guild_id: "1", user_id: "u1", role: "blacksmith",
-    joined_at: "2025-09-15T10:00:00Z", promoted_at: null, contribution_points: 8400,
-    is_active: true,
-    profile: { full_name: "Kaan Yılmaz", avatar_url: null, streak: 42, current_phase: 3, current_week: 2 },
-  },
-  {
-    id: "m2", guild_id: "1", user_id: "u2", role: "striker",
-    joined_at: "2025-09-20T10:00:00Z", promoted_at: "2026-01-10T10:00:00Z", contribution_points: 6200,
-    is_active: true,
-    profile: { full_name: "Elif Demir", avatar_url: null, streak: 38, current_phase: 3, current_week: 1 },
-  },
-  {
-    id: "m3", guild_id: "1", user_id: "u3", role: "tempered",
-    joined_at: "2025-10-05T10:00:00Z", promoted_at: "2025-12-15T10:00:00Z", contribution_points: 4100,
-    is_active: true,
-    profile: { full_name: "Ahmet Korkmaz", avatar_url: null, streak: 28, current_phase: 2, current_week: 4 },
-  },
-  {
-    id: "m4", guild_id: "1", user_id: "u4", role: "tempered",
-    joined_at: "2025-10-12T10:00:00Z", promoted_at: "2026-01-20T10:00:00Z", contribution_points: 3800,
-    is_active: true,
-    profile: { full_name: "Zeynep Aksoy", avatar_url: null, streak: 24, current_phase: 2, current_week: 3 },
-  },
-  {
-    id: "m5", guild_id: "1", user_id: "u5", role: "heated",
-    joined_at: "2025-11-01T10:00:00Z", promoted_at: "2026-02-01T10:00:00Z", contribution_points: 2100,
-    is_active: true,
-    profile: { full_name: "Burak Çelik", avatar_url: null, streak: 21, current_phase: 2, current_week: 1 },
-  },
-  {
-    id: "m6", guild_id: "1", user_id: "u6", role: "heated",
-    joined_at: "2025-11-15T10:00:00Z", promoted_at: null, contribution_points: 1800,
-    is_active: true,
-    profile: { full_name: "Selin Kaya", avatar_url: null, streak: 18, current_phase: 1, current_week: 8 },
-  },
-  {
-    id: "m7", guild_id: "1", user_id: "u7", role: "raw",
-    joined_at: "2026-03-10T10:00:00Z", promoted_at: null, contribution_points: 320,
-    is_active: true,
-    profile: { full_name: "Emre Aydın", avatar_url: null, streak: 5, current_phase: 1, current_week: 2 },
-  },
-  {
-    id: "m8", guild_id: "1", user_id: "u8", role: "raw",
-    joined_at: "2026-03-12T10:00:00Z", promoted_at: null, contribution_points: 180,
-    is_active: true,
-    profile: { full_name: "Defne Şahin", avatar_url: null, streak: 3, current_phase: 1, current_week: 1 },
-  },
-];
-
-const MOCK_APPLICATIONS = [
-  { id: "a1", name: "Mert Yılmaz", streak: 14, phase: 2, week: 1, score: 3500, appliedAt: "2026-03-16T10:00:00Z", message: "Disiplinli bir ortam arıyorum, sizin loncaya katılmak isterim." },
-  { id: "a2", name: "İrem Başaran", streak: 10, phase: 1, week: 8, score: 2800, appliedAt: "2026-03-17T14:00:00Z", message: "Arkadaşım Burak önerdi. Hedeflerim yüksek, katkı sağlamak istiyorum." },
-];
-
-const MOCK_QUESTS: GuildQuest[] = [
-  {
-    id: "q1", guild_id: "1", created_by: "u1",
-    title: "Haftalık Streak Koruma", description: "Tüm üyeler 7 gün boyunca streak korusun.",
-    quest_type: "weekly", target_value: 38, current_value: 31,
-    points_reward: 200, starts_at: "2026-03-11T00:00:00Z", ends_at: "2026-03-18T23:59:59Z",
-    status: "active", completion_rate: 81.5, created_at: "2026-03-11T00:00:00Z",
-  },
-  {
-    id: "q2", guild_id: "1", created_by: "u2",
-    title: "Brotherhood Çalışma Oturumu", description: "En az 5 üye birlikte 2 saat çalışsın.",
-    quest_type: "brotherhood", target_value: 5, current_value: 3,
-    points_reward: 150, starts_at: "2026-03-15T00:00:00Z", ends_at: "2026-03-20T23:59:59Z",
-    status: "active", completion_rate: 60, created_at: "2026-03-15T00:00:00Z",
-  },
-  {
-    id: "q3", guild_id: "1", created_by: "u1",
-    title: "Sprint: 500 Puan", description: "3 günde toplam 500 puan topla.",
-    quest_type: "sprint", target_value: 500, current_value: 500,
-    points_reward: 300, starts_at: "2026-03-08T00:00:00Z", ends_at: "2026-03-11T23:59:59Z",
-    status: "completed", completion_rate: 100, created_at: "2026-03-08T00:00:00Z",
-  },
-];
-
-const MOCK_CHALLENGES: GuildChallenge[] = [
-  {
-    id: "ch1", challenger_id: "1", challenged_id: "2",
-    challenge_type: "spark_duel", challenger_score: 340, challenged_score: 290,
-    winner_id: null, status: "live",
-    starts_at: "2026-03-15T00:00:00Z", ends_at: "2026-03-18T23:59:59Z",
-    created_at: "2026-03-14T10:00:00Z",
-    challenger: { ...MOCK_GUILD },
-    challenged: { ...MOCK_GUILD, id: "2", name: "STEEL PHOENIX", slug: "steel-phoenix", tier: "gold", heat_level: 68 },
-  },
-  {
-    id: "ch2", challenger_id: "3", challenged_id: "1",
-    challenge_type: "heat_wave", challenger_score: 0, challenged_score: 0,
-    winner_id: null, status: "pending",
-    starts_at: null, ends_at: null,
-    created_at: "2026-03-17T10:00:00Z",
-    challenger: { ...MOCK_GUILD, id: "3", name: "CRIMSON ANVIL", slug: "crimson-anvil", tier: "silver", heat_level: 55 },
-    challenged: { ...MOCK_GUILD },
-  },
-];
 
 const VAULT_ITEMS = [
   { id: "v1", name: "Arma Yenileme", description: "Guild amblemini güncelle", cost: 300, icon: RefreshCw, color: "#00BFFF" },
@@ -186,6 +56,8 @@ const SPENDING_HISTORY = [
   { id: "s2", item: "Shield", cost: 500, date: "2026-02-20T10:00:00Z", by: "Elif Demir" },
   { id: "s3", item: "Spotlight", cost: 400, date: "2026-02-05T10:00:00Z", by: "Kaan Yılmaz" },
 ];
+
+const MOCK_CHALLENGES: GuildChallenge[] = [];
 
 // ============================================
 // Section Config
@@ -349,6 +221,19 @@ function GlassSelect({
 }
 
 // ============================================
+// Loading Spinner
+// ============================================
+
+function LoadingSpinner({ text = "Yükleniyor..." }: { text?: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-12 gap-3">
+      <Loader2 className="w-8 h-8 text-ember animate-spin" />
+      <p className="text-sm text-muted-foreground">{text}</p>
+    </div>
+  );
+}
+
+// ============================================
 // Confirmation Dialog
 // ============================================
 
@@ -421,14 +306,42 @@ function ConfirmDialog({
 // Section Components
 // ============================================
 
-function SettingsSection() {
-  const [name, setName] = useState(MOCK_GUILD.name);
-  const [motto, setMotto] = useState(MOCK_GUILD.motto || "");
-  const [description, setDescription] = useState(MOCK_GUILD.description || "");
-  const [guildType, setGuildType] = useState<string>(MOCK_GUILD.guild_type);
-  const [minStreak, setMinStreak] = useState(String(MOCK_GUILD.min_streak_requirement));
-  const [minPhase, setMinPhase] = useState(String(MOCK_GUILD.min_phase_requirement));
-  const [minScore, setMinScore] = useState(String(MOCK_GUILD.min_score_requirement));
+function SettingsSection({ guild, onSaved }: { guild: Guild; onSaved: () => void }) {
+  const [name, setName] = useState(guild.name);
+  const [motto, setMotto] = useState(guild.motto || "");
+  const [description, setDescription] = useState(guild.description || "");
+  const [guildType, setGuildType] = useState<string>(guild.guild_type);
+  const [minStreak, setMinStreak] = useState(String(guild.min_streak_requirement));
+  const [minPhase, setMinPhase] = useState(String(guild.min_phase_requirement));
+  const [minScore, setMinScore] = useState(String(guild.min_score_requirement));
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from("guilds")
+        .update({
+          name,
+          motto: motto || null,
+          description: description || null,
+          guild_type: guildType as GuildType,
+          min_streak_requirement: parseInt(minStreak) || 0,
+          min_phase_requirement: parseInt(minPhase) || 0,
+          min_score_requirement: parseInt(minScore) || 0,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", guild.id);
+
+      if (error) throw error;
+      toast.success("Guild ayarları kaydedildi!");
+      onSaved();
+    } catch (err: any) {
+      toast.error(err.message || "Kaydetme başarısız oldu.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <GlassCard accentColor="#FF8C00">
@@ -466,10 +379,12 @@ function SettingsSection() {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="flex items-center gap-2 rounded-xl bg-ember px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-ember/20 hover:bg-ember/90 transition-colors"
+            onClick={handleSave}
+            disabled={saving}
+            className="flex items-center gap-2 rounded-xl bg-ember px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-ember/20 hover:bg-ember/90 transition-colors disabled:opacity-50"
           >
-            <Save size={15} />
-            Kaydet
+            {saving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
+            {saving ? "Kaydediliyor..." : "Kaydet"}
           </motion.button>
         </div>
       </div>
@@ -477,14 +392,92 @@ function SettingsSection() {
   );
 }
 
-function MembersSection() {
-  const [kickTarget, setKickTarget] = useState<string | null>(null);
+function MembersSection({ guild }: { guild: Guild }) {
+  const [members, setMembers] = useState<GuildMember[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [kickTarget, setKickTarget] = useState<{ id: string; name: string } | null>(null);
   const [roleDropdown, setRoleDropdown] = useState<string | null>(null);
   const [showApplications, setShowApplications] = useState(false);
 
-  const sorted = [...MOCK_MEMBERS].sort(
+  const fetchMembers = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from("guild_members")
+        .select("*, profiles(full_name, avatar_url, streak, current_phase, current_week)")
+        .eq("guild_id", guild.id)
+        .eq("is_active", true)
+        .order("contribution_points", { ascending: false });
+
+      if (error) throw error;
+
+      const mapped: GuildMember[] = (data || []).map((row: any) => ({
+        id: row.id,
+        guild_id: row.guild_id,
+        user_id: row.user_id,
+        role: row.role,
+        joined_at: row.joined_at,
+        promoted_at: row.promoted_at,
+        contribution_points: row.contribution_points || 0,
+        is_active: row.is_active,
+        profile: row.profiles ? {
+          full_name: row.profiles.full_name || "İsimsiz",
+          avatar_url: row.profiles.avatar_url,
+          streak: row.profiles.streak || 0,
+          current_phase: row.profiles.current_phase || 1,
+          current_week: row.profiles.current_week || 1,
+        } : undefined,
+      }));
+
+      setMembers(mapped);
+    } catch (err: any) {
+      toast.error("Üyeler yüklenemedi: " + (err.message || "Bilinmeyen hata"));
+    } finally {
+      setLoading(false);
+    }
+  }, [guild.id]);
+
+  useEffect(() => {
+    fetchMembers();
+  }, [fetchMembers]);
+
+  const handleRoleChange = async (memberId: string, newRole: GuildRole) => {
+    try {
+      const { error } = await supabase
+        .from("guild_members")
+        .update({ role: newRole, promoted_at: new Date().toISOString() })
+        .eq("id", memberId);
+
+      if (error) throw error;
+      toast.success("Rol güncellendi!");
+      setRoleDropdown(null);
+      fetchMembers();
+    } catch (err: any) {
+      toast.error("Rol değiştirilemedi: " + (err.message || ""));
+    }
+  };
+
+  const handleKick = async () => {
+    if (!kickTarget) return;
+    try {
+      const { error } = await supabase
+        .from("guild_members")
+        .update({ is_active: false })
+        .eq("id", kickTarget.id);
+
+      if (error) throw error;
+      toast.success(`${kickTarget.name} loncadan çıkarıldı.`);
+      setKickTarget(null);
+      fetchMembers();
+    } catch (err: any) {
+      toast.error("Üye çıkarılamadı: " + (err.message || ""));
+    }
+  };
+
+  const sorted = [...members].sort(
     (a, b) => GUILD_ROLE_ORDER[b.role] - GUILD_ROLE_ORDER[a.role]
   );
+
+  if (loading) return <LoadingSpinner text="Üyeler yükleniyor..." />;
 
   return (
     <>
@@ -497,84 +490,16 @@ function MembersSection() {
               </div>
               <div>
                 <h3 className="font-display text-base tracking-wide text-foreground">Üye Yönetimi</h3>
-                <p className="text-xs text-muted-foreground">{MOCK_MEMBERS.length} aktif üye</p>
+                <p className="text-xs text-muted-foreground">{members.length} aktif üye</p>
               </div>
             </div>
-            {MOCK_APPLICATIONS.length > 0 && (
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setShowApplications(!showApplications)}
-                className="flex items-center gap-2 rounded-xl bg-amber-500/10 border border-amber-500/20 px-4 py-2 text-sm font-medium text-amber-400 hover:bg-amber-500/20 transition-colors"
-              >
-                <UserCheck size={15} />
-                {MOCK_APPLICATIONS.length} Başvuru
-                <ChevronDown size={14} className={`transition-transform ${showApplications ? "rotate-180" : ""}`} />
-              </motion.button>
-            )}
           </div>
-
-          {/* Pending Applications */}
-          <AnimatePresence>
-            {showApplications && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="overflow-hidden mb-6"
-              >
-                <div className="rounded-xl border border-amber-500/10 bg-amber-500/[0.03] p-4 space-y-3">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-amber-400/60 mb-2">
-                    Bekleyen Başvurular
-                  </p>
-                  {MOCK_APPLICATIONS.map((app) => (
-                    <div
-                      key={app.id}
-                      className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.02] p-4"
-                    >
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-10 w-10 border border-white/[0.08]">
-                          <AvatarFallback className="text-xs font-bold bg-amber-500/10 text-amber-400">
-                            {getInitials(app.name)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="text-sm font-medium text-foreground">{app.name}</p>
-                          <p className="text-[11px] text-muted-foreground">
-                            Streak: {app.streak} &middot; Phase {app.phase} W{app.week} &middot; {app.score.toLocaleString()} puan
-                          </p>
-                          <p className="mt-1 text-[11px] text-muted-foreground/60 italic">"{app.message}"</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0 ml-4">
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-500/10 text-green-400 hover:bg-green-500/20 border border-green-500/20 transition-colors"
-                        >
-                          <Check size={15} />
-                        </motion.button>
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 transition-colors"
-                        >
-                          <X size={15} />
-                        </motion.button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
 
           {/* Member list */}
           <div className="space-y-1">
             {sorted.map((member, i) => {
               const roleColor = GUILD_ROLE_COLORS[member.role];
-              const isFounder = member.user_id === MOCK_GUILD.founder_id;
+              const isFounder = member.user_id === guild.founder_id;
               return (
                 <motion.div
                   key={member.id}
@@ -585,6 +510,9 @@ function MembersSection() {
                 >
                   {/* Avatar */}
                   <Avatar className="h-9 w-9 border border-white/[0.08] shrink-0">
+                    {member.profile?.avatar_url && (
+                      <AvatarImage src={member.profile.avatar_url} />
+                    )}
                     <AvatarFallback
                       className="text-[11px] font-bold"
                       style={{
@@ -641,7 +569,7 @@ function MembersSection() {
                               {ROLE_LIST.filter((r) => r !== "blacksmith").map((r) => (
                                 <button
                                   key={r}
-                                  onClick={() => setRoleDropdown(null)}
+                                  onClick={() => handleRoleChange(member.id, r)}
                                   className={`flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-xs transition-colors ${
                                     r === member.role ? "bg-white/[0.08] text-foreground" : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground"
                                   }`}
@@ -659,7 +587,7 @@ function MembersSection() {
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        onClick={() => setKickTarget(member.profile?.full_name || "")}
+                        onClick={() => setKickTarget({ id: member.id, name: member.profile?.full_name || "" })}
                         className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
                       >
                         <UserMinus size={13} />
@@ -669,6 +597,10 @@ function MembersSection() {
                 </motion.div>
               );
             })}
+
+            {members.length === 0 && (
+              <p className="text-center text-sm text-muted-foreground py-8">Henüz üye bulunamadı.</p>
+            )}
           </div>
         </div>
       </GlassCard>
@@ -676,9 +608,9 @@ function MembersSection() {
       <ConfirmDialog
         open={!!kickTarget}
         onClose={() => setKickTarget(null)}
-        onConfirm={() => setKickTarget(null)}
+        onConfirm={handleKick}
         title="Üyeyi Çıkar"
-        message={`${kickTarget} adlı üyeyi loncadan çıkarmak istediğine emin misin? Bu işlem geri alınamaz.`}
+        message={`${kickTarget?.name} adlı üyeyi loncadan çıkarmak istediğine emin misin? Bu işlem geri alınamaz.`}
         confirmLabel="Çıkar"
         danger
       />
@@ -686,8 +618,12 @@ function MembersSection() {
   );
 }
 
-function QuestsSection() {
+function QuestsSection({ guild }: { guild: Guild }) {
+  const { user } = useAuth();
+  const [quests, setQuests] = useState<GuildQuest[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
+  const [creating, setCreating] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newDesc, setNewDesc] = useState("");
   const [newType, setNewType] = useState<string>("weekly");
@@ -695,6 +631,63 @@ function QuestsSection() {
   const [newPoints, setNewPoints] = useState("");
   const [newStart, setNewStart] = useState("");
   const [newEnd, setNewEnd] = useState("");
+
+  const fetchQuests = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from("guild_quests")
+        .select("*")
+        .eq("guild_id", guild.id)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setQuests((data || []) as GuildQuest[]);
+    } catch (err: any) {
+      toast.error("Quest'ler yüklenemedi: " + (err.message || ""));
+    } finally {
+      setLoading(false);
+    }
+  }, [guild.id]);
+
+  useEffect(() => {
+    fetchQuests();
+  }, [fetchQuests]);
+
+  const handleCreate = async () => {
+    if (!newTitle.trim() || !newTarget || !newPoints || !newStart || !newEnd) {
+      toast.error("Lütfen tüm alanları doldurun.");
+      return;
+    }
+    setCreating(true);
+    try {
+      const { error } = await supabase.from("guild_quests").insert({
+        guild_id: guild.id,
+        created_by: user?.id,
+        title: newTitle.trim(),
+        description: newDesc.trim() || null,
+        quest_type: newType as QuestType,
+        target_value: parseInt(newTarget),
+        current_value: 0,
+        points_reward: parseInt(newPoints),
+        starts_at: new Date(newStart).toISOString(),
+        ends_at: new Date(newEnd).toISOString(),
+        status: "active",
+        completion_rate: 0,
+      });
+
+      if (error) throw error;
+      toast.success("Quest oluşturuldu!");
+      setNewTitle(""); setNewDesc(""); setNewTarget(""); setNewPoints(""); setNewStart(""); setNewEnd("");
+      setShowCreate(false);
+      fetchQuests();
+    } catch (err: any) {
+      toast.error("Quest oluşturulamadı: " + (err.message || ""));
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  if (loading) return <LoadingSpinner text="Quest'ler yükleniyor..." />;
 
   return (
     <GlassCard accentColor="#22C55E">
@@ -706,7 +699,7 @@ function QuestsSection() {
             </div>
             <div>
               <h3 className="font-display text-base tracking-wide text-foreground">Quest Yönetimi</h3>
-              <p className="text-xs text-muted-foreground">{MOCK_QUESTS.filter((q) => q.status === "active").length} aktif quest</p>
+              <p className="text-xs text-muted-foreground">{quests.filter((q) => q.status === "active").length} aktif quest</p>
             </div>
           </div>
           <motion.button
@@ -762,10 +755,12 @@ function QuestsSection() {
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="flex items-center gap-2 rounded-xl bg-[#22C55E] px-5 py-2 text-sm font-medium text-white shadow-lg shadow-[#22C55E]/20 hover:bg-[#22C55E]/90 transition-colors"
+                    onClick={handleCreate}
+                    disabled={creating}
+                    className="flex items-center gap-2 rounded-xl bg-[#22C55E] px-5 py-2 text-sm font-medium text-white shadow-lg shadow-[#22C55E]/20 hover:bg-[#22C55E]/90 transition-colors disabled:opacity-50"
                   >
-                    <Plus size={14} />
-                    Oluştur
+                    {creating ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+                    {creating ? "Oluşturuluyor..." : "Oluştur"}
                   </motion.button>
                 </div>
               </div>
@@ -775,7 +770,7 @@ function QuestsSection() {
 
         {/* Quest list */}
         <div className="space-y-3">
-          {MOCK_QUESTS.map((quest, i) => {
+          {quests.map((quest, i) => {
             const isActive = quest.status === "active";
             const isCompleted = quest.status === "completed";
             return (
@@ -857,13 +852,17 @@ function QuestsSection() {
               </motion.div>
             );
           })}
+
+          {quests.length === 0 && (
+            <p className="text-center text-sm text-muted-foreground py-8">Henüz quest bulunamadı.</p>
+          )}
         </div>
       </div>
     </GlassCard>
   );
 }
 
-function ChallengesSection() {
+function ChallengesSection({ guild }: { guild: Guild }) {
   const [searchGuild, setSearchGuild] = useState("");
   const [challengeType, setChallengeType] = useState<string>("spark_duel");
 
@@ -918,91 +917,17 @@ function ChallengesSection() {
           </div>
         </div>
 
-        {/* Active / past challenges */}
-        <div className="space-y-3">
-          {MOCK_CHALLENGES.map((ch, i) => {
-            const status = CHALLENGE_STATUS_LABELS[ch.status];
-            const isUs = ch.challenger_id === MOCK_GUILD.id;
-            const opponent = isUs ? ch.challenged : ch.challenger;
-            const ourScore = isUs ? ch.challenger_score : ch.challenged_score;
-            const theirScore = isUs ? ch.challenged_score : ch.challenger_score;
-            return (
-              <motion.div
-                key={ch.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: i * 0.05 }}
-                className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2">
-                      <span className="font-display text-sm text-foreground tracking-wide">{MOCK_GUILD.name}</span>
-                      <span className="text-xs text-muted-foreground">vs</span>
-                      <span className="font-display text-sm text-foreground tracking-wide">{opponent?.name}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="rounded-full px-2 py-0.5 text-[10px] font-medium border" style={{
-                      background: status.color + "15",
-                      borderColor: status.color + "33",
-                      color: status.color,
-                    }}>
-                      {status.label}
-                    </span>
-                    <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] text-muted-foreground border border-white/[0.06]">
-                      {CHALLENGE_TYPE_LABELS[ch.challenge_type]}
-                    </span>
-                  </div>
-                </div>
-                {ch.status === "live" && (
-                  <div className="flex items-center gap-4">
-                    <div className="flex-1 text-center">
-                      <p className="text-2xl font-display text-ember">{ourScore}</p>
-                      <p className="text-[10px] text-muted-foreground">Biz</p>
-                    </div>
-                    <div className="text-xl text-muted-foreground/30">—</div>
-                    <div className="flex-1 text-center">
-                      <p className="text-2xl font-display text-muted-foreground">{theirScore}</p>
-                      <p className="text-[10px] text-muted-foreground">Rakip</p>
-                    </div>
-                  </div>
-                )}
-                {ch.status === "pending" && !isUs && (
-                  <div className="flex gap-2 mt-2">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="flex items-center gap-2 rounded-xl bg-green-500/10 border border-green-500/20 px-4 py-2 text-sm font-medium text-green-400 hover:bg-green-500/20 transition-colors"
-                    >
-                      <Check size={14} />
-                      Kabul Et
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="flex items-center gap-2 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-2 text-sm font-medium text-red-400 hover:bg-red-500/20 transition-colors"
-                    >
-                      <X size={14} />
-                      Reddet
-                    </motion.button>
-                  </div>
-                )}
-                {ch.starts_at && (
-                  <p className="mt-2 text-[10px] text-muted-foreground/50">
-                    {formatDate(ch.starts_at)} — {ch.ends_at ? formatDate(ch.ends_at) : "Devam ediyor"}
-                  </p>
-                )}
-              </motion.div>
-            );
-          })}
+        {/* Empty state for challenges */}
+        <div className="text-center py-8">
+          <Swords size={32} className="mx-auto text-muted-foreground/20 mb-3" />
+          <p className="text-sm text-muted-foreground">Challenge sistemi yakında aktif olacak.</p>
         </div>
       </div>
     </GlassCard>
   );
 }
 
-function VaultSection() {
+function VaultSection({ guild }: { guild: Guild }) {
   const [confirmPurchase, setConfirmPurchase] = useState<string | null>(null);
   const purchaseItem = VAULT_ITEMS.find((v) => v.id === confirmPurchase);
 
@@ -1023,7 +948,7 @@ function VaultSection() {
             {/* Balance */}
             <div className="flex items-center gap-2 rounded-xl bg-[#FFD700]/10 border border-[#FFD700]/20 px-4 py-2">
               <Coins size={16} className="text-[#FFD700]" />
-              <span className="font-display text-lg text-[#FFD700]">{MOCK_GUILD.treasury_points.toLocaleString()}</span>
+              <span className="font-display text-lg text-[#FFD700]">{guild.treasury_points.toLocaleString()}</span>
               <span className="text-xs text-[#FFD700]/60">TP</span>
             </div>
           </div>
@@ -1032,7 +957,7 @@ function VaultSection() {
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 mb-6">
             {VAULT_ITEMS.map((item, i) => {
               const Icon = item.icon;
-              const canAfford = MOCK_GUILD.treasury_points >= item.cost;
+              const canAfford = guild.treasury_points >= item.cost;
               return (
                 <motion.button
                   key={item.id}
@@ -1114,15 +1039,35 @@ function VaultSection() {
   );
 }
 
-function RulesSection() {
-  const [rules, setRules] = useState<GuildRule[]>(MOCK_GUILD.rules);
+function RulesSection({ guild, onSaved }: { guild: Guild; onSaved: () => void }) {
+  const [rules, setRules] = useState<GuildRule[]>(guild.rules || []);
   const [newRule, setNewRule] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const saveRules = async (updatedRules: GuildRule[]) => {
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from("guilds")
+        .update({ rules: updatedRules as any, updated_at: new Date().toISOString() })
+        .eq("id", guild.id);
+
+      if (error) throw error;
+      setRules(updatedRules);
+      onSaved();
+    } catch (err: any) {
+      toast.error("Kurallar kaydedilemedi: " + (err.message || ""));
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const addRule = () => {
     if (!newRule.trim()) return;
-    setRules([...rules, { id: `r-${Date.now()}`, text: newRule.trim(), created_at: new Date().toISOString() }]);
+    const updatedRules = [...rules, { id: `r-${Date.now()}`, text: newRule.trim(), created_at: new Date().toISOString() }];
+    saveRules(updatedRules);
     setNewRule("");
   };
 
@@ -1132,13 +1077,15 @@ function RulesSection() {
   };
 
   const saveEdit = () => {
-    setRules(rules.map((r) => (r.id === editingId ? { ...r, text: editText } : r)));
+    const updatedRules = rules.map((r) => (r.id === editingId ? { ...r, text: editText } : r));
+    saveRules(updatedRules);
     setEditingId(null);
     setEditText("");
   };
 
   const deleteRule = (id: string) => {
-    setRules(rules.filter((r) => r.id !== id));
+    const updatedRules = rules.filter((r) => r.id !== id);
+    saveRules(updatedRules);
   };
 
   return (
@@ -1235,14 +1182,14 @@ function RulesSection() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={addRule}
-            disabled={!newRule.trim()}
+            disabled={!newRule.trim() || saving}
             className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all ${
               newRule.trim()
                 ? "bg-ember text-white shadow-lg shadow-ember/20 hover:bg-ember/90"
                 : "bg-white/[0.06] text-muted-foreground/30"
             }`}
           >
-            <Plus size={15} />
+            {saving ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />}
             Ekle
           </motion.button>
         </div>
@@ -1251,9 +1198,25 @@ function RulesSection() {
   );
 }
 
-function DangerSection() {
+function DangerSection({ guild }: { guild: Guild }) {
+  const navigate = useNavigate();
   const [showTransfer, setShowTransfer] = useState(false);
   const [showDisband, setShowDisband] = useState(false);
+
+  const handleDisband = async () => {
+    try {
+      const { error } = await supabase
+        .from("guilds")
+        .update({ is_active: false, updated_at: new Date().toISOString() })
+        .eq("id", guild.id);
+
+      if (error) throw error;
+      toast.success("Guild dağıtıldı.");
+      navigate("/guilds");
+    } catch (err: any) {
+      toast.error("Guild dağıtılamadı: " + (err.message || ""));
+    }
+  };
 
   return (
     <>
@@ -1319,9 +1282,9 @@ function DangerSection() {
       <ConfirmDialog
         open={showDisband}
         onClose={() => setShowDisband(false)}
-        onConfirm={() => setShowDisband(false)}
+        onConfirm={handleDisband}
         title="Guild'i Dağıt"
-        message="IRON WOLVES kalıcı olarak kapatılacak. Tüm üyeler çıkarılacak, tüm puanlar ve geçmiş silinecek. Bu işlem GERİ ALINAMAZ."
+        message={`${guild.name} kalıcı olarak kapatılacak. Tüm üyeler çıkarılacak, tüm puanlar ve geçmiş silinecek. Bu işlem GERİ ALINAMAZ.`}
         confirmLabel="Kalıcı Olarak Dağıt"
         danger
       />
@@ -1336,17 +1299,77 @@ function DangerSection() {
 export default function GuildManage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [activeSection, setActiveSection] = useState<SectionKey>("settings");
+  const [guild, setGuild] = useState<Guild | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchGuild = useCallback(async () => {
+    if (!slug) {
+      setError("Guild slug bulunamadı.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const { data, error: fetchError } = await supabase
+        .from("guilds")
+        .select("*")
+        .eq("slug", slug)
+        .eq("is_active", true)
+        .single();
+
+      if (fetchError) throw fetchError;
+      if (!data) throw new Error("Guild bulunamadı.");
+
+      setGuild(data as Guild);
+    } catch (err: any) {
+      setError(err.message || "Guild yüklenemedi.");
+      toast.error("Guild yüklenemedi: " + (err.message || ""));
+    } finally {
+      setLoading(false);
+    }
+  }, [slug]);
+
+  useEffect(() => {
+    fetchGuild();
+  }, [fetchGuild]);
+
+  if (loading) {
+    return (
+      <div className="w-full flex items-center justify-center min-h-[50vh]">
+        <LoadingSpinner text="Guild yükleniyor..." />
+      </div>
+    );
+  }
+
+  if (error || !guild) {
+    return (
+      <div className="w-full flex flex-col items-center justify-center min-h-[50vh] gap-4">
+        <AlertCircle size={48} className="text-red-400" />
+        <p className="text-lg text-muted-foreground">{error || "Guild bulunamadı."}</p>
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => navigate(-1)}
+          className="rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-white/[0.08] transition-colors"
+        >
+          Geri Dön
+        </motion.button>
+      </div>
+    );
+  }
 
   const renderSection = () => {
     switch (activeSection) {
-      case "settings": return <SettingsSection />;
-      case "members": return <MembersSection />;
-      case "quests": return <QuestsSection />;
-      case "challenges": return <ChallengesSection />;
-      case "vault": return <VaultSection />;
-      case "rules": return <RulesSection />;
-      case "danger": return <DangerSection />;
+      case "settings": return <SettingsSection guild={guild} onSaved={fetchGuild} />;
+      case "members": return <MembersSection guild={guild} />;
+      case "quests": return <QuestsSection guild={guild} />;
+      case "challenges": return <ChallengesSection guild={guild} />;
+      case "vault": return <VaultSection guild={guild} />;
+      case "rules": return <RulesSection guild={guild} onSaved={fetchGuild} />;
+      case "danger": return <DangerSection guild={guild} />;
     }
   };
 
@@ -1365,12 +1388,12 @@ export default function GuildManage() {
           </div>
           <div>
             <h1 className="font-display text-2xl tracking-wide text-foreground">Guild Yönetimi</h1>
-            <p className="text-sm text-muted-foreground">IRON WOLVES &middot; Blacksmith Paneli</p>
+            <p className="text-sm text-muted-foreground">{guild.name} &middot; Blacksmith Paneli</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <TierBadge tier={MOCK_GUILD.tier} size="md" />
-          <HeatMeter level={MOCK_GUILD.heat_level} size="sm" showLabel={false} />
+          <TierBadge tier={guild.tier} size="md" />
+          <HeatMeter level={guild.heat_level} size="sm" showLabel={false} />
         </div>
       </motion.div>
 

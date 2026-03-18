@@ -256,7 +256,7 @@ const Community = () => {
               <Textarea
                 value={content}
                 onChange={e => setContent(e.target.value)}
-                placeholder={postType === "milestone" ? "Basarini paylas..." : "Topluluga bir sey paylas..."}
+                placeholder={postType === "milestone" ? "Başarını paylaş..." : "Topluluğa bir şey paylaş..."}
                 className="bg-white/[0.02] border-white/[0.06] text-white placeholder:text-white/20 rounded-xl resize-none focus:border-[#FF4500]/30 focus:ring-1 focus:ring-[#FF4500]/20 transition-all duration-300 min-h-[100px]"
                 rows={3}
               />
@@ -302,7 +302,7 @@ const Community = () => {
               >
                 <Upload className={`w-5 h-5 mx-auto mb-1.5 transition-colors ${isDragging ? "text-[#FF4500]" : "text-white/20"}`} />
                 <p className={`text-xs transition-colors ${isDragging ? "text-[#FF4500]/70" : "text-white/20"}`}>
-                  Gorsel yuklemek icin tikla veya suruklep birak
+                  Görsel yüklemek için tıkla veya sürükleyip bırak
                 </p>
               </div>
             )}
@@ -323,7 +323,7 @@ const Community = () => {
                 className="ml-auto bg-gradient-to-r from-[#FF4500] to-orange-600 hover:from-[#FF4500]/90 hover:to-orange-600/90 text-white border-0 rounded-xl px-6 shadow-lg shadow-[#FF4500]/20 disabled:opacity-30 disabled:shadow-none transition-all duration-300"
               >
                 <Send className="w-4 h-4 mr-2" />
-                {loading ? "Gonderiliyor..." : "Paylas"}
+                {loading ? "Gönderiliyor..." : "Paylaş"}
               </Button>
             </div>
           </div>
@@ -332,9 +332,9 @@ const Community = () => {
         {/* Filter tabs */}
         <motion.div variants={itemVariants} className="flex gap-2">
           {([
-            ["all", "Tumu", Filter],
-            ["photo", "Fotograflar", Image],
-            ["milestone", "Basarilar", Trophy],
+            ["all", "Tümü", Filter],
+            ["photo", "Fotoğraflar", Image],
+            ["milestone", "Başarılar", Trophy],
           ] as const).map(([key, label, Icon]) => (
             <motion.button
               key={key}
