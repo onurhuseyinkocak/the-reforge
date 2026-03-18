@@ -1,15 +1,30 @@
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
 type UserRole = "admin" | "student";
+
+interface Profile {
+  id: string;
+  user_id: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  bio: string | null;
+  goals: string | null;
+  phone: string | null;
+  status: string | null;
+  current_phase: number;
+  current_week: number;
+  streak: number;
+  mentor_id: string | null;
+}
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
   role: UserRole | null;
-  profile: any;
+  profile: Profile | null;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
@@ -30,7 +45,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState<UserRole | null>(null);
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const initialSessionHandled = useRef(false);
 
   const fetchUserData = useCallback(async (userId: string) => {
     try {
@@ -41,6 +57,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (rolesRes.data && rolesRes.data.length > 0) {
         const hasAdmin = rolesRes.data.some((r: any) => r.role === "admin");
         setRole(hasAdmin ? "admin" : "student");
+      } else {
+        setRole("student");
       }
       if (profileRes.data) setProfile(profileRes.data);
     } catch (e) {
@@ -54,27 +72,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      (event, session) => {
+        if (event === "INITIAL_SESSION") {
+          initialSessionHandled.current = true;
+        }
+
         setSession(session);
         setUser(session?.user ?? null);
+
         if (session?.user) {
-          setTimeout(() => fetchUserData(session.user.id), 0);
+          setTimeout(() => {
+            fetchUserData(session.user.id).finally(() => setLoading(false));
+          }, 0);
         } else {
           setRole(null);
           setProfile(null);
+          setLoading(false);
         }
-        setLoading(false);
       }
     );
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchUserData(session.user.id);
-      }
-      setLoading(false);
-    });
 
     return () => subscription.unsubscribe();
   }, [fetchUserData]);

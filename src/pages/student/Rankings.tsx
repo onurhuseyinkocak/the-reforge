@@ -1,38 +1,106 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Trophy, Users, User, Flame, TrendingUp, TrendingDown, Minus, Crown, Medal, Award, ChevronUp, ChevronDown, Shield } from "lucide-react";
-import { TIER_CONFIG, RANK_CONFIG, type GuildTier, type PersonalRank } from "@/types/guild";
+import { Trophy, Users, User, Flame, TrendingUp, TrendingDown, Minus, Crown, Medal, Award, ChevronUp, ChevronDown, Shield, Loader2 } from "lucide-react";
+import { TIER_CONFIG, RANK_CONFIG, type GuildTier, type PersonalRank, type Guild, getPersonalRank } from "@/types/guild";
 import TierBadge from "@/components/guild/TierBadge";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
-const MOCK_GUILD_RANKINGS = [
-  { rank: 1, name: 'OBSIDIAN FORGE', tier: 'obsidian' as GuildTier, sp: 11200, heat: 98, members: 87, change: 'up' },
-  { rank: 2, name: 'SILENT HAMMERS', tier: 'diamond' as GuildTier, sp: 7500, heat: 85, members: 62, change: 'up' },
-  { rank: 3, name: 'IRON WOLVES', tier: 'diamond' as GuildTier, sp: 4800, heat: 92, members: 38, change: 'same' },
-  { rank: 4, name: 'PHOENIX GUARD', tier: 'gold' as GuildTier, sp: 3200, heat: 78, members: 31, change: 'down' },
-  { rank: 5, name: 'STEEL BROTHERS', tier: 'gold' as GuildTier, sp: 2100, heat: 71, members: 24, change: 'up' },
-  { rank: 6, name: 'EMBER LEGION', tier: 'silver' as GuildTier, sp: 1600, heat: 65, members: 16, change: 'same' },
-  { rank: 7, name: 'NIGHT ANVIL', tier: 'silver' as GuildTier, sp: 890, heat: 55, members: 11, change: 'down' },
-  { rank: 8, name: 'BRONZE FLAMES', tier: 'bronze' as GuildTier, sp: 450, heat: 35, members: 7, change: 'up' },
-  { rank: 9, name: 'RAW RECRUITS', tier: 'bronze' as GuildTier, sp: 320, heat: 42, members: 4, change: 'same' },
-];
+interface GuildRanking {
+  rank: number;
+  name: string;
+  tier: GuildTier;
+  sp: number;
+  heat: number;
+  members: number;
+  change: 'up' | 'down' | 'same';
+}
 
-const MOCK_PERSONAL_RANKINGS = [
-  { rank: 1, name: 'Kaan Yıldırım', score: 42500, personalRank: 'diamond' as PersonalRank, guild: 'OBSIDIAN FORGE' },
-  { rank: 2, name: 'Emre Demir', score: 38200, personalRank: 'diamond' as PersonalRank, guild: 'SILENT HAMMERS' },
-  { rank: 3, name: 'Burak Çelik', score: 31000, personalRank: 'platinum' as PersonalRank, guild: 'OBSIDIAN FORGE' },
-  { rank: 4, name: 'Arda Koç', score: 24500, personalRank: 'platinum' as PersonalRank, guild: 'IRON WOLVES' },
-  { rank: 5, name: 'Yusuf Kara', score: 19800, personalRank: 'gold' as PersonalRank, guild: 'PHOENIX GUARD' },
-  { rank: 6, name: 'Mert Aydın', score: 15200, personalRank: 'gold' as PersonalRank, guild: 'STEEL BROTHERS' },
-  { rank: 7, name: 'Ali Şahin', score: 11500, personalRank: 'silver' as PersonalRank, guild: 'IRON WOLVES' },
-  { rank: 8, name: 'Ozan Yılmaz', score: 8900, personalRank: 'silver' as PersonalRank, guild: 'EMBER LEGION' },
-  { rank: 9, name: 'Can Arslan', score: 5400, personalRank: 'bronze' as PersonalRank, guild: 'NIGHT ANVIL' },
-  { rank: 10, name: 'Deniz Öztürk', score: 2800, personalRank: 'steel' as PersonalRank, guild: 'BRONZE FLAMES' },
-];
+interface PersonalRanking {
+  rank: number;
+  name: string;
+  score: number;
+  personalRank: PersonalRank;
+  guild: string;
+}
 
 const RANK_MEDAL_COLORS = ['#FFD700', '#C0C0C0', '#CD7F32'];
 
 export default function Rankings() {
   const [tab, setTab] = useState<'guild' | 'personal'>('guild');
+  const [guildRankings, setGuildRankings] = useState<GuildRanking[]>([]);
+  const [personalRankings, setPersonalRankings] = useState<PersonalRanking[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+
+        const [guildsRes, profilesRes] = await Promise.all([
+          supabase
+            .from('guilds')
+            .select('*')
+            .eq('is_active', true)
+            .order('season_points', { ascending: false }),
+          supabase
+            .from('profiles')
+            .select('*, user_roles(role)')
+            .order('streak', { ascending: false })
+            .limit(50),
+        ]);
+
+        if (guildsRes.error) throw guildsRes.error;
+        if (profilesRes.error) throw profilesRes.error;
+
+        const guilds = (guildsRes.data || []) as unknown as Guild[];
+        setGuildRankings(
+          guilds.map((g, i) => ({
+            rank: i + 1,
+            name: g.name,
+            tier: g.tier,
+            sp: g.season_points,
+            heat: g.heat_level,
+            members: g.member_count,
+            change: 'same' as const,
+          }))
+        );
+
+        const profiles = profilesRes.data || [];
+        setPersonalRankings(
+          profiles.map((p: any, i: number) => ({
+            rank: i + 1,
+            name: p.full_name || 'Anonim',
+            score: p.streak || 0,
+            personalRank: getPersonalRank(p.streak || 0),
+            guild: '-',
+          }))
+        );
+      } catch (err: any) {
+        console.error('Error fetching rankings:', err);
+        toast({ title: 'Hata', description: 'Sıralama verileri yüklenirken bir hata oluştu.', variant: 'destructive' });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex flex-col items-center gap-4"
+        >
+          <Loader2 size={32} className="text-primary animate-spin" />
+          <p className="text-muted-foreground text-sm">Sıralama yükleniyor...</p>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pb-20">
@@ -116,79 +184,86 @@ export default function Rankings() {
             transition={{ duration: 0.3 }}
             className="space-y-2"
           >
-            {MOCK_GUILD_RANKINGS.map((g, i) => (
-              <motion.div
-                key={g.rank}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.06, duration: 0.4 }}
-                whileHover={{ x: 4, transition: { duration: 0.15 } }}
-                className={`relative flex items-center gap-4 px-5 py-4 rounded-xl border cursor-pointer transition-colors ${
-                  i < 3
-                    ? 'border-white/[0.1] bg-white/[0.04]'
-                    : 'border-white/[0.04] bg-white/[0.02] hover:bg-white/[0.03]'
-                }`}
-              >
-                {/* Top 3 left accent */}
-                {i < 3 && (
-                  <div className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full" style={{ backgroundColor: RANK_MEDAL_COLORS[i] }} />
-                )}
-
-                {/* Rank number */}
-                <div className="w-8 text-center shrink-0">
-                  {i < 3 ? (
-                    <motion.div
-                      animate={i === 0 ? { scale: [1, 1.1, 1] } : undefined}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    >
-                      {i === 0 ? <Crown size={22} style={{ color: RANK_MEDAL_COLORS[0] }} /> :
-                       i === 1 ? <Medal size={20} style={{ color: RANK_MEDAL_COLORS[1] }} /> :
-                       <Award size={20} style={{ color: RANK_MEDAL_COLORS[2] }} />}
-                    </motion.div>
-                  ) : (
-                    <span className="text-sm text-muted-foreground font-mono">#{g.rank}</span>
-                  )}
-                </div>
-
-                {/* Guild emblem placeholder */}
-                <div
-                  className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0"
-                  style={{
-                    background: `${TIER_CONFIG[g.tier].color}15`,
-                    border: `1px solid ${TIER_CONFIG[g.tier].color}33`
-                  }}
-                >
-                  <Shield size={18} style={{ color: TIER_CONFIG[g.tier].color }} strokeWidth={1.5} />
-                </div>
-
-                {/* Name + Tier */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className={`font-display tracking-wider truncate ${i < 3 ? 'text-base' : 'text-sm'}`}>{g.name}</span>
-                    <TierBadge tier={g.tier} size="sm" showLabel={false} />
-                  </div>
-                  <div className="flex items-center gap-3 text-[11px] text-muted-foreground mt-0.5">
-                    <span>{g.members} üye</span>
-                    <span className="flex items-center gap-0.5"><Flame size={10} /> {g.heat}</span>
-                  </div>
-                </div>
-
-                {/* Score */}
-                <div className="text-right shrink-0">
-                  <div className="font-display text-lg tracking-wider" style={{ color: i < 3 ? RANK_MEDAL_COLORS[i] : undefined }}>
-                    {g.sp.toLocaleString()}
-                  </div>
-                  <div className="text-[10px] text-muted-foreground">SP</div>
-                </div>
-
-                {/* Change indicator */}
-                <div className="w-6 shrink-0 flex justify-center">
-                  {g.change === 'up' && <ChevronUp size={16} className="text-emerald-500" />}
-                  {g.change === 'down' && <ChevronDown size={16} className="text-red-500" />}
-                  {g.change === 'same' && <Minus size={14} className="text-muted-foreground/40" />}
-                </div>
+            {guildRankings.length === 0 ? (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-20">
+                <Trophy size={48} className="mx-auto text-muted-foreground/30 mb-4" />
+                <p className="text-muted-foreground">Henüz sıralamada lonca yok.</p>
               </motion.div>
-            ))}
+            ) : (
+              guildRankings.map((g, i) => (
+                <motion.div
+                  key={g.rank}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.06, duration: 0.4 }}
+                  whileHover={{ x: 4, transition: { duration: 0.15 } }}
+                  className={`relative flex items-center gap-4 px-5 py-4 rounded-xl border cursor-pointer transition-colors ${
+                    i < 3
+                      ? 'border-white/[0.1] bg-white/[0.04]'
+                      : 'border-white/[0.04] bg-white/[0.02] hover:bg-white/[0.03]'
+                  }`}
+                >
+                  {/* Top 3 left accent */}
+                  {i < 3 && (
+                    <div className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full" style={{ backgroundColor: RANK_MEDAL_COLORS[i] }} />
+                  )}
+
+                  {/* Rank number */}
+                  <div className="w-8 text-center shrink-0">
+                    {i < 3 ? (
+                      <motion.div
+                        animate={i === 0 ? { scale: [1, 1.1, 1] } : undefined}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      >
+                        {i === 0 ? <Crown size={22} style={{ color: RANK_MEDAL_COLORS[0] }} /> :
+                         i === 1 ? <Medal size={20} style={{ color: RANK_MEDAL_COLORS[1] }} /> :
+                         <Award size={20} style={{ color: RANK_MEDAL_COLORS[2] }} />}
+                      </motion.div>
+                    ) : (
+                      <span className="text-sm text-muted-foreground font-mono">#{g.rank}</span>
+                    )}
+                  </div>
+
+                  {/* Guild emblem placeholder */}
+                  <div
+                    className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0"
+                    style={{
+                      background: `${TIER_CONFIG[g.tier].color}15`,
+                      border: `1px solid ${TIER_CONFIG[g.tier].color}33`
+                    }}
+                  >
+                    <Shield size={18} style={{ color: TIER_CONFIG[g.tier].color }} strokeWidth={1.5} />
+                  </div>
+
+                  {/* Name + Tier */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className={`font-display tracking-wider truncate ${i < 3 ? 'text-base' : 'text-sm'}`}>{g.name}</span>
+                      <TierBadge tier={g.tier} size="sm" showLabel={false} />
+                    </div>
+                    <div className="flex items-center gap-3 text-[11px] text-muted-foreground mt-0.5">
+                      <span>{g.members} üye</span>
+                      <span className="flex items-center gap-0.5"><Flame size={10} /> {g.heat}</span>
+                    </div>
+                  </div>
+
+                  {/* Score */}
+                  <div className="text-right shrink-0">
+                    <div className="font-display text-lg tracking-wider" style={{ color: i < 3 ? RANK_MEDAL_COLORS[i] : undefined }}>
+                      {g.sp.toLocaleString()}
+                    </div>
+                    <div className="text-[10px] text-muted-foreground">SP</div>
+                  </div>
+
+                  {/* Change indicator */}
+                  <div className="w-6 shrink-0 flex justify-center">
+                    {g.change === 'up' && <ChevronUp size={16} className="text-emerald-500" />}
+                    {g.change === 'down' && <ChevronDown size={16} className="text-red-500" />}
+                    {g.change === 'same' && <Minus size={14} className="text-muted-foreground/40" />}
+                  </div>
+                </motion.div>
+              ))
+            )}
           </motion.div>
         ) : (
           <motion.div
@@ -199,67 +274,74 @@ export default function Rankings() {
             transition={{ duration: 0.3 }}
             className="space-y-2"
           >
-            {MOCK_PERSONAL_RANKINGS.map((p, i) => {
-              const rankConfig = RANK_CONFIG[p.personalRank];
-              return (
-                <motion.div
-                  key={p.rank}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.06, duration: 0.4 }}
-                  whileHover={{ x: 4, transition: { duration: 0.15 } }}
-                  className={`relative flex items-center gap-4 px-5 py-4 rounded-xl border cursor-pointer ${
-                    i < 3
-                      ? 'border-white/[0.1] bg-white/[0.04]'
-                      : 'border-white/[0.04] bg-white/[0.02] hover:bg-white/[0.03]'
-                  }`}
-                >
-                  {i < 3 && (
-                    <div className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full" style={{ backgroundColor: RANK_MEDAL_COLORS[i] }} />
-                  )}
-
-                  {/* Rank */}
-                  <div className="w-8 text-center shrink-0">
-                    {i < 3 ? (
-                      <motion.div animate={i === 0 ? { scale: [1, 1.1, 1] } : undefined} transition={{ duration: 2, repeat: Infinity }}>
-                        {i === 0 ? <Crown size={22} style={{ color: RANK_MEDAL_COLORS[0] }} /> :
-                         i === 1 ? <Medal size={20} style={{ color: RANK_MEDAL_COLORS[1] }} /> :
-                         <Award size={20} style={{ color: RANK_MEDAL_COLORS[2] }} />}
-                      </motion.div>
-                    ) : (
-                      <span className="text-sm text-muted-foreground font-mono">#{p.rank}</span>
-                    )}
-                  </div>
-
-                  {/* Avatar placeholder */}
-                  <div className="h-10 w-10 rounded-full bg-white/[0.06] flex items-center justify-center shrink-0">
-                    <span className="text-sm font-bold text-muted-foreground">{p.name.split(' ').map(n => n[0]).join('')}</span>
-                  </div>
-
-                  {/* Name + Guild */}
-                  <div className="flex-1 min-w-0">
-                    <span className={`font-medium truncate block ${i < 3 ? 'text-base' : 'text-sm'}`}>{p.name}</span>
-                    <span className="text-[11px] text-muted-foreground">{p.guild}</span>
-                  </div>
-
-                  {/* Rank badge */}
-                  <div
-                    className="px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0"
-                    style={{ backgroundColor: rankConfig.color + '20', color: rankConfig.color, border: `1px solid ${rankConfig.color}33` }}
+            {personalRankings.length === 0 ? (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-20">
+                <User size={48} className="mx-auto text-muted-foreground/30 mb-4" />
+                <p className="text-muted-foreground">Henüz bireysel sıralamada kimse yok.</p>
+              </motion.div>
+            ) : (
+              personalRankings.map((p, i) => {
+                const rankConfig = RANK_CONFIG[p.personalRank];
+                return (
+                  <motion.div
+                    key={p.rank}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.06, duration: 0.4 }}
+                    whileHover={{ x: 4, transition: { duration: 0.15 } }}
+                    className={`relative flex items-center gap-4 px-5 py-4 rounded-xl border cursor-pointer ${
+                      i < 3
+                        ? 'border-white/[0.1] bg-white/[0.04]'
+                        : 'border-white/[0.04] bg-white/[0.02] hover:bg-white/[0.03]'
+                    }`}
                   >
-                    {rankConfig.label}
-                  </div>
+                    {i < 3 && (
+                      <div className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full" style={{ backgroundColor: RANK_MEDAL_COLORS[i] }} />
+                    )}
 
-                  {/* Score */}
-                  <div className="text-right shrink-0">
-                    <div className="font-display text-lg tracking-wider" style={{ color: i < 3 ? RANK_MEDAL_COLORS[i] : undefined }}>
-                      {p.score.toLocaleString()}
+                    {/* Rank */}
+                    <div className="w-8 text-center shrink-0">
+                      {i < 3 ? (
+                        <motion.div animate={i === 0 ? { scale: [1, 1.1, 1] } : undefined} transition={{ duration: 2, repeat: Infinity }}>
+                          {i === 0 ? <Crown size={22} style={{ color: RANK_MEDAL_COLORS[0] }} /> :
+                           i === 1 ? <Medal size={20} style={{ color: RANK_MEDAL_COLORS[1] }} /> :
+                           <Award size={20} style={{ color: RANK_MEDAL_COLORS[2] }} />}
+                        </motion.div>
+                      ) : (
+                        <span className="text-sm text-muted-foreground font-mono">#{p.rank}</span>
+                      )}
                     </div>
-                    <div className="text-[10px] text-muted-foreground">puan</div>
-                  </div>
-                </motion.div>
-              );
-            })}
+
+                    {/* Avatar placeholder */}
+                    <div className="h-10 w-10 rounded-full bg-white/[0.06] flex items-center justify-center shrink-0">
+                      <span className="text-sm font-bold text-muted-foreground">{p.name.split(' ').map(n => n[0]).join('')}</span>
+                    </div>
+
+                    {/* Name + Guild */}
+                    <div className="flex-1 min-w-0">
+                      <span className={`font-medium truncate block ${i < 3 ? 'text-base' : 'text-sm'}`}>{p.name}</span>
+                      <span className="text-[11px] text-muted-foreground">{p.guild}</span>
+                    </div>
+
+                    {/* Rank badge */}
+                    <div
+                      className="px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0"
+                      style={{ backgroundColor: rankConfig.color + '20', color: rankConfig.color, border: `1px solid ${rankConfig.color}33` }}
+                    >
+                      {rankConfig.label}
+                    </div>
+
+                    {/* Score */}
+                    <div className="text-right shrink-0">
+                      <div className="font-display text-lg tracking-wider" style={{ color: i < 3 ? RANK_MEDAL_COLORS[i] : undefined }}>
+                        {p.score.toLocaleString()}
+                      </div>
+                      <div className="text-[10px] text-muted-foreground">streak</div>
+                    </div>
+                  </motion.div>
+                );
+              })
+            )}
           </motion.div>
         )}
       </AnimatePresence>

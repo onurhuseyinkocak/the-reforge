@@ -77,9 +77,9 @@ const App = () => (
               <Route path="/community" element={<Community />} />
               <Route path="/guilds" element={<Guilds />} />
               <Route path="/guilds/create" element={<GuildCreate />} />
-              <Route path="/guild" element={<GuildDashboard />} />
-              <Route path="/guild/chat" element={<GuildChat />} />
-              <Route path="/guild/manage" element={<GuildManage />} />
+              <Route path="/guilds/dashboard" element={<GuildDashboard />} />
+              <Route path="/guilds/chat" element={<GuildChat />} />
+              <Route path="/guilds/manage" element={<GuildManage />} />
               <Route path="/rankings" element={<Rankings />} />
               <Route path="/forged" element={<ForgedWall />} />
             </Route>

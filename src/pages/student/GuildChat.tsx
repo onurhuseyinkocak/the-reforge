@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Hash, Lock, Flame, Swords, Send, Smile, Paperclip,
   Users, ChevronDown, AtSign, Bell, BellOff, Pin,
-  MessageSquare, Circle,
+  MessageSquare, Circle, Loader2, Shield,
 } from "lucide-react";
 import {
   type GuildChannel,
@@ -14,6 +14,8 @@ import {
 } from "@/types/guild";
 import RoleBadge from "@/components/guild/RoleBadge";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -22,6 +24,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useNavigate } from "react-router-dom";
 
 // ============================================
 // Channel Configuration
@@ -69,94 +72,6 @@ const CHANNELS: ChannelConfig[] = [
 ];
 
 // ============================================
-// Mock Users
-// ============================================
-
-interface MockUser {
-  id: string;
-  name: string;
-  avatar_url: string | null;
-  role: GuildRole;
-  isOnline: boolean;
-}
-
-const MOCK_USERS: MockUser[] = [
-  { id: "u1", name: "Kaan Yılmaz", avatar_url: null, role: "blacksmith", isOnline: true },
-  { id: "u2", name: "Elif Demir", avatar_url: null, role: "striker", isOnline: true },
-  { id: "u3", name: "Ahmet Korkmaz", avatar_url: null, role: "tempered", isOnline: true },
-  { id: "u4", name: "Zeynep Aksoy", avatar_url: null, role: "tempered", isOnline: false },
-  { id: "u5", name: "Burak Çelik", avatar_url: null, role: "heated", isOnline: true },
-  { id: "u6", name: "Selin Kaya", avatar_url: null, role: "heated", isOnline: false },
-  { id: "u7", name: "Emre Aydın", avatar_url: null, role: "raw", isOnline: true },
-  { id: "u8", name: "Defne Şahin", avatar_url: null, role: "raw", isOnline: false },
-  { id: "u9", name: "Arda Öztürk", avatar_url: null, role: "heated", isOnline: true },
-  { id: "u10", name: "Ceren Yıldız", avatar_url: null, role: "tempered", isOnline: true },
-];
-
-const CURRENT_USER_ID = "u1";
-
-// ============================================
-// Mock Messages
-// ============================================
-
-function makeMsg(
-  id: string,
-  userId: string,
-  channel: GuildChannel,
-  content: string,
-  minutesAgo: number
-): GuildMessage & { senderRole: GuildRole } {
-  const user = MOCK_USERS.find((u) => u.id === userId)!;
-  const ts = new Date(Date.now() - minutesAgo * 60000).toISOString();
-  return {
-    id,
-    guild_id: "1",
-    user_id: userId,
-    channel,
-    content,
-    created_at: ts,
-    profile: { full_name: user.name, avatar_url: user.avatar_url },
-    senderRole: user.role,
-  };
-}
-
-const MOCK_MESSAGES: (GuildMessage & { senderRole: GuildRole })[] = [
-  // General
-  makeMsg("g1", "u1", "general", "Günaydın ekip! Bugün streak güncellemelerinizi paylaşın.", 120),
-  makeMsg("g2", "u5", "general", "21 gün streak kırdım! 🔥 Artık duramıyorum.", 115),
-  makeMsg("g3", "u3", "general", "Helal olsun Burak! Ben de 28'e geldim, devam ediyoruz.", 110),
-  makeMsg("g4", "u7", "general", "Yeni katıldım, herkese merhaba! Nasıl hızlı adapte olabilirim?", 95),
-  makeMsg("g5", "u2", "general", "Hoş geldin Emre! İlk hafta günlük check-in yapmayı unutma, streak çok önemli.", 90),
-  makeMsg("g6", "u10", "general", "Bu haftaki quest'leri gördünüz mü? Brotherhood görevi ilginç görünüyor.", 45),
-  makeMsg("g7", "u9", "general", "Evet baktım, beraber yapabiliriz. Kim katılmak ister?", 40),
-  makeMsg("g8", "u1", "general", "Güzel fikir! En az 5 kişi olalım, herkesi etiketliyorum.", 30),
-
-  // Command
-  makeMsg("c1", "u1", "command", "Bu hafta heat level'ımız 92'ye çıktı, harika iş çıkarıyorsunuz.", 180),
-  makeMsg("c2", "u2", "command", "Yeni başvurular geldi. 3 aday var, profillerini inceledim. 2'si uygun görünüyor.", 160),
-  makeMsg("c3", "u1", "command", "Arda'yı Tempered'a terfi ettirelim mi? Contribution puanı yeterli.", 60),
-
-  // Forge Room
-  makeMsg("f1", "u3", "forge_room", "Phase 2 Week 4'teyim, resource planlaması konusunda tavsiye lazım.", 200),
-  makeMsg("f2", "u2", "forge_room", "Ben de o aşamadaydım, Pomodoro tekniği ile 3 saat bloklar oluştur. Çok işe yaradı.", 190),
-
-  // War Room
-  makeMsg("w1", "u1", "war_room", "Steel Phoenix'e Spark Duel challenge'ı attık! 3 gün sonra başlıyor.", 300),
-  makeMsg("w2", "u5", "war_room", "Hazırız! Herkese günlük hedef: en az 150 puan toplayın.", 280),
-];
-
-// ============================================
-// Unread counts
-// ============================================
-
-const UNREAD_COUNTS: Record<GuildChannel, number> = {
-  general: 3,
-  command: 1,
-  forge_room: 0,
-  war_room: 2,
-};
-
-// ============================================
 // Helpers
 // ============================================
 
@@ -173,27 +88,176 @@ function formatTime(iso: string) {
   const d = new Date(iso);
   const now = new Date();
   const diffMin = Math.floor((now.getTime() - d.getTime()) / 60000);
-  if (diffMin < 1) return "Şimdi";
-  if (diffMin < 60) return `${diffMin}dk önce`;
+  if (diffMin < 1) return "Simdi";
+  if (diffMin < 60) return `${diffMin}dk once`;
   const diffH = Math.floor(diffMin / 60);
   if (diffH < 24)
-    return `Bugün ${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
+    return `Bugun ${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
   return d.toLocaleDateString("tr-TR", { day: "numeric", month: "short" });
 }
+
+// ============================================
+// Extended message type with sender role
+// ============================================
+
+type ChatMessage = GuildMessage & { senderRole: GuildRole };
 
 // ============================================
 // Component
 // ============================================
 
 export default function GuildChat() {
+  const { user, profile } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const [loading, setLoading] = useState(true);
+  const [guildId, setGuildId] = useState<string | null>(null);
+  const [guildName, setGuildName] = useState("");
+  const [guildLevel, setGuildLevel] = useState(1);
+  const [userRole, setUserRole] = useState<GuildRole>("raw");
+  const [memberCount, setMemberCount] = useState(0);
+
   const [activeChannel, setActiveChannel] = useState<GuildChannel>("general");
   const [inputValue, setInputValue] = useState("");
-  const [messages, setMessages] = useState(MOCK_MESSAGES);
-  const [unreadCounts, setUnreadCounts] = useState(UNREAD_COUNTS);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [unreadCounts, setUnreadCounts] = useState<Record<GuildChannel, number>>({
+    general: 0,
+    command: 0,
+    forge_room: 0,
+    war_room: 0,
+  });
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const channelConfig = CHANNELS.find((c) => c.key === activeChannel)!;
+
+  // ---- Fetch guild membership ----
+  useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    const fetchGuild = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('guild_members')
+          .select('guild_id, role, guilds(name, level, member_count)')
+          .eq('user_id', user.id)
+          .eq('is_active', true)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (!data || !data.guilds) {
+          setGuildId(null);
+          setLoading(false);
+          return;
+        }
+
+        const g = data.guilds as any;
+        setGuildId(data.guild_id);
+        setUserRole(data.role as GuildRole);
+        setGuildName(g.name || '');
+        setGuildLevel(g.level || 1);
+        setMemberCount(g.member_count || 0);
+      } catch (err: any) {
+        console.error('Error fetching guild for chat:', err);
+        toast({ title: 'Hata', description: 'Lonca bilgisi yüklenemedi.', variant: 'destructive' });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchGuild();
+  }, [user]);
+
+  // ---- Fetch messages for active channel ----
+  const fetchMessages = useCallback(async () => {
+    if (!guildId) return;
+    try {
+      const { data, error } = await supabase
+        .from('guild_messages')
+        .select('*, profiles:user_id(full_name, avatar_url)')
+        .eq('guild_id', guildId)
+        .eq('channel', activeChannel)
+        .order('created_at', { ascending: true })
+        .limit(100);
+
+      if (error) throw error;
+
+      const mapped: ChatMessage[] = (data || []).map((m: any) => ({
+        id: m.id,
+        guild_id: m.guild_id,
+        user_id: m.user_id,
+        channel: m.channel,
+        content: m.content,
+        created_at: m.created_at,
+        profile: m.profiles || { full_name: 'Bilinmeyen', avatar_url: null },
+        senderRole: 'raw' as GuildRole, // We don't have role in messages table, default
+      }));
+      setMessages(mapped);
+    } catch (err: any) {
+      console.error('Error fetching messages:', err);
+    }
+  }, [guildId, activeChannel]);
+
+  useEffect(() => {
+    fetchMessages();
+  }, [fetchMessages]);
+
+  // ---- Realtime subscription ----
+  useEffect(() => {
+    if (!guildId) return;
+
+    const channel = supabase
+      .channel(`guild-chat-${guildId}-${activeChannel}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'guild_messages',
+          filter: `guild_id=eq.${guildId}`,
+        },
+        async (payload: any) => {
+          const newMsg = payload.new;
+          if (newMsg.channel !== activeChannel) {
+            // Increment unread for other channel
+            setUnreadCounts((prev) => ({
+              ...prev,
+              [newMsg.channel as GuildChannel]: (prev[newMsg.channel as GuildChannel] || 0) + 1,
+            }));
+            return;
+          }
+
+          // Fetch profile for the new message sender
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('full_name, avatar_url')
+            .eq('user_id', newMsg.user_id)
+            .maybeSingle();
+
+          const chatMsg: ChatMessage = {
+            id: newMsg.id,
+            guild_id: newMsg.guild_id,
+            user_id: newMsg.user_id,
+            channel: newMsg.channel,
+            content: newMsg.content,
+            created_at: newMsg.created_at,
+            profile: profileData || { full_name: 'Bilinmeyen', avatar_url: null },
+            senderRole: 'raw' as GuildRole,
+          };
+          setMessages((prev) => [...prev, chatMsg]);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [guildId, activeChannel]);
 
   const channelMessages = useMemo(
     () =>
@@ -205,8 +269,6 @@ export default function GuildChat() {
         ),
     [messages, activeChannel]
   );
-
-  const onlineCount = MOCK_USERS.filter((u) => u.isOnline).length;
 
   // Scroll to bottom on channel switch or new message
   useEffect(() => {
@@ -220,21 +282,27 @@ export default function GuildChat() {
     setUnreadCounts((prev) => ({ ...prev, [activeChannel]: 0 }));
   }, [activeChannel]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     const text = inputValue.trim();
-    if (!text) return;
-    const newMsg: GuildMessage & { senderRole: GuildRole } = {
-      id: `new-${Date.now()}`,
-      guild_id: "1",
-      user_id: CURRENT_USER_ID,
-      channel: activeChannel,
-      content: text,
-      created_at: new Date().toISOString(),
-      profile: { full_name: "Kaan Yılmaz", avatar_url: null },
-      senderRole: "blacksmith",
-    };
-    setMessages((prev) => [...prev, newMsg]);
+    if (!text || !guildId || !user) return;
+
     setInputValue("");
+
+    try {
+      const { error } = await supabase.from('guild_messages').insert({
+        guild_id: guildId,
+        user_id: user.id,
+        channel: activeChannel,
+        content: text,
+      });
+
+      if (error) throw error;
+    } catch (err: any) {
+      console.error('Error sending message:', err);
+      toast({ title: 'Hata', description: 'Mesaj gonderilemedi.', variant: 'destructive' });
+      setInputValue(text); // Restore input on error
+    }
+
     inputRef.current?.focus();
   };
 
@@ -253,7 +321,7 @@ export default function GuildChat() {
     userId: string;
     senderRole: GuildRole;
     profile: { full_name: string; avatar_url: string | null };
-    messages: (GuildMessage & { senderRole: GuildRole })[];
+    messages: ChatMessage[];
   }
 
   const groupedMessages = useMemo(() => {
@@ -279,6 +347,53 @@ export default function GuildChat() {
     return groups;
   }, [channelMessages]);
 
+  // ---- Loading state ----
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex flex-col items-center gap-4"
+        >
+          <Loader2 size={32} className="text-primary animate-spin" />
+          <p className="text-muted-foreground text-sm">Chat yükleniyor...</p>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // ---- No guild state ----
+  if (!guildId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center pb-20">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center max-w-md"
+        >
+          <Shield size={64} className="mx-auto text-muted-foreground/30 mb-6" strokeWidth={1} />
+          <h2 className="font-display text-2xl tracking-wider text-foreground mb-3">
+            Henüz bir loncaya katılmadın
+          </h2>
+          <p className="text-muted-foreground text-sm mb-8">
+            Chat özelliğini kullanmak için bir loncaya katılman gerekiyor.
+          </p>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => navigate('/guilds')}
+            className="flex items-center gap-2 px-6 py-3 mx-auto rounded-xl bg-primary/10 border border-primary/30 text-primary font-semibold text-sm hover:bg-primary/20 transition-colors"
+          >
+            <Users size={18} />
+            Loncaları Keşfet
+          </motion.button>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-[calc(100vh-80px)] max-h-[900px] w-full overflow-hidden rounded-2xl border border-white/[0.06] bg-black/40 backdrop-blur-2xl">
       {/* ====== Left Sidebar: Channels ====== */}
@@ -290,9 +405,9 @@ export default function GuildChat() {
           </div>
           <div className="min-w-0 flex-1">
             <h2 className="truncate font-display text-sm tracking-wide text-foreground">
-              IRON WOLVES
+              {guildName}
             </h2>
-            <p className="text-[10px] text-muted-foreground">Lv.7 Shield</p>
+            <p className="text-[10px] text-muted-foreground">Lv.{guildLevel}</p>
           </div>
         </div>
 
@@ -375,7 +490,7 @@ export default function GuildChat() {
               <span className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-green-500 ring-2 ring-black/60" />
             </div>
             <span className="text-xs">
-              {onlineCount} çevrimiçi
+              {memberCount} üye
             </span>
           </div>
         </div>
@@ -411,7 +526,7 @@ export default function GuildChat() {
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1.5 rounded-lg bg-white/[0.04] px-3 py-1.5 text-xs text-muted-foreground">
               <Users size={13} />
-              <span>{onlineCount}/{MOCK_USERS.length}</span>
+              <span>{memberCount}</span>
             </div>
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -454,9 +569,8 @@ export default function GuildChat() {
           ) : (
             <div className="space-y-0">
               {groupedMessages.map((group, gi) => {
-                const isOwn = group.userId === CURRENT_USER_ID;
-                const userMeta = MOCK_USERS.find((u) => u.id === group.userId);
-                const roleColor = GUILD_ROLE_COLORS[group.senderRole];
+                const isOwn = user ? group.userId === user.id : false;
+                const roleColor = GUILD_ROLE_COLORS[group.senderRole] || '#808080';
                 return (
                   <motion.div
                     key={`group-${gi}`}
@@ -481,10 +595,6 @@ export default function GuildChat() {
                           {getInitials(group.profile.full_name)}
                         </AvatarFallback>
                       </Avatar>
-                      {/* Online indicator */}
-                      {userMeta?.isOnline && (
-                        <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-green-500 ring-2 ring-black/80" />
-                      )}
                     </div>
 
                     {/* Content */}

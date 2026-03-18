@@ -1,86 +1,12 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Plus, Flame, Users, Trophy, Swords, TrendingUp, Crown, Zap, ChevronRight } from "lucide-react";
+import { Search, Plus, Flame, Users, Trophy, Swords, TrendingUp, Crown, Zap, ChevronRight, Loader2 } from "lucide-react";
 import { type Guild, type GuildTier, TIER_CONFIG } from "@/types/guild";
 import GuildCard from "@/components/guild/GuildCard";
 import TierBadge from "@/components/guild/TierBadge";
 import { useNavigate } from "react-router-dom";
-
-// Mock data for stunning visual demo
-const MOCK_GUILDS: Guild[] = [
-  {
-    id: '1', name: 'IRON WOLVES', slug: 'iron-wolves', motto: 'Sürüden ayrılan kurdu kış yer',
-    description: null, emblem_url: null, emblem_config: {}, guild_type: 'application',
-    rules: [], level: 7, total_points: 22000, season_points: 4800, treasury_points: 1200,
-    heat_level: 92, tier: 'diamond', max_members: 50, member_count: 38,
-    min_streak_requirement: 7, min_phase_requirement: 2, min_score_requirement: 3000,
-    founder_id: '', is_active: true, created_at: '', updated_at: ''
-  },
-  {
-    id: '2', name: 'OBSIDIAN FORGE', slug: 'obsidian-forge', motto: 'Ateşten geçmeyen çelik olmaz',
-    description: null, emblem_url: null, emblem_config: {}, guild_type: 'invite',
-    rules: [], level: 9, total_points: 65000, season_points: 11200, treasury_points: 3400,
-    heat_level: 98, tier: 'obsidian', max_members: 100, member_count: 87,
-    min_streak_requirement: 14, min_phase_requirement: 2, min_score_requirement: 5000,
-    founder_id: '', is_active: true, created_at: '', updated_at: ''
-  },
-  {
-    id: '3', name: 'STEEL BROTHERS', slug: 'steel-brothers', motto: 'Kardeşlik demirden güçlü',
-    description: null, emblem_url: null, emblem_config: {}, guild_type: 'open',
-    rules: [], level: 5, total_points: 8500, season_points: 2100, treasury_points: 600,
-    heat_level: 71, tier: 'gold', max_members: 30, member_count: 24,
-    min_streak_requirement: 3, min_phase_requirement: 1, min_score_requirement: 1000,
-    founder_id: '', is_active: true, created_at: '', updated_at: ''
-  },
-  {
-    id: '4', name: 'EMBER LEGION', slug: 'ember-legion', motto: 'Kor hiç sönmez',
-    description: null, emblem_url: null, emblem_config: {}, guild_type: 'application',
-    rules: [], level: 4, total_points: 4200, season_points: 1600, treasury_points: 300,
-    heat_level: 65, tier: 'silver', max_members: 20, member_count: 16,
-    min_streak_requirement: 5, min_phase_requirement: 1, min_score_requirement: 500,
-    founder_id: '', is_active: true, created_at: '', updated_at: ''
-  },
-  {
-    id: '5', name: 'NIGHT ANVIL', slug: 'night-anvil', motto: 'Gece örsünde dövülür en sert çelik',
-    description: null, emblem_url: null, emblem_config: {}, guild_type: 'open',
-    rules: [], level: 3, total_points: 2100, season_points: 890, treasury_points: 150,
-    heat_level: 55, tier: 'silver', max_members: 15, member_count: 11,
-    min_streak_requirement: 0, min_phase_requirement: 1, min_score_requirement: 0,
-    founder_id: '', is_active: true, created_at: '', updated_at: ''
-  },
-  {
-    id: '6', name: 'RAW RECRUITS', slug: 'raw-recruits', motto: 'Herkes bir yerden başlar',
-    description: null, emblem_url: null, emblem_config: {}, guild_type: 'open',
-    rules: [], level: 1, total_points: 320, season_points: 320, treasury_points: 40,
-    heat_level: 42, tier: 'bronze', max_members: 5, member_count: 4,
-    min_streak_requirement: 0, min_phase_requirement: 1, min_score_requirement: 0,
-    founder_id: '', is_active: true, created_at: '', updated_at: ''
-  },
-  {
-    id: '7', name: 'PHOENIX GUARD', slug: 'phoenix-guard', motto: 'Küllerin arasından yükseliriz',
-    description: null, emblem_url: null, emblem_config: {}, guild_type: 'application',
-    rules: [], level: 6, total_points: 14000, season_points: 3200, treasury_points: 900,
-    heat_level: 78, tier: 'gold', max_members: 40, member_count: 31,
-    min_streak_requirement: 7, min_phase_requirement: 2, min_score_requirement: 2000,
-    founder_id: '', is_active: true, created_at: '', updated_at: ''
-  },
-  {
-    id: '8', name: 'SILENT HAMMERS', slug: 'silent-hammers', motto: 'Çekiç konuşur, biz sustukça',
-    description: null, emblem_url: null, emblem_config: {}, guild_type: 'invite',
-    rules: [], level: 8, total_points: 38000, season_points: 7500, treasury_points: 2100,
-    heat_level: 85, tier: 'diamond', max_members: 75, member_count: 62,
-    min_streak_requirement: 14, min_phase_requirement: 2, min_score_requirement: 4000,
-    founder_id: '', is_active: true, created_at: '', updated_at: ''
-  },
-  {
-    id: '9', name: 'BRONZE FLAMES', slug: 'bronze-flames', motto: 'İlk kıvılcım en önemlisidir',
-    description: null, emblem_url: null, emblem_config: {}, guild_type: 'open',
-    rules: [], level: 2, total_points: 680, season_points: 450, treasury_points: 80,
-    heat_level: 35, tier: 'bronze', max_members: 10, member_count: 7,
-    min_streak_requirement: 0, min_phase_requirement: 1, min_score_requirement: 0,
-    founder_id: '', is_active: true, created_at: '', updated_at: ''
-  },
-];
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const TIER_FILTERS: { value: GuildTier | 'all'; label: string; color: string }[] = [
   { value: 'all', label: 'Tümü', color: '#FF4500' },
@@ -94,16 +20,56 @@ const TIER_FILTERS: { value: GuildTier | 'all'; label: string; color: string }[]
 export default function Guilds() {
   const [search, setSearch] = useState("");
   const [activeTier, setActiveTier] = useState<GuildTier | 'all'>('all');
+  const [guilds, setGuilds] = useState<Guild[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const forgeOfWeek = MOCK_GUILDS.find(g => g.tier === 'obsidian') || MOCK_GUILDS[0];
+  useEffect(() => {
+    const fetchGuilds = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('guilds')
+          .select('*')
+          .eq('is_active', true)
+          .order('season_points', { ascending: false });
+
+        if (error) throw error;
+        setGuilds((data as unknown as Guild[]) || []);
+      } catch (err: any) {
+        console.error('Error fetching guilds:', err);
+        toast({ title: 'Hata', description: 'Loncalar yüklenirken bir hata oluştu.', variant: 'destructive' });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchGuilds();
+  }, []);
+
+  const forgeOfWeek = guilds[0] || null;
 
   const filtered = useMemo(() => {
-    return MOCK_GUILDS
+    return guilds
       .filter(g => activeTier === 'all' || g.tier === activeTier)
       .filter(g => !search || g.name.toLowerCase().includes(search.toLowerCase()) || g.motto?.toLowerCase().includes(search.toLowerCase()))
       .sort((a, b) => b.season_points - a.season_points);
-  }, [search, activeTier]);
+  }, [search, activeTier, guilds]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex flex-col items-center gap-4"
+        >
+          <Loader2 size={32} className="text-primary animate-spin" />
+          <p className="text-muted-foreground text-sm">Loncalar yükleniyor...</p>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pb-20">
@@ -162,10 +128,10 @@ export default function Guilds() {
             transition={{ delay: 0.3, duration: 0.5 }}
           >
             {[
-              { icon: Users, label: 'Aktif Lonca', value: '47' },
-              { icon: Swords, label: 'Challenge', value: '12' },
+              { icon: Users, label: 'Aktif Lonca', value: String(guilds.length) },
+              { icon: Swords, label: 'Challenge', value: '-' },
               { icon: Trophy, label: 'Sezon', value: 'Kış Ateşi 2026' },
-              { icon: Crown, label: 'Forged', value: '23' },
+              { icon: Crown, label: 'Toplam Üye', value: String(guilds.reduce((sum, g) => sum + g.member_count, 0)) },
             ].map((stat, i) => (
               <div key={i} className="flex items-center gap-2 text-sm">
                 <stat.icon size={14} className="text-muted-foreground" />
@@ -178,67 +144,69 @@ export default function Guilds() {
       </div>
 
       {/* Forge of the Week - Featured */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4, duration: 0.6 }}
-        className="mb-8"
-      >
-        <div className="flex items-center gap-2 mb-4">
-          <motion.div
-            animate={{ rotate: [0, 5, -5, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            <Flame size={18} className="text-primary" />
-          </motion.div>
-          <h2 className="font-display text-lg tracking-wider text-foreground">HAFTANIN OCAĞI</h2>
-        </div>
-
-        <div className="relative rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/[0.06] via-transparent to-primary/[0.03] overflow-hidden">
-          {/* Animated accent */}
-          <motion.div
-            className="absolute top-0 left-0 right-0 h-[2px]"
-            style={{ background: 'linear-gradient(90deg, transparent, #FF4500, #FFD700, #FF4500, transparent)' }}
-            animate={{ backgroundPosition: ['0% 0%', '200% 0%'] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-          />
-
-          <div className="p-6 flex items-center gap-6">
-            {/* Large emblem */}
-            <div className="h-24 w-24 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 relative">
-              <motion.div
-                className="absolute inset-0 rounded-2xl"
-                animate={{ boxShadow: ['0 0 0px rgba(255,69,0,0)', '0 0 30px rgba(255,69,0,0.3)', '0 0 0px rgba(255,69,0,0)'] }}
-                transition={{ duration: 3, repeat: Infinity }}
-              />
-              <Crown size={40} className="text-primary" strokeWidth={1.5} />
-            </div>
-
-            {/* Info */}
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-1">
-                <h3 className="font-display text-2xl tracking-wider">{forgeOfWeek.name}</h3>
-                <TierBadge tier={forgeOfWeek.tier} size="sm" />
-              </div>
-              <p className="text-sm text-muted-foreground italic mb-3">"{forgeOfWeek.motto}"</p>
-              <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                <span className="flex items-center gap-1"><Users size={14} /> {forgeOfWeek.member_count} üye</span>
-                <span className="flex items-center gap-1"><Flame size={14} className="text-white" /> Heat {forgeOfWeek.heat_level}</span>
-                <span className="flex items-center gap-1"><TrendingUp size={14} /> {forgeOfWeek.season_points.toLocaleString()} SP</span>
-                <span className="flex items-center gap-1"><Zap size={14} /> Lv.{forgeOfWeek.level}</span>
-              </div>
-            </div>
-
-            {/* View button */}
-            <motion.button
-              whileHover={{ x: 4 }}
-              className="flex items-center gap-1 text-primary text-sm font-medium"
+      {forgeOfWeek && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.6 }}
+          className="mb-8"
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <motion.div
+              animate={{ rotate: [0, 5, -5, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
             >
-              Görüntüle <ChevronRight size={16} />
-            </motion.button>
+              <Flame size={18} className="text-primary" />
+            </motion.div>
+            <h2 className="font-display text-lg tracking-wider text-foreground">HAFTANIN OCAĞI</h2>
           </div>
-        </div>
-      </motion.div>
+
+          <div className="relative rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/[0.06] via-transparent to-primary/[0.03] overflow-hidden">
+            {/* Animated accent */}
+            <motion.div
+              className="absolute top-0 left-0 right-0 h-[2px]"
+              style={{ background: 'linear-gradient(90deg, transparent, #FF4500, #FFD700, #FF4500, transparent)' }}
+              animate={{ backgroundPosition: ['0% 0%', '200% 0%'] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+            />
+
+            <div className="p-6 flex items-center gap-6">
+              {/* Large emblem */}
+              <div className="h-24 w-24 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 relative">
+                <motion.div
+                  className="absolute inset-0 rounded-2xl"
+                  animate={{ boxShadow: ['0 0 0px rgba(255,69,0,0)', '0 0 30px rgba(255,69,0,0.3)', '0 0 0px rgba(255,69,0,0)'] }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                />
+                <Crown size={40} className="text-primary" strokeWidth={1.5} />
+              </div>
+
+              {/* Info */}
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-1">
+                  <h3 className="font-display text-2xl tracking-wider">{forgeOfWeek.name}</h3>
+                  <TierBadge tier={forgeOfWeek.tier} size="sm" />
+                </div>
+                <p className="text-sm text-muted-foreground italic mb-3">"{forgeOfWeek.motto}"</p>
+                <div className="flex items-center gap-6 text-sm text-muted-foreground">
+                  <span className="flex items-center gap-1"><Users size={14} /> {forgeOfWeek.member_count} üye</span>
+                  <span className="flex items-center gap-1"><Flame size={14} className="text-white" /> Heat {forgeOfWeek.heat_level}</span>
+                  <span className="flex items-center gap-1"><TrendingUp size={14} /> {forgeOfWeek.season_points.toLocaleString()} SP</span>
+                  <span className="flex items-center gap-1"><Zap size={14} /> Lv.{forgeOfWeek.level}</span>
+                </div>
+              </div>
+
+              {/* View button */}
+              <motion.button
+                whileHover={{ x: 4 }}
+                className="flex items-center gap-1 text-primary text-sm font-medium"
+              >
+                Görüntüle <ChevronRight size={16} />
+              </motion.button>
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       {/* Search + Filters */}
       <motion.div
@@ -289,7 +257,7 @@ export default function Guilds() {
                   animate={{ opacity: 1, scale: 1 }}
                   className="ml-1"
                 >
-                  ({tier.value === 'all' ? MOCK_GUILDS.length : MOCK_GUILDS.filter(g => g.tier === tier.value).length})
+                  ({tier.value === 'all' ? guilds.length : guilds.filter(g => g.tier === tier.value).length})
                 </motion.span>
               )}
             </motion.button>
