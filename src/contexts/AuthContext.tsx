@@ -17,6 +17,8 @@ interface Profile {
   current_week: number;
   streak: number;
   mentor_id: string | null;
+  subscription_plan?: string;
+  subscription_status?: string;
 }
 
 interface AuthContextType {

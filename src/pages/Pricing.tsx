@@ -1,12 +1,25 @@
 import { motion } from "framer-motion";
 import { Check, Flame, Shield, Swords, ArrowLeft, Star } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useSubscription } from "@/hooks/useSubscription";
+
+// ============================================
+// Lemon Squeezy Checkout URLs
+// ============================================
+
+const CHECKOUT_URLS: Record<string, string> = {
+  ates: import.meta.env.VITE_LS_CHECKOUT_ATES || "#",
+  celik: import.meta.env.VITE_LS_CHECKOUT_CELIK || "#",
+  kilic: import.meta.env.VITE_LS_CHECKOUT_KILIC || "#",
+};
 
 // ============================================
 // Tier Data
 // ============================================
 
 interface PricingTier {
+  key: string;
   name: string;
   price: string;
   priceSuffix?: string;
@@ -21,6 +34,7 @@ interface PricingTier {
 
 const TIERS: PricingTier[] = [
   {
+    key: "ates",
     name: "Ateş",
     price: "Ücretsiz",
     priceSuffix: "7 gün deneme",
@@ -39,6 +53,7 @@ const TIERS: PricingTier[] = [
     glow: "rgba(255,140,0,0.3)",
   },
   {
+    key: "celik",
     name: "Çelik",
     price: "₺999",
     priceSuffix: "/ay",
@@ -60,6 +75,7 @@ const TIERS: PricingTier[] = [
     glow: "rgba(59,130,246,0.3)",
   },
   {
+    key: "kilic",
     name: "Kılıç",
     price: "₺2,499",
     priceSuffix: "/ay",
@@ -108,6 +124,35 @@ const cardVariants = {
 // ============================================
 
 export default function Pricing() {
+  const { user } = useAuth();
+  const { plan: currentPlan } = useSubscription();
+  const navigate = useNavigate();
+
+  const handleCheckout = (tier: PricingTier) => {
+    // Free tier goes to apply
+    if (tier.price === "Ücretsiz") {
+      navigate("/apply");
+      return;
+    }
+
+    // If not logged in, redirect to login with return URL
+    if (!user) {
+      navigate(`/login?redirect=${encodeURIComponent("/pricing")}`);
+      return;
+    }
+
+    // Build checkout URL with user email for webhook identification
+    const baseUrl = CHECKOUT_URLS[tier.key];
+    if (!baseUrl || baseUrl === "#") {
+      console.warn("Checkout URL not configured for:", tier.key);
+      return;
+    }
+
+    const separator = baseUrl.includes("?") ? "&" : "?";
+    const checkoutUrl = `${baseUrl}${separator}checkout[custom][user_email]=${encodeURIComponent(user.email || "")}`;
+    window.open(checkoutUrl, "_blank");
+  };
+
   return (
     <div className="relative min-h-screen bg-[hsl(0,0%,4%)] overflow-hidden">
       {/* Background effects */}
@@ -314,8 +359,13 @@ export default function Pricing() {
                     </ul>
 
                     {/* CTA Button */}
-                    <Link to={tier.price === "Ücretsiz" ? "/apply" : "/apply"}>
+                    {user && currentPlan === tier.key ? (
+                      <div className="w-full py-4 rounded-xl font-display text-sm tracking-[0.2em] text-center bg-white/[0.06] border border-white/[0.15] text-muted-foreground cursor-default">
+                        Mevcut Plan
+                      </div>
+                    ) : (
                       <motion.button
+                        onClick={() => handleCheckout(tier)}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         className={`w-full py-4 rounded-xl font-display text-sm tracking-[0.2em] transition-all duration-500 ${
@@ -341,7 +391,7 @@ export default function Pricing() {
                       >
                         {tier.cta}
                       </motion.button>
-                    </Link>
+                    )}
                   </div>
                 </div>
               </motion.div>
