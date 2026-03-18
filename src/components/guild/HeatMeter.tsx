@@ -1,4 +1,4 @@
-import { motion, useSpring, useTransform } from "framer-motion";
+import { motion, useSpring } from "framer-motion";
 import { getHeatLabel } from "@/types/guild";
 import { Flame } from "lucide-react";
 
@@ -11,7 +11,6 @@ interface HeatMeterProps {
 export default function HeatMeter({ level, size = "md", showLabel = true }: HeatMeterProps) {
   const heat = getHeatLabel(level);
   const spring = useSpring(level, { stiffness: 50, damping: 20 });
-  const fillHeight = useTransform(spring, [0, 100], ['0%', '100%']);
 
   const sizes = { sm: 32, md: 48, lg: 64 };
   const s = sizes[size];

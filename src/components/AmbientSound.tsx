@@ -83,7 +83,7 @@ const AmbientSound = () => {
   const toggleSound = useCallback(() => {
     const audio = audioRef.current;
     if (!audio || !audioLoaded) {
-      console.log("Audio not ready yet");
+      // Audio not ready yet
       return;
     }
 

@@ -191,7 +191,11 @@ ALTER TABLE weekly_rankings ENABLE ROW LEVEL SECURITY;
 -- RLS Policies: guilds readable by all authenticated, writable by founder
 CREATE POLICY "Guilds are viewable by authenticated users" ON guilds FOR SELECT TO authenticated USING (true);
 CREATE POLICY "Guilds are creatable by authenticated users" ON guilds FOR INSERT TO authenticated WITH CHECK (auth.uid() = founder_id);
-CREATE POLICY "Guilds are updatable by founder" ON guilds FOR UPDATE TO authenticated USING (auth.uid() = founder_id);
+CREATE POLICY "Guilds are updatable by founder or striker" ON guilds FOR UPDATE TO authenticated USING (
+  auth.uid() = founder_id OR EXISTS (
+    SELECT 1 FROM guild_members WHERE guild_members.guild_id = guilds.id AND guild_members.user_id = auth.uid() AND guild_members.role IN ('blacksmith', 'striker') AND guild_members.is_active = true
+  )
+);
 
 -- RLS Policies: guild_members
 CREATE POLICY "Guild members viewable by authenticated" ON guild_members FOR SELECT TO authenticated USING (true);
