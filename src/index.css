@@ -69,6 +69,69 @@
     --shadow-ember: 0 0 30px hsl(16 100% 50% / 0.3);
     --shadow-glow: 0 0 60px hsl(16 100% 50% / 0.2);
   }
+
+  .light {
+    /* Core - Warm Light Foundation */
+    --background: 30 15% 95%;
+    --foreground: 0 0% 15%;
+
+    /* Card - White with warmth */
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 15%;
+
+    /* Popover */
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 15%;
+
+    /* Primary - Molten Orange (stays) */
+    --primary: 16 100% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary */
+    --secondary: 30 10% 90%;
+    --secondary-foreground: 0 0% 25%;
+
+    /* Muted */
+    --muted: 30 10% 88%;
+    --muted-foreground: 0 0% 40%;
+
+    /* Accent */
+    --accent: 16 100% 50%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Destructive */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Border & Input */
+    --border: 30 10% 82%;
+    --input: 30 10% 82%;
+    --ring: 16 100% 50%;
+
+    --radius: 0.5rem;
+
+    /* Custom Forge Variables */
+    --ember: 16 100% 50%;
+    --ember-dark: 0 80% 40%;
+    --ember-glow: 30 100% 60%;
+    --charcoal: 30 10% 90%;
+    --steel: 0 0% 55%;
+    --smoke: 0 0% 15%;
+    --forge-blue: 16 100% 50%;
+    --forge-navy: 30 15% 95%;
+    --forge-navy-light: 0 0% 100%;
+    --forge-white: 0 0% 15%;
+    --forge-blue-glow: 30 100% 60%;
+    --forge-steel: 0 0% 55%;
+
+    /* Gradients */
+    --gradient-ember: linear-gradient(135deg, hsl(16 100% 50%), hsl(0 80% 40%));
+    --gradient-glow: linear-gradient(180deg, hsl(16 100% 50% / 0.15), transparent);
+
+    /* Shadows */
+    --shadow-ember: 0 0 30px hsl(16 100% 50% / 0.15);
+    --shadow-glow: 0 0 60px hsl(16 100% 50% / 0.1);
+  }
 }
 
 @layer base {
@@ -157,4 +220,17 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--ember) / 0.6);
+}
+
+/* Light mode scrollbar */
+.light ::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: hsl(var(--ember) / 0.25);
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--ember) / 0.4);
 }

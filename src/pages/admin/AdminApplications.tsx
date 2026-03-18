@@ -34,14 +34,50 @@ const AdminApplications = () => {
   useEffect(() => { fetchApps(); }, []);
 
   const handleAction = async (id: string, status: "approved" | "rejected") => {
+    const app = applications.find(a => a.id === id);
     const { error } = await supabase.from("applications").update({
       status, reviewed_by: user?.id, reviewed_at: new Date().toISOString(),
     }).eq("id", id);
-    if (error) toast.error("Hata: " + error.message);
-    else {
-      toast.success(status === "approved" ? "Başvuru onaylandı" : "Başvuru reddedildi");
-      fetchApps();
+    if (error) {
+      toast.error("Hata: " + error.message);
+      return;
     }
+
+    // Send email notification
+    if (app) {
+      try {
+        if (status === "approved") {
+          await supabase.functions.invoke("send-email", {
+            body: {
+              to: app.email,
+              subject: "THE FORGE \u2014 Ba\u015fvurun Onayland\u0131!",
+              template: "application_approved",
+              data: {
+                name: app.full_name,
+                loginUrl: window.location.origin + "/login",
+              },
+            },
+          });
+        } else {
+          await supabase.functions.invoke("send-email", {
+            body: {
+              to: app.email,
+              subject: "THE FORGE \u2014 Ba\u015fvuru Sonucu",
+              template: "application_rejected",
+              data: {
+                name: app.full_name,
+              },
+            },
+          });
+        }
+      } catch (emailErr: any) {
+        console.error("Email gonderim hatasi:", emailErr);
+        // Don't block — status is already updated
+      }
+    }
+
+    toast.success(status === "approved" ? "Ba\u015fvuru onayland\u0131 ve email g\u00f6nderildi" : "Ba\u015fvuru reddedildi ve email g\u00f6nderildi");
+    fetchApps();
   };
 
   const statusBadge = (s: string) => {

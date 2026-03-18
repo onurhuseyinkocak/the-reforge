@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, User, Flame, MessageSquare, Brain, Loader2, Image, X } from "lucide-react";
+import { ArrowLeft, User, Flame, MessageSquare, Brain, Loader2, Image, X, Mail, ChevronDown, Send, AlertTriangle, BarChart3, MessageCircle } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -34,6 +34,10 @@ const AdminStudentDetail = () => {
   const [analyzing, setAnalyzing] = useState(false);
   const [lifePhotos, setLifePhotos] = useState<any[]>([]);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [emailDropdownOpen, setEmailDropdownOpen] = useState(false);
+  const [customEmailMessage, setCustomEmailMessage] = useState("");
+  const [showCustomEmail, setShowCustomEmail] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -69,6 +73,45 @@ const AdminStudentDetail = () => {
       toast.error("Analiz hatası: " + (e.message || "Bilinmeyen hata"));
     }
     setAnalyzing(false);
+  };
+
+  const sendEmailToStudent = async (template: string, customMsg?: string) => {
+    if (!profile?.email && !id) return;
+    setSendingEmail(true);
+    try {
+      // Get user email from auth (profile might not have it)
+      const emailTo = profile.email || profile.full_name;
+      const body: any = {
+        to: emailTo,
+        template,
+        data: {
+          name: profile.full_name,
+          studentId: id,
+        },
+      };
+
+      if (template === "streak_warning") {
+        body.subject = "THE FORGE \u2014 Seri Uyar\u0131s\u0131";
+        body.data.streak = profile.streak || 0;
+      } else if (template === "weekly_summary") {
+        body.subject = "THE FORGE \u2014 Haftal\u0131k \u00d6zet";
+        body.data.week = profile.current_week || 1;
+        body.data.phase = profile.current_phase || 1;
+      } else if (template === "welcome" && customMsg) {
+        body.subject = "THE FORGE \u2014 Mesaj";
+        body.data.message = customMsg;
+      }
+
+      const res = await supabase.functions.invoke("send-email", { body });
+      if (res.error) throw new Error(res.error.message);
+      toast.success("Email g\u00f6nderildi!");
+    } catch (e: any) {
+      toast.error("Email hatas\u0131: " + (e.message || "Bilinmeyen hata"));
+    }
+    setSendingEmail(false);
+    setEmailDropdownOpen(false);
+    setShowCustomEmail(false);
+    setCustomEmailMessage("");
   };
 
   const energyData = checkins.filter(c => c.energy_rating).map(c => ({ date: c.checkin_date.slice(5), energy: c.energy_rating }));
@@ -316,12 +359,106 @@ const AdminStudentDetail = () => {
         </motion.div>
 
         {/* Message link */}
-        <motion.div variants={item}>
+        <motion.div variants={item} className="flex items-center gap-3">
           <Link to="/admin/messages">
             <Button className="bg-white/[0.03] border border-white/[0.06] text-white/60 hover:text-[#FF4500] hover:border-[#FF4500]/30 hover:bg-[#FF4500]/5 backdrop-blur-xl transition-all duration-300">
-              <MessageSquare className="w-4 h-4 mr-2" /> Mesaj Gönder
+              <MessageSquare className="w-4 h-4 mr-2" /> Mesaj G\u00f6nder
             </Button>
           </Link>
+
+          {/* Email Dropdown */}
+          <div className="relative">
+            <Button
+              onClick={() => setEmailDropdownOpen(!emailDropdownOpen)}
+              disabled={sendingEmail}
+              className="bg-white/[0.03] border border-white/[0.06] text-white/60 hover:text-[#FF4500] hover:border-[#FF4500]/30 hover:bg-[#FF4500]/5 backdrop-blur-xl transition-all duration-300"
+            >
+              {sendingEmail ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Mail className="w-4 h-4 mr-2" />
+              )}
+              Email G\u00f6nder
+              <ChevronDown className={`w-3.5 h-3.5 ml-1.5 transition-transform duration-200 ${emailDropdownOpen ? "rotate-180" : ""}`} />
+            </Button>
+
+            <AnimatePresence>
+              {emailDropdownOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -4, scale: 0.97 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute left-0 top-full mt-2 w-72 z-50 rounded-2xl bg-[#0a0a0a]/95 border border-white/[0.08] backdrop-blur-2xl shadow-[0_16px_48px_rgba(0,0,0,0.5)] overflow-hidden"
+                >
+                  <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#FF4500]/60 to-transparent" />
+                  <div className="p-2">
+                    <p className="px-3 py-2 text-[10px] uppercase tracking-[0.15em] text-white/25 font-medium">Email Sablonlari</p>
+                    <button
+                      onClick={() => sendEmailToStudent("streak_warning")}
+                      className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left hover:bg-[#FF4500]/10 transition-colors group"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
+                        <AlertTriangle className="w-4 h-4 text-amber-400" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-white/70 group-hover:text-white/90 transition-colors">Seri Uyar\u0131s\u0131</p>
+                        <p className="text-[10px] text-white/20">streak_warning</p>
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => sendEmailToStudent("weekly_summary")}
+                      className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left hover:bg-[#FF4500]/10 transition-colors group"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-violet-500/10 flex items-center justify-center shrink-0">
+                        <BarChart3 className="w-4 h-4 text-violet-400" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-white/70 group-hover:text-white/90 transition-colors">Haftal\u0131k \u00d6zet</p>
+                        <p className="text-[10px] text-white/20">weekly_summary</p>
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => { setShowCustomEmail(!showCustomEmail); }}
+                      className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left hover:bg-[#FF4500]/10 transition-colors group"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-[#FF4500]/10 flex items-center justify-center shrink-0">
+                        <MessageCircle className="w-4 h-4 text-[#FF4500]" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-white/70 group-hover:text-white/90 transition-colors">\u00d6zel Mesaj</p>
+                        <p className="text-[10px] text-white/20">Serbest metin</p>
+                      </div>
+                    </button>
+
+                    {showCustomEmail && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        className="px-2 pb-2 pt-1 overflow-hidden"
+                      >
+                        <textarea
+                          value={customEmailMessage}
+                          onChange={(e) => setCustomEmailMessage(e.target.value)}
+                          rows={3}
+                          placeholder="Mesaj\u0131n\u0131z\u0131 yaz\u0131n..."
+                          className="w-full px-3 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.08] text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF4500]/30 focus:ring-1 focus:ring-[#FF4500]/20 resize-none transition-all"
+                        />
+                        <Button
+                          onClick={() => sendEmailToStudent("welcome", customEmailMessage)}
+                          disabled={!customEmailMessage.trim() || sendingEmail}
+                          size="sm"
+                          className="w-full mt-2 bg-[#FF4500]/20 hover:bg-[#FF4500]/30 text-[#FF4500] border border-[#FF4500]/30 transition-all duration-300 disabled:opacity-30"
+                        >
+                          <Send className="w-3.5 h-3.5 mr-1.5" /> G\u00f6nder
+                        </Button>
+                      </motion.div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </motion.div>
       </motion.div>
 

@@ -20,8 +20,15 @@ import {
   Activity,
   ChevronRight,
   Star,
+  UserPlus,
+  Search,
+  X,
+  Send,
+  UserCheck,
+  UserX,
 } from "lucide-react";
 import NotificationBanner from "@/components/NotificationBanner";
+import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
@@ -122,6 +129,16 @@ const Dashboard = () => {
   const [latestAI, setLatestAI] = useState<any>(null);
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
 
+  // Buddy system state
+  const [buddyPair, setBuddyPair] = useState<any>(null);
+  const [buddyProfile, setBuddyProfile] = useState<any>(null);
+  const [pendingBuddyRequest, setPendingBuddyRequest] = useState<any>(null);
+  const [pendingRequesterProfile, setPendingRequesterProfile] = useState<any>(null);
+  const [buddySearchQuery, setBuddySearchQuery] = useState("");
+  const [buddySearchResults, setBuddySearchResults] = useState<any[]>([]);
+  const [buddySearching, setBuddySearching] = useState(false);
+  const [buddySending, setBuddySending] = useState(false);
+
   const dailyMotivation =
     MOTIVATIONS[new Date().getDate() % MOTIVATIONS.length];
 
@@ -200,7 +217,162 @@ const Dashboard = () => {
       .order("created_at", { ascending: false })
       .limit(5)
       .then(({ data }) => setRecentActivity(data || []));
+
+    // Fetch buddy pairs
+    fetchBuddyData(user.id);
   }, [user]);
+
+  const fetchBuddyData = async (userId: string) => {
+    // Check for active buddy pair
+    const { data: activePairs } = await supabase
+      .from("buddy_pairs")
+      .select("*")
+      .eq("status", "active")
+      .or(`user_a.eq.${userId},user_b.eq.${userId}`)
+      .limit(1);
+
+    if (activePairs && activePairs.length > 0) {
+      const pair = activePairs[0];
+      setBuddyPair(pair);
+      const buddyId = pair.user_a === userId ? pair.user_b : pair.user_a;
+      const { data: bp } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("user_id", buddyId)
+        .maybeSingle();
+      setBuddyProfile(bp);
+      setPendingBuddyRequest(null);
+      return;
+    }
+
+    // Check for pending request where I am user_b (incoming)
+    const { data: pendingIncoming } = await supabase
+      .from("buddy_pairs")
+      .select("*")
+      .eq("status", "pending")
+      .eq("user_b", userId)
+      .limit(1);
+
+    if (pendingIncoming && pendingIncoming.length > 0) {
+      const req = pendingIncoming[0];
+      setPendingBuddyRequest(req);
+      const { data: rp } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("user_id", req.user_a)
+        .maybeSingle();
+      setPendingRequesterProfile(rp);
+      setBuddyPair(null);
+      setBuddyProfile(null);
+      return;
+    }
+
+    // Check for pending request where I am user_a (outgoing)
+    const { data: pendingOutgoing } = await supabase
+      .from("buddy_pairs")
+      .select("*")
+      .eq("status", "pending")
+      .eq("user_a", userId)
+      .limit(1);
+
+    if (pendingOutgoing && pendingOutgoing.length > 0) {
+      setPendingBuddyRequest(pendingOutgoing[0]);
+      setPendingRequesterProfile(null);
+      setBuddyPair(null);
+      setBuddyProfile(null);
+      return;
+    }
+
+    setBuddyPair(null);
+    setBuddyProfile(null);
+    setPendingBuddyRequest(null);
+    setPendingRequesterProfile(null);
+  };
+
+  const searchBuddies = async (query: string) => {
+    setBuddySearchQuery(query);
+    if (query.trim().length < 2) {
+      setBuddySearchResults([]);
+      return;
+    }
+    setBuddySearching(true);
+    const { data } = await supabase
+      .from("profiles")
+      .select("user_id, full_name, avatar_url, streak")
+      .ilike("full_name", `%${query.trim()}%`)
+      .neq("user_id", user!.id)
+      .limit(5);
+    setBuddySearchResults(data || []);
+    setBuddySearching(false);
+  };
+
+  const sendBuddyRequest = async (targetUserId: string) => {
+    if (!user) return;
+    setBuddySending(true);
+    const { error } = await supabase.from("buddy_pairs").insert({
+      user_a: user.id,
+      user_b: targetUserId,
+    });
+    if (error) {
+      if (error.code === "23505") {
+        // duplicate
+        // Try reverse
+        const { error: err2 } = await supabase.from("buddy_pairs").insert({
+          user_a: targetUserId,
+          user_b: user.id,
+        });
+        if (err2) toast.error("Bu kisiyle zaten bir buddy isteginiz var.");
+        else {
+          toast.success("Istek gonderildi!");
+          fetchBuddyData(user.id);
+        }
+      } else {
+        toast.error("Hata: " + error.message);
+      }
+    } else {
+      toast.success("Buddy istegi gonderildi!");
+      fetchBuddyData(user.id);
+    }
+    setBuddySending(false);
+    setBuddySearchQuery("");
+    setBuddySearchResults([]);
+  };
+
+  const acceptBuddyRequest = async (pairId: string) => {
+    const { error } = await supabase
+      .from("buddy_pairs")
+      .update({ status: "active" })
+      .eq("id", pairId);
+    if (error) toast.error("Hata: " + error.message);
+    else {
+      toast.success("Buddy kabul edildi!");
+      if (user) fetchBuddyData(user.id);
+    }
+  };
+
+  const rejectBuddyRequest = async (pairId: string) => {
+    const { error } = await supabase
+      .from("buddy_pairs")
+      .update({ status: "ended" })
+      .eq("id", pairId);
+    if (error) toast.error("Hata: " + error.message);
+    else {
+      toast.success("Istek reddedildi.");
+      if (user) fetchBuddyData(user.id);
+    }
+  };
+
+  const endBuddy = async (pairId: string) => {
+    const { error } = await supabase
+      .from("buddy_pairs")
+      .update({ status: "ended" })
+      .eq("id", pairId);
+    if (error) toast.error("Hata: " + error.message);
+    else {
+      toast.success("Buddy sonlandirildi.");
+      if (user) fetchBuddyData(user.id);
+    }
+  };
 
   const totalWeeks = 24;
   const currentWeek = profile?.current_week || 1;
@@ -906,6 +1078,180 @@ const Dashboard = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* ── Hesap Ortagi (Buddy System) ── */}
+      <motion.div variants={itemVariants}>
+        <div className={`${glassCard} p-6`}>
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-orange-500/50 to-transparent" />
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500/20 to-amber-500/10 ring-1 ring-orange-500/20">
+              <UserPlus className="h-4 w-4 text-orange-400" />
+            </div>
+            <h3 className="font-display text-lg tracking-wide text-white">
+              Hesap Ortagi
+            </h3>
+          </div>
+
+          {/* Active buddy */}
+          {buddyPair && buddyPair.status === "active" && buddyProfile && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-orange-500/[0.06] to-amber-500/[0.03] border border-orange-500/10">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500/20 to-amber-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 font-display text-lg shadow-[0_0_20px_rgba(249,115,22,0.15)]">
+                  {buddyProfile.avatar_url ? (
+                    <img src={buddyProfile.avatar_url} alt="" className="w-full h-full object-cover rounded-2xl" />
+                  ) : (
+                    buddyProfile.full_name?.charAt(0)?.toUpperCase() || "?"
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-white truncate">{buddyProfile.full_name}</p>
+                  <div className="flex items-center gap-3 mt-1">
+                    <span className="flex items-center gap-1 text-xs text-orange-400/70">
+                      <Flame className="h-3 w-3" /> {buddyProfile.streak || 0} gun serisi
+                    </span>
+                    <span className="text-[10px] text-white/25">
+                      Hafta {buddyProfile.current_week || 1}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Link
+                    to="/messages"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-orange-500/10 border border-orange-500/20 text-xs text-orange-400 hover:bg-orange-500/20 transition-colors"
+                  >
+                    <Send className="h-3 w-3" /> Mesaj
+                  </Link>
+                </div>
+              </div>
+              <button
+                onClick={() => endBuddy(buddyPair.id)}
+                className="text-[10px] text-white/20 hover:text-red-400/60 transition-colors"
+              >
+                Buddy'yi sonlandir
+              </button>
+            </div>
+          )}
+
+          {/* Pending incoming request */}
+          {!buddyPair && pendingBuddyRequest && pendingBuddyRequest.user_b === user?.id && pendingRequesterProfile && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 font-display text-sm">
+                  {pendingRequesterProfile.full_name?.charAt(0)?.toUpperCase() || "?"}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-white/70 truncate">
+                    <span className="font-medium text-white">{pendingRequesterProfile.full_name}</span>{" "}
+                    seni buddy olarak secti
+                  </p>
+                  <p className="text-[10px] text-amber-400/60 mt-0.5 uppercase tracking-wider">Bekleyen istek</p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => acceptBuddyRequest(pendingBuddyRequest.id)}
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-sm text-emerald-400 hover:bg-emerald-500/20 transition-colors"
+                >
+                  <UserCheck className="h-3.5 w-3.5" /> Kabul Et
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => rejectBuddyRequest(pendingBuddyRequest.id)}
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-400 hover:bg-red-500/20 transition-colors"
+                >
+                  <UserX className="h-3.5 w-3.5" /> Reddet
+                </motion.button>
+              </div>
+            </div>
+          )}
+
+          {/* Pending outgoing request */}
+          {!buddyPair && pendingBuddyRequest && pendingBuddyRequest.user_a === user?.id && (
+            <div className="flex items-center gap-3 p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+              <div className="h-8 w-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                <Clock className="h-4 w-4 text-amber-400/60" />
+              </div>
+              <div>
+                <p className="text-sm text-white/50">Buddy istegin gonderildi</p>
+                <p className="text-[10px] text-white/20 mt-0.5">Karsi tarafin kabul etmesini bekliyorsun</p>
+              </div>
+            </div>
+          )}
+
+          {/* No buddy - search */}
+          {!buddyPair && !pendingBuddyRequest && (
+            <div className="space-y-3">
+              <p className="text-sm text-white/40">
+                Bir hesap ortagi sec, birbirinizi motive edin.
+              </p>
+              <div className="relative">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-white/20" />
+                <input
+                  type="text"
+                  value={buddySearchQuery}
+                  onChange={(e) => searchBuddies(e.target.value)}
+                  placeholder="Isim ile ara..."
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06] text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-orange-500/30 focus:ring-1 focus:ring-orange-500/20 transition-all"
+                />
+                {buddySearchQuery && (
+                  <button
+                    onClick={() => { setBuddySearchQuery(""); setBuddySearchResults([]); }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/40"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+              {buddySearching && (
+                <div className="flex justify-center py-3">
+                  <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+                </div>
+              )}
+              {buddySearchResults.length > 0 && (
+                <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                  {buddySearchResults.map((p) => (
+                    <motion.div
+                      key={p.user_id}
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.04] hover:bg-white/[0.04] transition-colors"
+                    >
+                      <div className="w-9 h-9 rounded-lg bg-white/[0.05] border border-white/[0.06] flex items-center justify-center text-white/40 text-sm font-display">
+                        {p.avatar_url ? (
+                          <img src={p.avatar_url} alt="" className="w-full h-full object-cover rounded-lg" />
+                        ) : (
+                          p.full_name?.charAt(0)?.toUpperCase() || "?"
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-white/70 truncate">{p.full_name}</p>
+                        <span className="flex items-center gap-1 text-[10px] text-orange-400/50">
+                          <Flame className="h-2.5 w-2.5" /> {p.streak || 0}
+                        </span>
+                      </div>
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        disabled={buddySending}
+                        onClick={() => sendBuddyRequest(p.user_id)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-orange-500/10 border border-orange-500/20 text-xs text-orange-400 hover:bg-orange-500/20 transition-colors disabled:opacity-50"
+                      >
+                        <UserPlus className="h-3 w-3" /> Istek Gonder
+                      </motion.button>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+              {buddySearchQuery.length >= 2 && !buddySearching && buddySearchResults.length === 0 && (
+                <p className="text-xs text-white/20 text-center py-2">Sonuc bulunamadi</p>
+              )}
+            </div>
+          )}
+        </div>
+      </motion.div>
 
       {/* ── Mentor Message ── */}
       <AnimatePresence>

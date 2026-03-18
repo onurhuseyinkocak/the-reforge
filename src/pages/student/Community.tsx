@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -24,17 +24,21 @@ import {
   Upload,
   Sparkles,
   TrendingUp,
+  Loader2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 
 type PostFilter = "all" | "photo" | "milestone";
 
+const PAGE_SIZE = 20;
+
 const PHASE_COLORS: Record<number, { bg: string; text: string; glow: string; label: string }> = {
-  1: { bg: "from-orange-500/20 to-red-500/20", text: "text-orange-400", glow: "shadow-orange-500/20", label: "Ateş" },
+  1: { bg: "from-orange-500/20 to-red-500/20", text: "text-orange-400", glow: "shadow-orange-500/20", label: "Ates" },
   2: { bg: "from-blue-500/20 to-cyan-500/20", text: "text-blue-400", glow: "shadow-blue-500/20", label: "Su" },
   3: { bg: "from-emerald-500/20 to-green-500/20", text: "text-emerald-400", glow: "shadow-emerald-500/20", label: "Toprak" },
-  4: { bg: "from-purple-500/20 to-violet-500/20", text: "text-purple-400", glow: "shadow-purple-500/20", label: "Rüzgar" },
-  5: { bg: "from-yellow-500/20 to-amber-500/20", text: "text-yellow-400", glow: "shadow-yellow-500/20", label: "Yıldırım" },
+  4: { bg: "from-purple-500/20 to-violet-500/20", text: "text-purple-400", glow: "shadow-purple-500/20", label: "Ruzgar" },
+  5: { bg: "from-yellow-500/20 to-amber-500/20", text: "text-yellow-400", glow: "shadow-yellow-500/20", label: "Yildirim" },
 };
 
 const containerVariants = {
@@ -66,12 +70,40 @@ const Community = () => {
   const [isDragging, setIsDragging] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const fetchPosts = async () => {
-    const { data } = await supabase.from("community_posts")
+  // Infinite scroll state
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+
+  const fetchPosts = async (offset = 0, append = false) => {
+    if (offset === 0) setInitialLoading(true);
+    else setLoadingMore(true);
+
+    const { data } = await supabase
+      .from("community_posts")
       .select("*, profiles!community_posts_profile_fkey(full_name, current_phase, streak)")
-      .order("created_at", { ascending: false }).limit(50);
-    setPosts(data || []);
+      .order("created_at", { ascending: false })
+      .range(offset, offset + PAGE_SIZE - 1);
+
+    const newPosts = data || [];
+
+    if (append) {
+      setPosts(prev => [...prev, ...newPosts]);
+    } else {
+      setPosts(newPosts);
+    }
+
+    setHasMore(newPosts.length === PAGE_SIZE);
+    setInitialLoading(false);
+    setLoadingMore(false);
   };
+
+  const loadMore = useCallback(() => {
+    if (loadingMore || !hasMore) return;
+    fetchPosts(posts.length, true);
+  }, [posts.length, loadingMore, hasMore]);
+
+  const sentinelRef = useInfiniteScroll(loadMore, hasMore, loadingMore);
 
   const fetchLikes = async () => {
     if (!user) return;
@@ -87,16 +119,16 @@ const Community = () => {
       const { data: profiles } = await supabase.from("profiles").select("user_id, full_name").in("user_id", userIds);
       const nameMap: Record<string, string> = {};
       (profiles || []).forEach((p: any) => { nameMap[p.user_id] = p.full_name; });
-      data.forEach((c: any) => { c.profiles = { full_name: nameMap[c.user_id] || "Kullanıcı" }; });
+      data.forEach((c: any) => { c.profiles = { full_name: nameMap[c.user_id] || "Kullanici" }; });
     }
     setComments(prev => ({ ...prev, [postId]: data || [] }));
   };
 
   useEffect(() => {
-    fetchPosts();
+    fetchPosts(0, false);
     fetchLikes();
     const channel = supabase.channel("community_realtime")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "community_posts" }, () => fetchPosts())
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "community_posts" }, () => fetchPosts(0, false))
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "community_comments" }, (payload) => {
         const postId = (payload.new as any).post_id;
         if (openComments.has(postId)) fetchComments(postId);
@@ -132,7 +164,7 @@ const Community = () => {
       const ext = imageFile.name.split(".").pop();
       const path = `${user.id}/${Date.now()}.${ext}`;
       const { error: uploadErr } = await supabase.storage.from("community-images").upload(path, imageFile);
-      if (uploadErr) { toast.error("Görsel yükleme hatası"); setLoading(false); return; }
+      if (uploadErr) { toast.error("Gorsel yukleme hatasi"); setLoading(false); return; }
       const { data: { publicUrl } } = supabase.storage.from("community-images").getPublicUrl(path);
       imageUrl = publicUrl;
     }
@@ -144,7 +176,7 @@ const Community = () => {
     if (error) toast.error("Hata: " + error.message);
     else {
       setContent(""); setImageFile(null); setImagePreview(null); setPostType("text");
-      fetchPosts(); toast.success("Paylaşıldı! 🔥");
+      fetchPosts(0, false); toast.success("Paylasildi!");
     }
   };
 
@@ -160,7 +192,7 @@ const Community = () => {
       await supabase.from("community_posts").update({ likes_count: (posts.find(p => p.id === postId)?.likes_count || 0) + 1 }).eq("id", postId);
       setUserLikes(prev => new Set(prev).add(postId));
     }
-    fetchPosts();
+    fetchPosts(0, false);
   };
 
   const toggleComments = (postId: string) => {
@@ -174,7 +206,7 @@ const Community = () => {
     const text = commentInputs[postId]?.trim();
     if (!text || !user) return;
     const { error } = await supabase.from("community_comments").insert({ post_id: postId, user_id: user.id, content: text });
-    if (error) toast.error("Yorum gönderilemedi");
+    if (error) toast.error("Yorum gonderilemedi");
     else {
       setCommentInputs(prev => ({ ...prev, [postId]: "" }));
       fetchComments(postId);
@@ -210,8 +242,8 @@ const Community = () => {
               <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-[#0a0a0a] animate-pulse" />
             </div>
             <div>
-              <h2 className="font-display text-2xl tracking-wide text-white">TOPLULUK</h2>
-              <p className="text-xs text-white/40 mt-0.5">{posts.length} paylaşım</p>
+              <h2 className="font-display text-2xl tracking-wide text-white dark:text-white">TOPLULUK</h2>
+              <p className="text-xs text-white/40 mt-0.5">{posts.length} paylasim</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -256,7 +288,7 @@ const Community = () => {
               <Textarea
                 value={content}
                 onChange={e => setContent(e.target.value)}
-                placeholder={postType === "milestone" ? "Başarını paylaş..." : "Topluluğa bir şey paylaş..."}
+                placeholder={postType === "milestone" ? "Basarini paylas..." : "Topluluga bir sey paylas..."}
                 className="bg-white/[0.02] border-white/[0.06] text-white placeholder:text-white/20 rounded-xl resize-none focus:border-[#FF4500]/30 focus:ring-1 focus:ring-[#FF4500]/20 transition-all duration-300 min-h-[100px]"
                 rows={3}
               />
@@ -302,7 +334,7 @@ const Community = () => {
               >
                 <Upload className={`w-5 h-5 mx-auto mb-1.5 transition-colors ${isDragging ? "text-[#FF4500]" : "text-white/20"}`} />
                 <p className={`text-xs transition-colors ${isDragging ? "text-[#FF4500]/70" : "text-white/20"}`}>
-                  Görsel yüklemek için tıkla veya sürükleyip bırak
+                  Gorsel yuklemek icin tikla veya surukleyip birak
                 </p>
               </div>
             )}
@@ -323,7 +355,7 @@ const Community = () => {
                 className="ml-auto bg-gradient-to-r from-[#FF4500] to-orange-600 hover:from-[#FF4500]/90 hover:to-orange-600/90 text-white border-0 rounded-xl px-6 shadow-lg shadow-[#FF4500]/20 disabled:opacity-30 disabled:shadow-none transition-all duration-300"
               >
                 <Send className="w-4 h-4 mr-2" />
-                {loading ? "Gönderiliyor..." : "Paylaş"}
+                {loading ? "Gonderiliyor..." : "Paylas"}
               </Button>
             </div>
           </div>
@@ -332,9 +364,9 @@ const Community = () => {
         {/* Filter tabs */}
         <motion.div variants={itemVariants} className="flex gap-2">
           {([
-            ["all", "Tümü", Filter],
-            ["photo", "Fotoğraflar", Image],
-            ["milestone", "Başarılar", Trophy],
+            ["all", "Tumu", Filter],
+            ["photo", "Fotograflar", Image],
+            ["milestone", "Basarilar", Trophy],
           ] as const).map(([key, label, Icon]) => (
             <motion.button
               key={key}
@@ -532,8 +564,30 @@ const Community = () => {
             })}
           </AnimatePresence>
 
+          {/* Infinite scroll sentinel */}
+          <div ref={sentinelRef} className="h-1" />
+
+          {/* Loading more spinner */}
+          {loadingMore && (
+            <div className="flex items-center justify-center py-6">
+              <Loader2 className="w-5 h-5 text-[#FF4500]/60 animate-spin" />
+              <span className="ml-2 text-xs text-white/30">Daha fazla yukleniyor...</span>
+            </div>
+          )}
+
+          {/* No more posts message */}
+          {!hasMore && posts.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-6"
+            >
+              <p className="text-xs text-white/20">Hepsi bu kadar</p>
+            </motion.div>
+          )}
+
           {/* Empty state */}
-          {filtered.length === 0 && (
+          {filtered.length === 0 && !initialLoading && (
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}

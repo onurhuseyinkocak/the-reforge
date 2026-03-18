@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { BookOpen, Lock, ExternalLink, Video, FileText, Search, CheckCircle2, Sparkles, Filter, Library } from "lucide-react";
+import { BookOpen, Lock, ExternalLink, Video, FileText, Search, CheckCircle2, Sparkles, Filter, Library, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 
 const typeIcons: Record<string, any> = {
   article: FileText,
@@ -20,6 +21,8 @@ const typeColors: Record<string, { hex: string; label: string }> = {
 };
 
 type FilterType = "all" | "article" | "video";
+
+const PAGE_SIZE = 18;
 
 const container = {
   hidden: { opacity: 0 },
@@ -37,9 +40,46 @@ const Resources = () => {
   const [filter, setFilter] = useState<FilterType>("all");
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
 
+  // Infinite scroll state
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
+
+  const fetchResources = async (offset = 0, append = false) => {
+    if (offset === 0) setInitialLoading(true);
+    else setLoadingMore(true);
+
+    const { data, count } = await supabase
+      .from("resources")
+      .select("*", { count: "exact" })
+      .order("phase_required")
+      .order("created_at")
+      .range(offset, offset + PAGE_SIZE - 1);
+
+    const newResources = data || [];
+
+    if (append) {
+      setResources(prev => [...prev, ...newResources]);
+    } else {
+      setResources(newResources);
+    }
+
+    if (count !== null) setTotalCount(count);
+    setHasMore(newResources.length === PAGE_SIZE);
+    setInitialLoading(false);
+    setLoadingMore(false);
+  };
+
+  const loadMore = useCallback(() => {
+    if (loadingMore || !hasMore) return;
+    fetchResources(resources.length, true);
+  }, [resources.length, loadingMore, hasMore]);
+
+  const sentinelRef = useInfiniteScroll(loadMore, hasMore, loadingMore);
+
   useEffect(() => {
-    supabase.from("resources").select("*").order("phase_required").order("created_at")
-      .then(({ data }) => setResources(data || []));
+    fetchResources(0, false);
     if (user) {
       supabase.from("resource_completions").select("resource_id").eq("user_id", user.id)
         .then(({ data }) => setCompletedIds(new Set((data || []).map(d => d.resource_id))));
@@ -51,11 +91,11 @@ const Resources = () => {
     if (completedIds.has(resourceId)) {
       await supabase.from("resource_completions").delete().eq("user_id", user.id).eq("resource_id", resourceId);
       setCompletedIds(prev => { const s = new Set(prev); s.delete(resourceId); return s; });
-      toast.success("İşaret kaldırıldı");
+      toast.success("Isaret kaldirildi");
     } else {
       await supabase.from("resource_completions").insert({ user_id: user.id, resource_id: resourceId });
       setCompletedIds(prev => new Set(prev).add(resourceId));
-      toast.success("Tamamlandı olarak işaretlendi!");
+      toast.success("Tamamlandi olarak isaretlendi!");
     }
   };
 
@@ -93,7 +133,7 @@ const Resources = () => {
                 </div>
                 <div>
                   <h2 className="font-display text-2xl text-white tracking-wide">Kaynak Kutuphanesi</h2>
-                  <p className="text-xs text-white/30 mt-0.5">{resources.length} kaynak mevcut</p>
+                  <p className="text-xs text-white/30 mt-0.5">{totalCount || resources.length} kaynak mevcut</p>
                 </div>
               </div>
 
@@ -296,7 +336,7 @@ const Resources = () => {
           })}
         </AnimatePresence>
 
-        {filtered.length === 0 && (
+        {filtered.length === 0 && !initialLoading && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -313,6 +353,28 @@ const Resources = () => {
           </motion.div>
         )}
       </motion.div>
+
+      {/* Infinite scroll sentinel */}
+      <div ref={sentinelRef} className="h-1" />
+
+      {/* Loading more spinner */}
+      {loadingMore && (
+        <div className="flex items-center justify-center py-6">
+          <Loader2 className="w-5 h-5 text-[#FF4500]/60 animate-spin" />
+          <span className="ml-2 text-xs text-white/30">Daha fazla yukleniyor...</span>
+        </div>
+      )}
+
+      {/* No more resources message */}
+      {!hasMore && resources.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-center py-6"
+        >
+          <p className="text-xs text-white/20">Hepsi bu kadar</p>
+        </motion.div>
+      )}
     </motion.div>
   );
 };

@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import OnboardingModal from "@/components/OnboardingModal";
+import ThemeToggle from "@/components/ThemeToggle";
 
 // ─── Navigation Links ────────────────────────────────────────────────────────
 
@@ -344,6 +345,9 @@ const DashboardLayout = () => {
           <h1 className="font-display text-lg text-foreground tracking-wide">
             {currentPageLabel}
           </h1>
+          <div className="ml-auto">
+            <ThemeToggle />
+          </div>
         </header>
 
         {/* Onboarding Modal (first login only) */}
