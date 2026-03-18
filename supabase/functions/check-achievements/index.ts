@@ -14,7 +14,8 @@ interface AchievementDef {
 
 interface CheckContext {
   userId: string;
-  admin: ReturnType<typeof createClient>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  admin: any;
 }
 
 const ACHIEVEMENT_DEFS: AchievementDef[] = [
