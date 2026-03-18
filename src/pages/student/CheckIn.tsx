@@ -173,6 +173,22 @@ const CheckIn = () => {
     setTimeout(() => setShowConfetti(false), 3000);
   };
 
+  const checkAchievements = async () => {
+    if (!user) return;
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+      if (!token) return;
+      await supabase.functions.invoke("check-achievements", {
+        body: { user_id: user.id },
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    } catch (e) {
+      // Achievement check is non-blocking, silently fail
+      console.warn("Achievement check failed:", e);
+    }
+  };
+
   const handleMorningSubmit = async () => {
     if (!user) return;
     setLoading(true);
@@ -193,8 +209,12 @@ const CheckIn = () => {
     setLoading(false);
     if (error) toast.error("Hata: " + error.message);
     else {
+      // Award XP for check-in
+      await supabase.rpc('add_xp', { p_user_id: user.id, p_amount: 10, p_source: 'checkin', p_description: 'Günlük check-in' });
       toast.success("Sabah check-in kaydedildi! ☀️");
+      toast("+10 XP kazandin!", { icon: "⚡", duration: 2000, style: { background: "rgba(255,69,0,0.15)", border: "1px solid rgba(255,69,0,0.3)", color: "#FF4500" } });
       triggerConfetti();
+      checkAchievements();
     }
   };
 
@@ -212,14 +232,20 @@ const CheckIn = () => {
         day_rating: dayRating,
         priority_review: priorityReview,
         gratitude,
+        biggest_win: biggestWin,
+        tomorrow_improvement: tomorrowImprovement,
       },
       { onConflict: "user_id,checkin_date,checkin_type" }
     );
     setLoading(false);
     if (error) toast.error("Hata: " + error.message);
     else {
+      // Award XP for check-in
+      await supabase.rpc('add_xp', { p_user_id: user.id, p_amount: 10, p_source: 'checkin', p_description: 'Günlük check-in' });
       toast.success("Akşam check-in kaydedildi! 🌙");
+      toast("+10 XP kazandin!", { icon: "⚡", duration: 2000, style: { background: "rgba(255,69,0,0.15)", border: "1px solid rgba(255,69,0,0.3)", color: "#FF4500" } });
       triggerConfetti();
+      checkAchievements();
     }
   };
 

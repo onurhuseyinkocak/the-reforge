@@ -24,7 +24,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 // ============================================
 // Channel Configuration
@@ -109,6 +109,7 @@ type ChatMessage = GuildMessage & { senderRole: GuildRole };
 export default function GuildChat() {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
+  const { slug } = useParams<{ slug: string }>();
   const { toast } = useToast();
 
   const [loading, setLoading] = useState(true);
@@ -132,9 +133,9 @@ export default function GuildChat() {
 
   const channelConfig = CHANNELS.find((c) => c.key === activeChannel)!;
 
-  // ---- Fetch guild membership ----
+  // ---- Fetch guild by slug ----
   useEffect(() => {
-    if (!user) {
+    if (!user || !slug) {
       setLoading(false);
       return;
     }
@@ -142,27 +143,39 @@ export default function GuildChat() {
     const fetchGuild = async () => {
       try {
         setLoading(true);
-        const { data, error } = await supabase
-          .from('guild_members')
-          .select('guild_id, role, guilds(name, level, member_count)')
-          .eq('user_id', user.id)
-          .eq('is_active', true)
-          .maybeSingle();
 
-        if (error) throw error;
+        // Fetch guild by slug
+        const { data: guildRow, error: guildError } = await supabase
+          .from('guilds')
+          .select('id, name, level, member_count')
+          .eq('slug', slug)
+          .single();
 
-        if (!data || !data.guilds) {
+        if (guildError) throw guildError;
+
+        if (!guildRow) {
           setGuildId(null);
           setLoading(false);
           return;
         }
 
-        const g = data.guilds as any;
-        setGuildId(data.guild_id);
-        setUserRole(data.role as GuildRole);
-        setGuildName(g.name || '');
-        setGuildLevel(g.level || 1);
-        setMemberCount(g.member_count || 0);
+        setGuildId(guildRow.id);
+        setGuildName(guildRow.name || '');
+        setGuildLevel(guildRow.level || 1);
+        setMemberCount(guildRow.member_count || 0);
+
+        // Get user's role in this guild
+        const { data: memberData } = await supabase
+          .from('guild_members')
+          .select('role')
+          .eq('guild_id', guildRow.id)
+          .eq('user_id', user.id)
+          .eq('is_active', true)
+          .maybeSingle();
+
+        if (memberData) {
+          setUserRole(memberData.role as GuildRole);
+        }
       } catch (err: any) {
         console.error('Error fetching guild for chat:', err);
         toast({ title: 'Hata', description: 'Lonca bilgisi yüklenemedi.', variant: 'destructive' });
@@ -171,7 +184,7 @@ export default function GuildChat() {
       }
     };
     fetchGuild();
-  }, [user]);
+  }, [user, slug]);
 
   // ---- Fetch messages for active channel ----
   const fetchMessages = useCallback(async () => {

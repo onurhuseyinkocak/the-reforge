@@ -169,6 +169,22 @@ const CTASection = () => {
           24 haftalık dönüşüm programına başvur
         </motion.p>
 
+        {/* Pricing link */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.7 }}
+          viewport={{ once: true }}
+          className="mt-4"
+        >
+          <Link
+            to="/pricing"
+            className="text-sm text-primary/60 hover:text-primary transition-colors duration-300 tracking-wider"
+          >
+            Fiyatlandırma &rarr;
+          </Link>
+        </motion.div>
+
         {/* Trust indicators */}
         <motion.div
           initial={{ opacity: 0 }}

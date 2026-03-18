@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import OnboardingModal from "@/components/OnboardingModal";
 
 // ─── Navigation Links ────────────────────────────────────────────────────────
 
@@ -342,6 +343,9 @@ const DashboardLayout = () => {
             {currentPageLabel}
           </h1>
         </header>
+
+        {/* Onboarding Modal (first login only) */}
+        <OnboardingModal />
 
         {/* Page Content with Transitions */}
         <main className="flex-1 p-4 lg:p-6 overflow-y-auto">

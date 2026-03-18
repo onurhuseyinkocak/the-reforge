@@ -13,10 +13,10 @@ const brothers = [
   { id: 8, initials: "LM", role: "Öğretmen" },
 ];
 
-const stats = [
-  { label: "Aktif Üye", value: "250+", suffix: "" },
-  { label: "Tamamlanan Dönüşüm", value: "180+", suffix: "" },
-  { label: "Ülke", value: "12", suffix: "" },
+const principles = [
+  { label: "Disiplin", value: "Her Gun" },
+  { label: "Hesap Verebilirlik", value: "Her An" },
+  { label: "Kardeslik", value: "Sonsuza Dek" },
 ];
 
 const BrotherhoodSection = () => {
@@ -173,7 +173,7 @@ const BrotherhoodSection = () => {
           ))}
         </div>
 
-        {/* Community Stats */}
+        {/* Community Principles */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -182,12 +182,12 @@ const BrotherhoodSection = () => {
           className="mb-16"
         >
           <div className="flex flex-wrap justify-center gap-6 md:gap-0">
-            {stats.map((stat, index) => (
+            {principles.map((item, index) => (
               <div
                 key={index}
                 className="text-center px-8 md:px-16 relative"
               >
-                {/* Divider between stats */}
+                {/* Divider between items */}
                 {index > 0 && (
                   <div className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 w-[1px] h-12 bg-white/[0.06]" />
                 )}
@@ -197,12 +197,12 @@ const BrotherhoodSection = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
                   viewport={{ once: true }}
-                  className="font-display text-5xl md:text-6xl text-primary mb-2 forge-glow"
+                  className="font-display text-4xl md:text-5xl text-primary mb-2 forge-glow"
                 >
-                  {stat.value}
+                  {item.value}
                 </motion.p>
                 <p className="text-[10px] text-muted-foreground/40 tracking-[0.3em] uppercase">
-                  {stat.label}
+                  {item.label}
                 </p>
               </div>
             ))}

@@ -19,7 +19,9 @@ import {
   Moon,
   Activity,
   ChevronRight,
+  Star,
 } from "lucide-react";
+import NotificationBanner from "@/components/NotificationBanner";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
@@ -228,6 +230,9 @@ const Dashboard = () => {
       initial="hidden"
       animate="visible"
     >
+      {/* Notification Banner */}
+      <NotificationBanner />
+
       {/* Background Glow Orbs */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-orange-500/[0.07] blur-[120px]" />
@@ -385,6 +390,50 @@ const Dashboard = () => {
             </div>
           </motion.div>
         ))}
+      </motion.div>
+
+      {/* ── XP & Level ── */}
+      <motion.div variants={itemVariants}>
+        <div className={`${glassCard} p-5`}>
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-yellow-500/50 to-transparent" />
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-500/20 to-amber-500/10 ring-1 ring-yellow-500/20">
+                <Star className="h-5 w-5 text-yellow-400" />
+              </div>
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-yellow-400/70">
+                  Seviye {profile?.level || 1}
+                </p>
+                <p className="text-2xl font-bold text-white">
+                  <AnimatedCounter value={profile?.xp || 0} /> <span className="text-sm font-normal text-white/30">XP</span>
+                </p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-xs text-white/30">Sonraki seviye</p>
+              <p className="text-sm font-bold text-yellow-400">
+                {((profile?.level || 1) + 1) * 100} XP
+              </p>
+            </div>
+          </div>
+          {/* XP Progress bar to next level */}
+          <div className="relative h-2.5 rounded-full bg-white/[0.04] overflow-hidden">
+            <motion.div
+              className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-yellow-600 via-yellow-500 to-amber-400"
+              initial={{ width: 0 }}
+              animate={{ width: `${Math.min(100, ((profile?.xp || 0) % 100))}%` }}
+              transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.3 }}
+            />
+            <div
+              className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-yellow-400/30 to-amber-400/10 blur-sm"
+              style={{ width: `${Math.min(100, ((profile?.xp || 0) % 100))}%` }}
+            />
+          </div>
+          <p className="text-[10px] text-white/20 mt-1.5 text-right">
+            {(profile?.xp || 0) % 100} / 100 XP
+          </p>
+        </div>
       </motion.div>
 
       {/* ── Quick Actions ── */}

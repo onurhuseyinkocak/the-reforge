@@ -31,6 +31,9 @@ import GuildDashboard from "./pages/student/GuildDashboard";
 import GuildChat from "./pages/student/GuildChat";
 import GuildManage from "./pages/student/GuildManage";
 
+// Public pages
+import Pricing from "./pages/Pricing";
+
 // Admin pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminStudents from "./pages/admin/AdminStudents";
@@ -63,6 +66,7 @@ const App = () => (
             <Route path="/apply" element={<Apply />} />
             <Route path="/application-submitted" element={<ApplicationSubmitted />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/pricing" element={<Pricing />} />
 
             {/* Student routes */}
             <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
@@ -77,9 +81,9 @@ const App = () => (
               <Route path="/community" element={<Community />} />
               <Route path="/guilds" element={<Guilds />} />
               <Route path="/guilds/create" element={<GuildCreate />} />
-              <Route path="/guilds/dashboard" element={<GuildDashboard />} />
-              <Route path="/guilds/chat" element={<GuildChat />} />
-              <Route path="/guilds/manage" element={<GuildManage />} />
+              <Route path="/guilds/:slug" element={<GuildDashboard />} />
+              <Route path="/guilds/:slug/chat" element={<GuildChat />} />
+              <Route path="/guilds/:slug/manage" element={<GuildManage />} />
               <Route path="/rankings" element={<Rankings />} />
               <Route path="/forged" element={<ForgedWall />} />
             </Route>

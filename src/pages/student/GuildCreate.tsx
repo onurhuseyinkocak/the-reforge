@@ -298,7 +298,7 @@ export default function GuildCreate() {
 
       if (memberError) throw memberError;
 
-      navigate("/guilds");
+      navigate(`/guilds/${slug}`);
     } catch (err: any) {
       console.error("Guild creation failed:", err);
       setError(err.message || "Lonca oluşturulamadı. Tekrar deneyin.");

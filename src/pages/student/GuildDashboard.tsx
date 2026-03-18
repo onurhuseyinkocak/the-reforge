@@ -21,7 +21,7 @@ import {
 import TierBadge from "@/components/guild/TierBadge";
 import HeatMeter from "@/components/guild/HeatMeter";
 import RoleBadge from "@/components/guild/RoleBadge";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -104,6 +104,7 @@ function getInitials(name: string): string {
 export default function GuildDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { slug } = useParams<{ slug: string }>();
   const { toast } = useToast();
 
   const [loading, setLoading] = useState(true);
@@ -115,7 +116,7 @@ export default function GuildDashboard() {
   const [activity] = useState<ActivityItem[]>([]); // Static empty for now
 
   useEffect(() => {
-    if (!user) {
+    if (!user || !slug) {
       setLoading(false);
       return;
     }
@@ -124,26 +125,37 @@ export default function GuildDashboard() {
       try {
         setLoading(true);
 
-        // 1. Get user's guild membership
-        const { data: membershipData, error: membershipError } = await supabase
-          .from('guild_members')
-          .select('guild_id, role, guilds(*)')
-          .eq('user_id', user.id)
-          .eq('is_active', true)
-          .maybeSingle();
+        // 1. Fetch guild by slug
+        const { data: guildRow, error: guildError } = await supabase
+          .from('guilds')
+          .select('*')
+          .eq('slug', slug)
+          .single();
 
-        if (membershipError) throw membershipError;
+        if (guildError) throw guildError;
 
-        if (!membershipData || !membershipData.guilds) {
+        if (!guildRow) {
           setGuild(null);
           setLoading(false);
           return;
         }
 
-        const guildData = membershipData.guilds as unknown as Guild;
+        const guildData = guildRow as unknown as Guild;
         setGuild(guildData);
-        setUserRole(membershipData.role as GuildRole);
-        const guildId = membershipData.guild_id;
+        const guildId = guildData.id;
+
+        // 2. Get user's membership to determine role/permissions
+        const { data: membershipData } = await supabase
+          .from('guild_members')
+          .select('role')
+          .eq('guild_id', guildId)
+          .eq('user_id', user.id)
+          .eq('is_active', true)
+          .maybeSingle();
+
+        if (membershipData) {
+          setUserRole(membershipData.role as GuildRole);
+        }
 
         // 2. Fetch members, quests, challenges in parallel
         const [membersRes, questsRes, challengesRes] = await Promise.all([
@@ -184,7 +196,7 @@ export default function GuildDashboard() {
     };
 
     fetchDashboard();
-  }, [user]);
+  }, [user, slug]);
 
   if (loading) {
     return (
@@ -325,6 +337,7 @@ export default function GuildDashboard() {
                       <motion.button
                         whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,0.08)' }}
                         whileTap={{ scale: 0.95 }}
+                        onClick={() => navigate(`/guilds/${slug}/manage`)}
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/[0.08] bg-white/[0.04] text-xs text-muted-foreground hover:text-foreground transition-colors"
                       >
                         <Settings size={14} />

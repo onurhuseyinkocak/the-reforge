@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Settings, Users, Target, Swords, Coins, ScrollText,
@@ -1333,6 +1334,8 @@ function DangerSection() {
 // ============================================
 
 export default function GuildManage() {
+  const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<SectionKey>("settings");
 
   const renderSection = () => {

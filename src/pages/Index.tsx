@@ -35,7 +35,7 @@ const Index = () => {
             THE FORGE
           </p>
           <p className="text-sm text-muted-foreground">
-            © 2024 THE FORGE. Tüm hakları saklıdır.
+            © {new Date().getFullYear()} THE FORGE. Tüm hakları saklıdır.
           </p>
         </div>
       </footer>
