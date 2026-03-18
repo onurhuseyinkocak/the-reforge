@@ -322,46 +322,55 @@ export type Database = {
       }
       guild_challenges: {
         Row: {
-          challenged_guild_id: string
+          challenge_type: string
+          challenged_id: string
           challenged_score: number
-          challenger_guild_id: string
+          challenger_id: string
           challenger_score: number
           created_at: string
           ends_at: string | null
           id: string
+          starts_at: string | null
           status: string
+          winner_id: string | null
         }
         Insert: {
-          challenged_guild_id: string
+          challenge_type?: string
+          challenged_id: string
           challenged_score?: number
-          challenger_guild_id: string
+          challenger_id: string
           challenger_score?: number
           created_at?: string
           ends_at?: string | null
           id?: string
+          starts_at?: string | null
           status?: string
+          winner_id?: string | null
         }
         Update: {
-          challenged_guild_id?: string
+          challenge_type?: string
+          challenged_id?: string
           challenged_score?: number
-          challenger_guild_id?: string
+          challenger_id?: string
           challenger_score?: number
           created_at?: string
           ends_at?: string | null
           id?: string
+          starts_at?: string | null
           status?: string
+          winner_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "guild_challenges_challenged_guild_id_fkey"
-            columns: ["challenged_guild_id"]
+            foreignKeyName: "guild_challenges_challenged_id_fkey"
+            columns: ["challenged_id"]
             isOneToOne: false
             referencedRelation: "guilds"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "guild_challenges_challenger_guild_id_fkey"
-            columns: ["challenger_guild_id"]
+            foreignKeyName: "guild_challenges_challenger_id_fkey"
+            columns: ["challenger_id"]
             isOneToOne: false
             referencedRelation: "guilds"
             referencedColumns: ["id"]
@@ -435,37 +444,102 @@ export type Database = {
           },
         ]
       }
+      guild_quest_participants: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          proof_note: string | null
+          proof_url: string | null
+          quest_id: string
+          reviewed_by: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          proof_note?: string | null
+          proof_url?: string | null
+          quest_id: string
+          reviewed_by?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          proof_note?: string | null
+          proof_url?: string | null
+          quest_id?: string
+          reviewed_by?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guild_quest_participants_quest_id_fkey"
+            columns: ["quest_id"]
+            isOneToOne: false
+            referencedRelation: "guild_quests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       guild_quests: {
         Row: {
           completion_rate: number
           created_at: string
+          created_by: string
+          current_value: number
           description: string | null
           due_date: string | null
+          ends_at: string | null
           guild_id: string
           id: string
+          points_reward: number
+          quest_type: string
+          starts_at: string
           status: string
+          target_value: number | null
           title: string
           xp_reward: number
         }
         Insert: {
           completion_rate?: number
           created_at?: string
+          created_by: string
+          current_value?: number
           description?: string | null
           due_date?: string | null
+          ends_at?: string | null
           guild_id: string
           id?: string
+          points_reward?: number
+          quest_type?: string
+          starts_at?: string
           status?: string
+          target_value?: number | null
           title: string
           xp_reward?: number
         }
         Update: {
           completion_rate?: number
           created_at?: string
+          created_by?: string
+          current_value?: number
           description?: string | null
           due_date?: string | null
+          ends_at?: string | null
           guild_id?: string
           id?: string
+          points_reward?: number
+          quest_type?: string
+          starts_at?: string
           status?: string
+          target_value?: number | null
           title?: string
           xp_reward?: number
         }
