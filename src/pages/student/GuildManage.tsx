@@ -641,7 +641,7 @@ function QuestsSection({ guild }: { guild: Guild }) {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setQuests((data || []) as GuildQuest[]);
+      setQuests(((data || []) as unknown) as GuildQuest[]);
     } catch (err: any) {
       toast.error("Quest'ler yüklenemedi: " + (err.message || ""));
     } finally {
