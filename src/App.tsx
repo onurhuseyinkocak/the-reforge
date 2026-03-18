@@ -23,6 +23,9 @@ import Profile from "./pages/student/Profile";
 import LifeAreas from "./pages/student/LifeAreas";
 import Resources from "./pages/student/Resources";
 import Community from "./pages/student/Community";
+import Guilds from "./pages/student/Guilds";
+import Rankings from "./pages/student/Rankings";
+import ForgedWall from "./pages/student/ForgedWall";
 
 // Admin pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -68,6 +71,9 @@ const App = () => (
               <Route path="/life-areas" element={<LifeAreas />} />
               <Route path="/resources" element={<Resources />} />
               <Route path="/community" element={<Community />} />
+              <Route path="/guilds" element={<Guilds />} />
+              <Route path="/rankings" element={<Rankings />} />
+              <Route path="/forged" element={<ForgedWall />} />
             </Route>
 
             {/* Admin routes */}

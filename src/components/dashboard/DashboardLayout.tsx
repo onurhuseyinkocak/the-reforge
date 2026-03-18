@@ -6,7 +6,7 @@ import {
   LayoutDashboard, CheckSquare, ListTodo, TrendingUp,
   MessageSquare, User, LogOut, Menu, Shield,
   Users, CreditCard, Flame, Compass, BookOpen,
-  UsersRound, ClipboardList
+  UsersRound, ClipboardList, Swords, Trophy, Award
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -19,6 +19,9 @@ const studentLinks = [
   { to: "/progress", label: "İlerleme", icon: TrendingUp },
   { to: "/resources", label: "Kaynaklar", icon: BookOpen },
   { to: "/community", label: "Topluluk", icon: UsersRound },
+  { to: "/guilds", label: "Loncalar", icon: Swords },
+  { to: "/rankings", label: "Sıralama", icon: Trophy },
+  { to: "/forged", label: "Forged Wall", icon: Award },
   { to: "/messages", label: "Mesajlar", icon: MessageSquare },
   { to: "/profile", label: "Profil", icon: User },
 ];
