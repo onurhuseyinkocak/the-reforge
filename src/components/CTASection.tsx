@@ -33,7 +33,7 @@ const CTASection = () => {
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
       {/* Background */}
-      <div className="absolute inset-0 bg-[hsl(0,0%,3%)]" />
+      <div className="absolute inset-0 bg-[hsl(0,0%,5%)]" />
 
       {/* Grid pattern */}
       <div className="absolute inset-0 opacity-[0.01]" style={{
@@ -91,7 +91,7 @@ const CTASection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="text-lg md:text-2xl text-muted-foreground/40 mb-12 font-light"
+          className="text-lg md:text-2xl text-muted-foreground/70 mb-12 font-light"
         >
           Bahanelerin burada bitiyor.
         </motion.p>
@@ -171,7 +171,7 @@ const CTASection = () => {
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.6 }}
           viewport={{ once: true }}
-          className="mt-8 text-sm text-muted-foreground/35"
+          className="mt-8 text-sm text-muted-foreground/60"
         >
           24 haftalık dönüşüm programına başvur
         </motion.p>
@@ -185,7 +185,7 @@ const CTASection = () => {
           className="mt-4"
         >
           <Link to="/pricing"
-            className="text-sm text-primary/50 hover:text-primary transition-colors duration-300 tracking-wider"
+            className="text-sm text-primary/70 hover:text-primary transition-colors duration-300 tracking-wider"
           >
             Fiyatlandırma &rarr;
           </Link>
@@ -200,10 +200,10 @@ const CTASection = () => {
           className="mt-20 flex flex-wrap justify-center gap-8 md:gap-12"
         >
           {["Sınırlı kontenjan", "Birebir mentorluk", "Sonuç garantili"].map((text, index) => (
-            <span key={index} className="flex items-center gap-3 text-[10px] text-muted-foreground/25 tracking-[0.25em] uppercase">
+            <span key={index} className="flex items-center gap-3 text-[10px] text-muted-foreground/60 tracking-[0.25em] uppercase">
               <span className="relative flex h-1.5 w-1.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary/30 opacity-75" />
-                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary/30" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary/60 opacity-75" />
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary/60" />
               </span>
               {text}
             </span>
@@ -219,7 +219,7 @@ const CTASection = () => {
         viewport={{ once: true }}
         className="absolute bottom-10 left-0 right-0 text-center"
       >
-        <p className="font-display text-primary/15 tracking-[0.6em] text-[9px] uppercase">
+        <p className="font-display text-primary/30 tracking-[0.6em] text-[9px] uppercase">
           Discipline Is Fire
         </p>
       </motion.div>

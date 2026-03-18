@@ -1,10 +1,12 @@
 import EmberParticles from "@/components/EmberParticles";
 import FloatingNav from "@/components/FloatingNav";
 import HeroSection from "@/components/HeroSection";
+import ForgeAnimation from "@/components/ForgeAnimation";
 import ProblemSection from "@/components/ProblemSection";
 import PhilosophySection from "@/components/PhilosophySection";
 import ProgramSection from "@/components/ProgramSection";
 import BrotherhoodSection from "@/components/BrotherhoodSection";
+import StatsSection from "@/components/StatsSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import CTASection from "@/components/CTASection";
 import AmbientSound from "@/components/AmbientSound";
@@ -24,6 +26,7 @@ const Index = () => {
       {/* Main Content */}
       <main className="relative z-0">
         <HeroSection />
+        <ForgeAnimation />
         <div id="manifesto">
           <ProblemSection />
           <PhilosophySection />
@@ -34,6 +37,7 @@ const Index = () => {
         <div id="brotherhood">
           <BrotherhoodSection />
         </div>
+        <StatsSection />
         <div id="testimonials">
           <TestimonialsSection />
         </div>

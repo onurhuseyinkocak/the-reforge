@@ -67,17 +67,17 @@ const ProgramSection = () => {
   return (
     <section ref={containerRef} className="relative py-32 md:py-48 overflow-hidden">
       {/* Background */}
-      <div className="absolute inset-0 bg-[hsl(0,0%,3%)]" />
+      <div className="absolute inset-0 bg-[hsl(0,0%,5%)]" />
       <motion.div style={{ y: bgY }} className="absolute inset-0 pointer-events-none">
         <div className="absolute inset-0" style={{
-          background: "radial-gradient(ellipse 100% 60% at 50% 40%, hsl(16 100% 50% / 0.03) 0%, transparent 60%)",
+          background: "radial-gradient(ellipse 100% 60% at 50% 40%, hsl(16 100% 50% / 0.06) 0%, transparent 60%)",
         }} />
       </motion.div>
 
       {/* Decorative lines */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-0 left-[25%] w-[1px] h-full bg-gradient-to-b from-transparent via-white/[0.02] to-transparent" />
-        <div className="absolute top-0 right-[25%] w-[1px] h-full bg-gradient-to-b from-transparent via-white/[0.02] to-transparent" />
+        <div className="absolute top-0 left-[25%] w-[1px] h-full bg-gradient-to-b from-transparent via-white/[0.06] to-transparent" />
+        <div className="absolute top-0 right-[25%] w-[1px] h-full bg-gradient-to-b from-transparent via-white/[0.06] to-transparent" />
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-4">
@@ -89,10 +89,10 @@ const ProgramSection = () => {
           viewport={{ once: true }}
           className="text-center mb-8"
         >
-          <span className="inline-flex items-center gap-4 text-[10px] tracking-[0.5em] text-primary/35 uppercase mb-8">
-            <span className="w-8 h-[1px] bg-primary/20" />
+          <span className="inline-flex items-center gap-4 text-[10px] tracking-[0.5em] text-primary/60 uppercase mb-8">
+            <span className="w-8 h-[1px] bg-primary/40" />
             Program
-            <span className="w-8 h-[1px] bg-primary/20" />
+            <span className="w-8 h-[1px] bg-primary/40" />
           </span>
           <div className="overflow-hidden">
             <motion.h2
@@ -110,7 +110,7 @@ const ProgramSection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
             viewport={{ once: true }}
-            className="text-base md:text-lg text-muted-foreground/50 mt-6"
+            className="text-base md:text-lg text-muted-foreground/70 mt-6"
           >
             Birebir mentorluk ile dönüşüm
           </motion.p>
@@ -118,7 +118,7 @@ const ProgramSection = () => {
 
         {/* Progress Bar */}
         <div className="max-w-3xl mx-auto mb-6 mt-20">
-          <div className="relative h-[2px] bg-white/[0.03] rounded-full overflow-hidden">
+          <div className="relative h-[2px] bg-white/[0.12] rounded-full overflow-hidden">
             <motion.div
               style={{ width: progressWidth }}
               className="absolute inset-y-0 left-0 rounded-full"
@@ -132,8 +132,8 @@ const ProgramSection = () => {
 
         {/* Labels */}
         <div className="flex justify-between max-w-3xl mx-auto mb-6 px-1">
-          <span className="text-[9px] tracking-[0.3em] text-muted-foreground/30 uppercase font-display">Raw Iron</span>
-          <span className="text-[9px] tracking-[0.3em] text-primary/50 uppercase font-display">Sharp Steel</span>
+          <span className="text-[9px] tracking-[0.3em] text-muted-foreground/60 uppercase font-display">Raw Iron</span>
+          <span className="text-[9px] tracking-[0.3em] text-primary/70 uppercase font-display">Sharp Steel</span>
         </div>
 
         {/* Phase markers */}
@@ -148,13 +148,13 @@ const ProgramSection = () => {
                 viewport={{ once: true }}
                 className="text-center group"
               >
-                <div className="font-display text-lg text-primary/20 mb-2 group-hover:text-primary/40 transition-colors duration-300">
+                <div className="font-display text-lg text-primary/40 mb-2 group-hover:text-primary/60 transition-colors duration-300">
                   {phase.icon}
                 </div>
-                <div className="text-[9px] tracking-[0.2em] text-muted-foreground/25 mb-1">
+                <div className="text-[9px] tracking-[0.2em] text-muted-foreground/60 mb-1">
                   Hafta {phase.week}
                 </div>
-                <div className="text-xs text-foreground/40 font-display tracking-wider">
+                <div className="text-xs text-foreground/70 font-display tracking-wider">
                   {phase.label}
                 </div>
               </motion.div>
@@ -187,16 +187,10 @@ const ProgramSection = () => {
                 <div className={`
                   relative h-full rounded-2xl p-8 md:p-10 transition-all duration-700 overflow-hidden border
                   ${isActive
-                    ? "border-primary/20 shadow-[0_0_50px_hsl(16_100%_50%/0.06)]"
-                    : "border-white/[0.03] hover:border-white/[0.06]"
+                    ? "bg-[#151515] border-primary/20 shadow-[0_0_50px_hsl(16_100%_50%/0.06)]"
+                    : "bg-[#111111] border-white/[0.08] hover:border-white/[0.12]"
                   }
-                `}
-                style={{
-                  background: isActive
-                    ? "linear-gradient(145deg, hsl(0 0% 9% / 0.9) 0%, hsl(0 0% 5% / 0.95) 100%)"
-                    : "linear-gradient(145deg, hsl(0 0% 7% / 0.8) 0%, hsl(0 0% 4% / 0.9) 100%)",
-                  backdropFilter: "blur(24px)",
-                }}>
+                `}>
                   {/* Top accent line on active */}
                   <motion.div
                     initial={false}
@@ -215,11 +209,11 @@ const ProgramSection = () => {
                   {/* Icon */}
                   <div className={`
                     relative z-10 w-14 h-14 rounded-xl flex items-center justify-center mb-6 transition-all duration-500
-                    ${isActive ? "text-primary" : "text-muted-foreground/40 group-hover:text-primary/60"}
+                    ${isActive ? "text-primary" : "text-muted-foreground/60 group-hover:text-primary/70"}
                   `}
                   style={{
-                    background: isActive ? "hsl(16 100% 50% / 0.1)" : "hsl(0 0% 100% / 0.02)",
-                    border: `1px solid ${isActive ? "hsl(16 100% 50% / 0.2)" : "hsl(0 0% 100% / 0.04)"}`,
+                    background: isActive ? "hsl(16 100% 50% / 0.12)" : "hsl(0 0% 100% / 0.03)",
+                    border: `1px solid ${isActive ? "hsl(16 100% 50% / 0.25)" : "hsl(0 0% 100% / 0.06)"}`,
                   }}>
                     <Icon className="w-6 h-6" />
                   </div>
@@ -229,13 +223,13 @@ const ProgramSection = () => {
                     <h3 className="font-display text-3xl md:text-4xl text-foreground tracking-wider">
                       {pillar.title}
                     </h3>
-                    <span className="text-[9px] tracking-[0.3em] text-primary/25 uppercase">
+                    <span className="text-[9px] tracking-[0.3em] text-primary/50 uppercase">
                       {pillar.subtitle}
                     </span>
                   </div>
 
                   {/* Description */}
-                  <p className="relative z-10 text-muted-foreground/50 leading-relaxed mb-6 text-sm">
+                  <p className="relative z-10 text-muted-foreground/70 leading-relaxed mb-6 text-sm">
                     {pillar.description}
                   </p>
 
@@ -246,7 +240,7 @@ const ProgramSection = () => {
                     transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                     className="overflow-hidden relative z-10"
                   >
-                    <ul className="space-y-3 pt-6 border-t border-white/[0.04]">
+                    <ul className="space-y-3 pt-6 border-t border-white/[0.10]">
                       {pillar.details.map((detail, i) => (
                         <motion.li
                           key={i}
@@ -255,7 +249,7 @@ const ProgramSection = () => {
                           transition={{ duration: 0.3, delay: i * 0.05 }}
                           className="flex items-center gap-3 text-sm text-foreground/60"
                         >
-                          <span className="w-1.5 h-1.5 bg-primary/50 rounded-full flex-shrink-0" />
+                          <span className="w-1.5 h-1.5 bg-primary/70 rounded-full flex-shrink-0" />
                           {detail}
                         </motion.li>
                       ))}
@@ -283,8 +277,8 @@ const ProgramSection = () => {
         >
           <div className="inline-flex items-center gap-4 px-8 py-4 rounded-full"
             style={{
-              background: "hsl(16 100% 50% / 0.04)",
-              border: "1px solid hsl(16 100% 50% / 0.1)",
+              background: "hsl(16 100% 50% / 0.08)",
+              border: "1px solid hsl(16 100% 50% / 0.15)",
             }}>
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />

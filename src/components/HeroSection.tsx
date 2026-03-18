@@ -33,7 +33,7 @@ const HeroSection = () => {
       className="relative min-h-[130vh] flex flex-col items-center justify-center overflow-hidden"
     >
       {/* Deep black base */}
-      <div className="absolute inset-0 bg-[hsl(0,0%,3%)]" />
+      <div className="absolute inset-0 bg-[hsl(0,0%,5%)]" />
 
       {/* Animated gradient mesh - follows mouse subtly */}
       <motion.div
@@ -75,7 +75,7 @@ const HeroSection = () => {
       {/* Dark scroll overlay */}
       <motion.div
         style={{ opacity: overlayOpacity }}
-        className="absolute inset-0 bg-[hsl(0,0%,3%)] z-[5] pointer-events-none"
+        className="absolute inset-0 bg-[hsl(0,0%,5%)] z-[5] pointer-events-none"
       />
 
       {/* Content */}
@@ -199,7 +199,7 @@ const HeroSection = () => {
         className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20"
       >
         <div className="flex flex-col items-center gap-4">
-          <span className="text-[9px] text-muted-foreground/40 tracking-[0.6em] uppercase">
+          <span className="text-[9px] text-muted-foreground/60 tracking-[0.6em] uppercase">
             Scroll
           </span>
           <motion.div

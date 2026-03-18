@@ -26,15 +26,15 @@ const PhilosophySection = () => {
       className="relative min-h-screen py-32 md:py-48 overflow-hidden"
     >
       {/* Base */}
-      <div className="absolute inset-0 bg-[hsl(0,0%,3%)]" />
+      <div className="absolute inset-0 bg-[hsl(0,0%,5%)]" />
 
       {/* Parallax orbs */}
       <motion.div style={{ y: layer1Y }} className="absolute inset-0 pointer-events-none">
         <div className="absolute top-[10%] left-[10%] w-[600px] h-[600px] rounded-full"
-          style={{ background: "radial-gradient(circle, hsl(16 100% 50% / 0.03) 0%, transparent 70%)" }}
+          style={{ background: "radial-gradient(circle, hsl(16 100% 50% / 0.06) 0%, transparent 70%)" }}
         />
         <div className="absolute bottom-[10%] right-[5%] w-[500px] h-[500px] rounded-full"
-          style={{ background: "radial-gradient(circle, hsl(0 80% 40% / 0.04) 0%, transparent 70%)" }}
+          style={{ background: "radial-gradient(circle, hsl(0 80% 40% / 0.07) 0%, transparent 70%)" }}
         />
       </motion.div>
 
@@ -47,8 +47,8 @@ const PhilosophySection = () => {
 
       {/* Vertical accent lines */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-[8%] w-[1px] h-full bg-gradient-to-b from-transparent via-primary/[0.03] to-transparent" />
-        <div className="absolute top-0 right-[8%] w-[1px] h-full bg-gradient-to-b from-transparent via-primary/[0.03] to-transparent" />
+        <div className="absolute top-0 left-[8%] w-[1px] h-full bg-gradient-to-b from-transparent via-primary/[0.06] to-transparent" />
+        <div className="absolute top-0 right-[8%] w-[1px] h-full bg-gradient-to-b from-transparent via-primary/[0.06] to-transparent" />
       </div>
 
       {/* Content */}
@@ -61,10 +61,10 @@ const PhilosophySection = () => {
           viewport={{ once: true }}
           className="text-center mb-32 md:mb-40"
         >
-          <span className="inline-flex items-center gap-4 text-[10px] tracking-[0.5em] text-primary/35 uppercase mb-8">
-            <span className="w-8 h-[1px] bg-primary/20" />
+          <span className="inline-flex items-center gap-4 text-[10px] tracking-[0.5em] text-primary/60 uppercase mb-8">
+            <span className="w-8 h-[1px] bg-primary/40" />
             Manifesto
-            <span className="w-8 h-[1px] bg-primary/20" />
+            <span className="w-8 h-[1px] bg-primary/40" />
           </span>
           <div className="overflow-hidden">
             <motion.h2
@@ -82,7 +82,7 @@ const PhilosophySection = () => {
             whileInView={{ scaleX: 1 }}
             transition={{ duration: 1.5, delay: 0.3 }}
             viewport={{ once: true }}
-            className="w-20 h-[1px] bg-primary/30 mx-auto mt-10"
+            className="w-20 h-[1px] bg-primary/60 mx-auto mt-10"
           />
         </motion.div>
 
@@ -110,7 +110,7 @@ const PhilosophySection = () => {
                       ? "text-7xl md:text-9xl lg:text-[10rem] text-primary"
                       : isMedium
                       ? "text-3xl md:text-5xl lg:text-6xl text-foreground"
-                      : "text-xl md:text-3xl text-muted-foreground/40"
+                      : "text-xl md:text-3xl text-muted-foreground/70"
                   }`}
                   style={isHeavy ? {
                     textShadow: "0 0 60px hsl(16 100% 50% / 0.4), 0 0 120px hsl(16 100% 50% / 0.2)",
@@ -142,12 +142,7 @@ const PhilosophySection = () => {
           viewport={{ once: true }}
           className="relative max-w-3xl mx-auto"
         >
-          <div className="relative rounded-2xl p-10 md:p-14 overflow-hidden"
-            style={{
-              background: "linear-gradient(145deg, hsl(0 0% 8% / 0.6) 0%, hsl(0 0% 4% / 0.8) 100%)",
-              backdropFilter: "blur(24px)",
-              border: "1px solid hsl(0 0% 100% / 0.04)",
-            }}
+          <div className="relative rounded-2xl p-10 md:p-14 overflow-hidden bg-[#111111] border border-white/[0.08]"
           >
             {/* Accent corner */}
             <div className="absolute top-0 left-0 w-20 h-20">
@@ -175,8 +170,8 @@ const PhilosophySection = () => {
                 </span>"
               </blockquote>
               <div className="flex items-center gap-4">
-                <div className="w-10 h-[1px] bg-primary/25" />
-                <p className="text-muted-foreground/40 text-[10px] tracking-[0.4em] uppercase">
+                <div className="w-10 h-[1px] bg-primary/50" />
+                <p className="text-muted-foreground/70 text-[10px] tracking-[0.4em] uppercase">
                   THE FORGE Felsefesi
                 </p>
               </div>

@@ -45,16 +45,16 @@ const ProblemSection = () => {
   return (
     <section ref={containerRef} className="relative py-32 md:py-48 overflow-hidden">
       {/* Background */}
-      <div className="absolute inset-0 bg-[hsl(0,0%,3%)]" />
+      <div className="absolute inset-0 bg-[hsl(0,0%,5%)]" />
 
       {/* Gradient atmosphere */}
       <div className="absolute inset-0" style={{
-        background: "radial-gradient(ellipse 80% 60% at 50% 0%, hsl(0 80% 30% / 0.06) 0%, transparent 60%)",
+        background: "radial-gradient(ellipse 80% 60% at 50% 0%, hsl(0 80% 30% / 0.10) 0%, transparent 60%)",
       }} />
 
       {/* Large background number */}
       <motion.div style={{ y: counterY }} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none">
-        <span className="font-display text-[30rem] md:text-[50rem] leading-none text-white/[0.01]">
+        <span className="font-display text-[30rem] md:text-[50rem] leading-none text-white/[0.04]">
           05
         </span>
       </motion.div>
@@ -71,17 +71,17 @@ const ProblemSection = () => {
           viewport={{ once: true }}
           className="mb-8"
         >
-          <span className="inline-flex items-center gap-4 text-[10px] tracking-[0.5em] text-primary/40 uppercase">
-            <span className="w-8 h-[1px] bg-primary/20" />
+          <span className="inline-flex items-center gap-4 text-[10px] tracking-[0.5em] text-primary/60 uppercase">
+            <span className="w-8 h-[1px] bg-primary/40" />
             Sana Satılan Yalanlar
-            <span className="w-8 h-[1px] bg-primary/20" />
+            <span className="w-8 h-[1px] bg-primary/40" />
           </span>
         </motion.div>
 
         <div className="overflow-hidden">
           <motion.h2
-            initial={{ y: 100 }}
-            whileInView={{ y: 0 }}
+            initial={{ y: 60, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
             viewport={{ once: true }}
             className="font-display text-7xl md:text-9xl lg:text-[11rem] text-foreground tracking-wider"
@@ -95,7 +95,7 @@ const ProblemSection = () => {
             whileInView={{ y: 0 }}
             transition={{ duration: 1, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
             viewport={{ once: true }}
-            className="font-display text-7xl md:text-9xl lg:text-[11rem] text-primary/20 tracking-wider"
+            className="font-display text-7xl md:text-9xl lg:text-[11rem] text-primary/60 tracking-wider"
           >
             STEEL
           </motion.h2>
@@ -106,7 +106,7 @@ const ProblemSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
           viewport={{ once: true }}
-          className="text-base md:text-lg text-muted-foreground/50 max-w-md mx-auto mt-8"
+          className="text-base md:text-lg text-muted-foreground/70 max-w-md mx-auto mt-8"
         >
           Motivasyon endüstrisinin sana sattığı yalanlar
         </motion.p>
@@ -144,25 +144,21 @@ const ProblemSection = () => {
                 className="relative h-[340px] md:h-[380px] group cursor-default"
               >
                 {/* Card background */}
-                <div className="absolute inset-0 rounded-2xl border border-white/[0.04] group-hover:border-primary/15 transition-all duration-700"
-                  style={{
-                    background: "linear-gradient(145deg, hsl(0 0% 8% / 0.8) 0%, hsl(0 0% 5% / 0.9) 100%)",
-                    backdropFilter: "blur(24px)",
-                  }}
+                <div className="absolute inset-0 rounded-2xl bg-[#111111] border border-white/[0.08] group-hover:border-primary/20 transition-all duration-700"
                 />
 
                 {/* Top accent line */}
-                <div className="absolute top-0 left-8 right-8 h-[1px] bg-gradient-to-r from-transparent via-white/[0.04] to-transparent group-hover:via-primary/20 transition-all duration-700" />
+                <div className="absolute top-0 left-8 right-8 h-[1px] bg-gradient-to-r from-transparent via-white/[0.10] to-transparent group-hover:via-primary/30 transition-all duration-700" />
 
                 {/* Hover glow */}
                 <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
                   style={{
-                    background: "radial-gradient(ellipse at 50% 0%, hsl(16 100% 50% / 0.06) 0%, transparent 60%)",
+                    background: "radial-gradient(ellipse at 50% 0%, hsl(16 100% 50% / 0.10) 0%, transparent 60%)",
                   }}
                 />
 
                 {/* Number */}
-                <span className="absolute top-6 right-8 font-display text-[8rem] md:text-[9rem] leading-none text-white/[0.015] group-hover:text-primary/[0.05] transition-colors duration-700 select-none">
+                <span className="absolute top-6 right-8 font-display text-[8rem] md:text-[9rem] leading-none text-white/[0.04] group-hover:text-primary/[0.10] transition-colors duration-700 select-none">
                   {String(lie.id).padStart(2, "0")}
                 </span>
 
@@ -194,7 +190,7 @@ const ProblemSection = () => {
                         className="absolute left-0 top-1/2 w-full h-[2px] bg-red-500/50 origin-left"
                       />
                     </p>
-                    <p className="text-sm md:text-base text-muted-foreground/50 leading-relaxed">
+                    <p className="text-sm md:text-base text-muted-foreground/70 leading-relaxed">
                       {lie.subtext}
                     </p>
                   </div>
@@ -205,9 +201,9 @@ const ProblemSection = () => {
                       initial={false}
                       animate={{ width: hoveredCard === lie.id ? 48 : 24 }}
                       transition={{ duration: 0.5 }}
-                      className="h-[1px] bg-primary/20 group-hover:bg-primary/40"
+                      className="h-[1px] bg-primary/40 group-hover:bg-primary/60"
                     />
-                    <span className="text-[9px] tracking-[0.3em] text-primary/25 group-hover:text-primary/50 transition-colors duration-500 uppercase">
+                    <span className="text-[9px] tracking-[0.3em] text-primary/50 group-hover:text-primary/70 transition-colors duration-500 uppercase">
                       Yalan #{lie.id}
                     </span>
                   </div>
@@ -229,7 +225,7 @@ const ProblemSection = () => {
               <div className="absolute inset-0 rounded-2xl" style={{
                 background: "linear-gradient(135deg, hsl(16 100% 50% / 0.2) 0%, hsl(0 80% 40% / 0.1) 50%, hsl(16 100% 50% / 0.2) 100%)",
               }} />
-              <div className="absolute inset-[1px] rounded-2xl bg-[hsl(0,0%,4%)]" />
+              <div className="absolute inset-[1px] rounded-2xl bg-[hsl(0,0%,7%)]" />
 
               {/* Inner glow */}
               <div className="absolute inset-0 rounded-2xl" style={{
@@ -274,8 +270,8 @@ const ProblemSection = () => {
         </div>
 
         {/* Edge fades */}
-        <div className="absolute right-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-l from-[hsl(0,0%,3%)] to-transparent pointer-events-none z-10" />
-        <div className="absolute left-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-r from-[hsl(0,0%,3%)] to-transparent pointer-events-none z-10" />
+        <div className="absolute right-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-l from-[hsl(0,0%,5%)] to-transparent pointer-events-none z-10" />
+        <div className="absolute left-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-r from-[hsl(0,0%,5%)] to-transparent pointer-events-none z-10" />
       </div>
     </section>
   );

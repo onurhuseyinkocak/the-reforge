@@ -38,12 +38,12 @@ const TestimonialsSection = () => {
   return (
     <section ref={containerRef} className="relative py-32 md:py-48 overflow-hidden">
       {/* Background */}
-      <div className="absolute inset-0 bg-[hsl(0,0%,3%)]" />
+      <div className="absolute inset-0 bg-[hsl(0,0%,5%)]" />
 
       {/* Ambient glow */}
       <motion.div style={{ y: bgY }} className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[600px]"
-          style={{ background: "radial-gradient(ellipse, hsl(16 100% 50% / 0.025) 0%, transparent 70%)" }}
+          style={{ background: "radial-gradient(ellipse, hsl(16 100% 50% / 0.06) 0%, transparent 70%)" }}
         />
       </motion.div>
 
@@ -56,10 +56,10 @@ const TestimonialsSection = () => {
           viewport={{ once: true }}
           className="text-center mb-28"
         >
-          <span className="inline-flex items-center gap-4 text-[10px] tracking-[0.5em] text-primary/35 uppercase mb-8">
-            <span className="w-8 h-[1px] bg-primary/20" />
+          <span className="inline-flex items-center gap-4 text-[10px] tracking-[0.5em] text-primary/60 uppercase mb-8">
+            <span className="w-8 h-[1px] bg-primary/40" />
             Dönüşümler
-            <span className="w-8 h-[1px] bg-primary/20" />
+            <span className="w-8 h-[1px] bg-primary/40" />
           </span>
           <div className="overflow-hidden">
             <motion.h2
@@ -77,7 +77,7 @@ const TestimonialsSection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
             viewport={{ once: true }}
-            className="text-base md:text-lg text-muted-foreground/45 mt-6 tracking-wider"
+            className="text-base md:text-lg text-muted-foreground/70 mt-6 tracking-wider"
           >
             Steel Becomes Blade
           </motion.p>
@@ -98,11 +98,7 @@ const TestimonialsSection = () => {
               viewport={{ once: true }}
               className="group"
             >
-              <div className="relative h-full rounded-2xl p-8 md:p-10 transition-all duration-700 border border-white/[0.03] hover:border-primary/15 overflow-hidden"
-                style={{
-                  background: "linear-gradient(145deg, hsl(0 0% 7% / 0.8) 0%, hsl(0 0% 4% / 0.9) 100%)",
-                  backdropFilter: "blur(24px)",
-                }}
+              <div className="relative h-full rounded-2xl p-8 md:p-10 transition-all duration-700 border bg-[#111111] border-white/[0.08] hover:border-primary/20 overflow-hidden"
               >
                 {/* Top accent on hover */}
                 <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-transparent to-transparent group-hover:via-primary/30 transition-all duration-700" />
@@ -116,11 +112,11 @@ const TestimonialsSection = () => {
                 <div className="mb-8 relative z-10">
                   <div className="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-500"
                     style={{
-                      background: "hsl(16 100% 50% / 0.04)",
-                      border: "1px solid hsl(16 100% 50% / 0.08)",
+                      background: "hsl(16 100% 50% / 0.08)",
+                      border: "1px solid hsl(16 100% 50% / 0.15)",
                     }}
                   >
-                    <Quote className="w-4 h-4 text-primary/40 group-hover:text-primary/70 transition-colors duration-500" />
+                    <Quote className="w-4 h-4 text-primary/60 group-hover:text-primary/80 transition-colors duration-500" />
                   </div>
                 </div>
 
@@ -130,32 +126,32 @@ const TestimonialsSection = () => {
                 </blockquote>
 
                 {/* Author */}
-                <div className="relative z-10 pt-6 border-t border-white/[0.03]">
+                <div className="relative z-10 pt-6 border-t border-white/[0.08]">
                   <div className="flex items-center gap-4 mb-4">
                     <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-display tracking-wider"
                       style={{
-                        background: "hsl(16 100% 50% / 0.06)",
-                        border: "1px solid hsl(16 100% 50% / 0.12)",
-                        color: "hsl(16 100% 50% / 0.6)",
+                        background: "hsl(16 100% 50% / 0.10)",
+                        border: "1px solid hsl(16 100% 50% / 0.18)",
+                        color: "hsl(16 100% 50% / 0.7)",
                       }}
                     >
                       {testimonial.author}
                     </div>
                     <div>
                       <p className="font-display text-lg text-primary/70 tracking-wider">{testimonial.author}</p>
-                      <p className="text-[10px] text-muted-foreground/35">{testimonial.title}</p>
+                      <p className="text-[10px] text-muted-foreground/60">{testimonial.title}</p>
                     </div>
                   </div>
 
                   {/* Transformation Tag */}
                   <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-500 group-hover:border-primary/15"
                     style={{
-                      background: "hsl(16 100% 50% / 0.03)",
-                      border: "1px solid hsl(16 100% 50% / 0.06)",
+                      background: "hsl(16 100% 50% / 0.06)",
+                      border: "1px solid hsl(16 100% 50% / 0.12)",
                     }}
                   >
-                    <span className="w-1 h-1 bg-primary/40 rounded-full" />
-                    <span className="text-[9px] text-primary/50 tracking-[0.15em] uppercase">
+                    <span className="w-1 h-1 bg-primary/60 rounded-full" />
+                    <span className="text-[9px] text-primary/70 tracking-[0.15em] uppercase">
                       {testimonial.transformation}
                     </span>
                   </div>

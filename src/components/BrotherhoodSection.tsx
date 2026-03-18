@@ -33,12 +33,12 @@ const BrotherhoodSection = () => {
   return (
     <section ref={containerRef} className="relative py-32 md:py-48 overflow-hidden">
       {/* Background */}
-      <div className="absolute inset-0 bg-[hsl(0,0%,3%)]" />
+      <div className="absolute inset-0 bg-[hsl(0,0%,5%)]" />
 
       {/* Ambient glow */}
       <motion.div style={{ y: bgY }} className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[700px]"
-          style={{ background: "radial-gradient(ellipse, hsl(16 100% 50% / 0.03) 0%, transparent 70%)" }}
+          style={{ background: "radial-gradient(ellipse, hsl(16 100% 50% / 0.06) 0%, transparent 70%)" }}
         />
       </motion.div>
 
@@ -51,10 +51,10 @@ const BrotherhoodSection = () => {
           viewport={{ once: true }}
           className="text-center mb-8"
         >
-          <span className="inline-flex items-center gap-4 text-[10px] tracking-[0.5em] text-primary/35 uppercase mb-8">
-            <span className="w-8 h-[1px] bg-primary/20" />
+          <span className="inline-flex items-center gap-4 text-[10px] tracking-[0.5em] text-primary/60 uppercase mb-8">
+            <span className="w-8 h-[1px] bg-primary/40" />
             Topluluk
-            <span className="w-8 h-[1px] bg-primary/20" />
+            <span className="w-8 h-[1px] bg-primary/40" />
           </span>
           <div className="overflow-hidden">
             <motion.h2
@@ -72,7 +72,7 @@ const BrotherhoodSection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
             viewport={{ once: true }}
-            className="text-base md:text-lg text-muted-foreground/45 mt-6"
+            className="text-base md:text-lg text-muted-foreground/70 mt-6"
           >
             Aynı Ateşte Dövülenler
           </motion.p>
@@ -114,12 +114,12 @@ const BrotherhoodSection = () => {
                 <div className={`
                   absolute inset-0 rounded-2xl transition-all duration-500 flex flex-col items-center justify-center
                   border overflow-hidden
-                  ${isHovered ? "border-primary/20 shadow-[0_0_40px_hsl(16_100%_50%/0.06)]" : "border-white/[0.03] hover:border-white/[0.06]"}
+                  ${isHovered ? "border-primary/25 shadow-[0_0_40px_hsl(16_100%_50%/0.10)]" : "border-white/[0.08] hover:border-white/[0.12]"}
                 `}
                 style={{
                   background: isHovered
-                    ? "linear-gradient(145deg, hsl(0 0% 9%) 0%, hsl(0 0% 5%) 100%)"
-                    : "linear-gradient(145deg, hsl(0 0% 7%) 0%, hsl(0 0% 4%) 100%)",
+                    ? "linear-gradient(145deg, hsl(0 0% 13%) 0%, hsl(0 0% 8%) 100%)"
+                    : "linear-gradient(145deg, hsl(0 0% 10%) 0%, hsl(0 0% 7%) 100%)",
                 }}>
                   {/* Glow on hover */}
                   <div className={`absolute inset-0 pointer-events-none transition-opacity duration-500 ${isHovered ? "opacity-100" : "opacity-0"}`}
@@ -129,12 +129,12 @@ const BrotherhoodSection = () => {
                   {/* Avatar */}
                   <div className={`
                     w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center mb-3 transition-all duration-500 border
-                    ${isHovered ? "bg-primary/10 border-primary/25 text-primary" : "bg-white/[0.02] border-white/[0.05] text-muted-foreground/35"}
+                    ${isHovered ? "bg-primary/15 border-primary/30 text-primary" : "bg-white/[0.05] border-white/[0.08] text-muted-foreground/60"}
                   `}>
                     <span className="font-display text-lg md:text-xl tracking-wider">{brother.initials}</span>
                   </div>
 
-                  <span className={`text-[10px] tracking-[0.2em] transition-colors duration-500 ${isHovered ? "text-primary/60" : "text-muted-foreground/25"}`}>
+                  <span className={`text-[10px] tracking-[0.2em] transition-colors duration-500 ${isHovered ? "text-primary/70" : "text-muted-foreground/60"}`}>
                     {brother.role}
                   </span>
                 </div>
@@ -155,7 +155,7 @@ const BrotherhoodSection = () => {
             {principles.map((item, index) => (
               <div key={index} className="text-center px-8 md:px-16 relative">
                 {index > 0 && (
-                  <div className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 w-[1px] h-12 bg-white/[0.04]" />
+                  <div className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 w-[1px] h-12 bg-white/[0.10]" />
                 )}
                 <motion.p
                   initial={{ opacity: 0, y: 20 }}
@@ -167,7 +167,7 @@ const BrotherhoodSection = () => {
                 >
                   {item.value}
                 </motion.p>
-                <p className="text-[9px] text-muted-foreground/35 tracking-[0.3em] uppercase">
+                <p className="text-[9px] text-muted-foreground/60 tracking-[0.3em] uppercase">
                   {item.label}
                 </p>
               </div>
@@ -184,10 +184,10 @@ const BrotherhoodSection = () => {
           className="flex justify-center"
         >
           <div className="p-5 rounded-full" style={{
-            background: "hsl(16 100% 50% / 0.04)",
-            border: "1px solid hsl(16 100% 50% / 0.1)",
+            background: "hsl(16 100% 50% / 0.08)",
+            border: "1px solid hsl(16 100% 50% / 0.15)",
           }}>
-            <Users className="w-7 h-7 text-primary/50" />
+            <Users className="w-7 h-7 text-primary/70" />
           </div>
         </motion.div>
       </div>
