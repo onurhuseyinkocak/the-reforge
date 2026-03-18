@@ -10,19 +10,19 @@ const CTASection = () => {
     offset: ["start end", "end start"],
   });
 
-  const glowScale = useTransform(scrollYProgress, [0.2, 0.6], [0.5, 1.2]);
-  const glowOpacity = useTransform(scrollYProgress, [0.2, 0.5, 0.8], [0, 0.15, 0.05]);
+  const glowScale = useTransform(scrollYProgress, [0.2, 0.6], [0.3, 1.5]);
+  const glowOpacity = useTransform(scrollYProgress, [0.2, 0.5, 0.8], [0, 0.12, 0.03]);
 
-  // Pre-calculate particle positions for SSR safety
   const particles = useMemo(
     () =>
-      [...Array(30)].map((_, i) => ({
+      [...Array(25)].map((_, i) => ({
         id: i,
         startX: Math.random() * 100,
         startY: 100 + Math.random() * 20,
-        duration: 4 + Math.random() * 3,
-        delay: Math.random() * 4,
-        size: Math.random() * 2 + 0.5,
+        duration: 5 + Math.random() * 4,
+        delay: Math.random() * 5,
+        size: Math.random() * 2.5 + 0.5,
+        hue: 16 + Math.random() * 20,
       })),
     []
   );
@@ -33,31 +33,25 @@ const CTASection = () => {
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
       {/* Background */}
-      <div className="absolute inset-0 bg-[hsl(0,0%,4%)]" />
+      <div className="absolute inset-0 bg-[hsl(0,0%,3%)]" />
 
-      {/* Noise texture */}
-      <div
-        className="absolute inset-0 opacity-[0.03] pointer-events-none"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-        }}
-      />
+      {/* Grid pattern */}
+      <div className="absolute inset-0 opacity-[0.01]" style={{
+        backgroundImage: "linear-gradient(hsl(0 0% 100% / 0.15) 1px, transparent 1px), linear-gradient(90deg, hsl(0 0% 100% / 0.15) 1px, transparent 1px)",
+        backgroundSize: "80px 80px",
+      }} />
 
-      {/* Scroll-linked radial glow */}
+      {/* Scroll-linked glow */}
       <motion.div
         style={{ scale: glowScale, opacity: glowOpacity }}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] pointer-events-none"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] pointer-events-none"
       >
-        <div
-          className="w-full h-full rounded-full"
-          style={{
-            background:
-              "radial-gradient(circle, hsl(16 100% 50% / 0.4) 0%, hsl(0 80% 40% / 0.2) 30%, transparent 70%)",
-          }}
-        />
+        <div className="w-full h-full rounded-full" style={{
+          background: "radial-gradient(circle, hsl(16 100% 50% / 0.35) 0%, hsl(0 80% 40% / 0.15) 30%, transparent 70%)",
+        }} />
       </motion.div>
 
-      {/* Animated particles converging to center */}
+      {/* Floating particles */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {particles.map((p) => (
           <motion.div
@@ -66,8 +60,8 @@ const CTASection = () => {
             style={{
               width: p.size,
               height: p.size,
-              background: `hsl(${16 + Math.random() * 20} 100% ${50 + Math.random() * 20}%)`,
-              boxShadow: `0 0 ${p.size * 4}px hsl(16 100% 50% / 0.4)`,
+              background: `hsl(${p.hue} 100% ${55 + Math.random() * 15}%)`,
+              boxShadow: `0 0 ${p.size * 5}px hsl(16 100% 50% / 0.3)`,
             }}
             initial={{
               left: `${p.startX}%`,
@@ -77,7 +71,7 @@ const CTASection = () => {
             animate={{
               left: ["initial", "50%"],
               top: ["initial", "50%"],
-              opacity: [0, 0.8, 0.6, 0],
+              opacity: [0, 0.7, 0.5, 0],
             }}
             transition={{
               duration: p.duration,
@@ -95,27 +89,50 @@ const CTASection = () => {
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="text-lg md:text-2xl text-muted-foreground/50 mb-10 font-light"
+          className="text-lg md:text-2xl text-muted-foreground/40 mb-12 font-light"
         >
           Bahanelerin burada bitiyor.
         </motion.p>
 
         {/* Main Headline */}
-        <motion.h2
-          initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
-          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          viewport={{ once: true }}
-          className="font-display text-6xl md:text-8xl lg:text-9xl xl:text-[10rem] text-foreground mb-14 tracking-wider leading-[0.9]"
-        >
-          OCAĞA
-          <br />
-          <span className="text-primary forge-glow">GİRMEYE</span>
-          <br />
-          HAZIR MISIN?
-        </motion.h2>
+        <div className="mb-16">
+          <div className="overflow-hidden">
+            <motion.h2
+              initial={{ y: 100 }}
+              whileInView={{ y: 0 }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+              viewport={{ once: true }}
+              className="font-display text-6xl md:text-8xl lg:text-9xl xl:text-[10rem] text-foreground tracking-wider leading-[0.9]"
+            >
+              OCAĞA
+            </motion.h2>
+          </div>
+          <div className="overflow-hidden">
+            <motion.h2
+              initial={{ y: 100 }}
+              whileInView={{ y: 0 }}
+              transition={{ duration: 1, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+              viewport={{ once: true }}
+              className="font-display text-6xl md:text-8xl lg:text-9xl xl:text-[10rem] text-primary tracking-wider leading-[0.9]"
+              style={{ textShadow: "0 0 60px hsl(16 100% 50% / 0.3), 0 0 120px hsl(16 100% 50% / 0.15)" }}
+            >
+              GİRMEYE
+            </motion.h2>
+          </div>
+          <div className="overflow-hidden">
+            <motion.h2
+              initial={{ y: 100 }}
+              whileInView={{ y: 0 }}
+              transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              viewport={{ once: true }}
+              className="font-display text-6xl md:text-8xl lg:text-9xl xl:text-[10rem] text-foreground tracking-wider leading-[0.9]"
+            >
+              HAZIR MISIN?
+            </motion.h2>
+          </div>
+        </div>
 
         {/* CTA Button */}
         <motion.div
@@ -126,29 +143,19 @@ const CTASection = () => {
         >
           <Link to="/apply">
             <motion.button
-              whileHover={{ scale: 1.03 }}
+              whileHover={{ scale: 1.03, boxShadow: "0 0 80px hsl(16 100% 50% / 0.35)" }}
               whileTap={{ scale: 0.98 }}
-              className="
-                group relative overflow-hidden
-                font-display text-xl md:text-2xl tracking-[0.3em]
-                px-14 py-6
-                bg-primary
-                text-[hsl(0,0%,4%)]
-                transition-all duration-700
-                hover:shadow-[0_0_80px_hsl(16_100%_50%/0.4)]
-              "
+              className="group relative overflow-hidden font-display text-xl md:text-2xl tracking-[0.3em] px-16 py-7 bg-primary text-[hsl(0,0%,4%)] transition-all duration-700"
             >
-              {/* Shimmer effect */}
-              <span
-                className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out"
-                style={{
-                  background:
-                    "linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.15), transparent)",
-                }}
+              {/* Shimmer */}
+              <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out"
+                style={{ background: "linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.15), transparent)" }}
               />
 
-              {/* Gradient overlay on hover */}
-              <span className="absolute inset-0 bg-gradient-to-r from-ember-dark via-primary to-ember-glow opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              {/* Gradient overlay */}
+              <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                style={{ background: "linear-gradient(90deg, hsl(0 80% 40%), hsl(16 100% 50%), hsl(30 100% 60%))" }}
+              />
 
               <span className="relative z-10 flex items-center gap-4">
                 OCAĞA GİR
@@ -164,7 +171,7 @@ const CTASection = () => {
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.6 }}
           viewport={{ once: true }}
-          className="mt-8 text-sm text-muted-foreground/40"
+          className="mt-8 text-sm text-muted-foreground/35"
         >
           24 haftalık dönüşüm programına başvur
         </motion.p>
@@ -177,9 +184,8 @@ const CTASection = () => {
           viewport={{ once: true }}
           className="mt-4"
         >
-          <Link
-            to="/pricing"
-            className="text-sm text-primary/60 hover:text-primary transition-colors duration-300 tracking-wider"
+          <Link to="/pricing"
+            className="text-sm text-primary/50 hover:text-primary transition-colors duration-300 tracking-wider"
           >
             Fiyatlandırma &rarr;
           </Link>
@@ -191,20 +197,13 @@ const CTASection = () => {
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.8 }}
           viewport={{ once: true }}
-          className="mt-16 flex flex-wrap justify-center gap-6 md:gap-10"
+          className="mt-20 flex flex-wrap justify-center gap-8 md:gap-12"
         >
-          {[
-            "Sınırlı kontenjan",
-            "Birebir mentorluk",
-            "Sonuç garantili",
-          ].map((text, index) => (
-            <span
-              key={index}
-              className="flex items-center gap-3 text-xs text-muted-foreground/30 tracking-[0.2em] uppercase"
-            >
+          {["Sınırlı kontenjan", "Birebir mentorluk", "Sonuç garantili"].map((text, index) => (
+            <span key={index} className="flex items-center gap-3 text-[10px] text-muted-foreground/25 tracking-[0.25em] uppercase">
               <span className="relative flex h-1.5 w-1.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary/40 opacity-75" />
-                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary/40" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary/30 opacity-75" />
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary/30" />
               </span>
               {text}
             </span>
@@ -220,7 +219,7 @@ const CTASection = () => {
         viewport={{ once: true }}
         className="absolute bottom-10 left-0 right-0 text-center"
       >
-        <p className="font-display text-primary/20 tracking-[0.5em] text-[10px] uppercase">
+        <p className="font-display text-primary/15 tracking-[0.6em] text-[9px] uppercase">
           Discipline Is Fire
         </p>
       </motion.div>
