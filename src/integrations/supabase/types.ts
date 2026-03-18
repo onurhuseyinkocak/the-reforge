@@ -134,6 +134,33 @@ export type Database = {
         }
         Relationships: []
       }
+      buddy_pairs: {
+        Row: {
+          created_at: string
+          id: string
+          status: string
+          updated_at: string
+          user_a: string
+          user_b: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_a: string
+          user_b: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_a?: string
+          user_b?: string
+        }
+        Relationships: []
+      }
       checkins: {
         Row: {
           checkin_date: string
@@ -293,6 +320,210 @@ export type Database = {
           },
         ]
       }
+      guild_challenges: {
+        Row: {
+          challenged_guild_id: string
+          challenged_score: number
+          challenger_guild_id: string
+          challenger_score: number
+          created_at: string
+          ends_at: string | null
+          id: string
+          status: string
+        }
+        Insert: {
+          challenged_guild_id: string
+          challenged_score?: number
+          challenger_guild_id: string
+          challenger_score?: number
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          status?: string
+        }
+        Update: {
+          challenged_guild_id?: string
+          challenged_score?: number
+          challenger_guild_id?: string
+          challenger_score?: number
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guild_challenges_challenged_guild_id_fkey"
+            columns: ["challenged_guild_id"]
+            isOneToOne: false
+            referencedRelation: "guilds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guild_challenges_challenger_guild_id_fkey"
+            columns: ["challenger_guild_id"]
+            isOneToOne: false
+            referencedRelation: "guilds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guild_members: {
+        Row: {
+          guild_id: string
+          id: string
+          is_active: boolean
+          joined_at: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          guild_id: string
+          id?: string
+          is_active?: boolean
+          joined_at?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          guild_id?: string
+          id?: string
+          is_active?: boolean
+          joined_at?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guild_members_guild_id_fkey"
+            columns: ["guild_id"]
+            isOneToOne: false
+            referencedRelation: "guilds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guild_messages: {
+        Row: {
+          content: string
+          created_at: string
+          guild_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          guild_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          guild_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guild_messages_guild_id_fkey"
+            columns: ["guild_id"]
+            isOneToOne: false
+            referencedRelation: "guilds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guild_quests: {
+        Row: {
+          completion_rate: number
+          created_at: string
+          description: string | null
+          due_date: string | null
+          guild_id: string
+          id: string
+          status: string
+          title: string
+          xp_reward: number
+        }
+        Insert: {
+          completion_rate?: number
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          guild_id: string
+          id?: string
+          status?: string
+          title: string
+          xp_reward?: number
+        }
+        Update: {
+          completion_rate?: number
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          guild_id?: string
+          id?: string
+          status?: string
+          title?: string
+          xp_reward?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guild_quests_guild_id_fkey"
+            columns: ["guild_id"]
+            isOneToOne: false
+            referencedRelation: "guilds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guilds: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          heat_score: number
+          id: string
+          is_public: boolean
+          level: number
+          member_count: number
+          name: string
+          slug: string
+          updated_at: string
+          xp: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          heat_score?: number
+          id?: string
+          is_public?: boolean
+          level?: number
+          member_count?: number
+          name: string
+          slug: string
+          updated_at?: string
+          xp?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          heat_score?: number
+          id?: string
+          is_public?: boolean
+          level?: number
+          member_count?: number
+          name?: string
+          slug?: string
+          updated_at?: string
+          xp?: number
+        }
+        Relationships: []
+      }
       life_area_entries: {
         Row: {
           area: string
@@ -429,12 +660,19 @@ export type Database = {
           full_name: string
           goals: string | null
           id: string
+          level: number
           mentor_id: string | null
           phone: string | null
           status: string
           streak: number
+          streak_freeze_resets_at: string | null
+          streak_freeze_used_at: string | null
+          streak_freezes_remaining: number
+          subscription_plan: string
+          subscription_status: string
           updated_at: string
           user_id: string
+          xp: number
         }
         Insert: {
           avatar_url?: string | null
@@ -445,12 +683,19 @@ export type Database = {
           full_name?: string
           goals?: string | null
           id?: string
+          level?: number
           mentor_id?: string | null
           phone?: string | null
           status?: string
           streak?: number
+          streak_freeze_resets_at?: string | null
+          streak_freeze_used_at?: string | null
+          streak_freezes_remaining?: number
+          subscription_plan?: string
+          subscription_status?: string
           updated_at?: string
           user_id: string
+          xp?: number
         }
         Update: {
           avatar_url?: string | null
@@ -461,12 +706,19 @@ export type Database = {
           full_name?: string
           goals?: string | null
           id?: string
+          level?: number
           mentor_id?: string | null
           phone?: string | null
           status?: string
           streak?: number
+          streak_freeze_resets_at?: string | null
+          streak_freeze_used_at?: string | null
+          streak_freezes_remaining?: number
+          subscription_plan?: string
+          subscription_status?: string
           updated_at?: string
           user_id?: string
+          xp?: number
         }
         Relationships: []
       }
@@ -576,6 +828,51 @@ export type Database = {
           },
         ]
       }
+      subscriptions: {
+        Row: {
+          cancel_at: string | null
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          lemon_squeezy_customer_id: string | null
+          lemon_squeezy_id: string | null
+          plan: string
+          status: string
+          trial_ends_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cancel_at?: string | null
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          lemon_squeezy_customer_id?: string | null
+          lemon_squeezy_id?: string | null
+          plan?: string
+          status?: string
+          trial_ends_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cancel_at?: string | null
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          lemon_squeezy_customer_id?: string | null
+          lemon_squeezy_id?: string | null
+          plan?: string
+          status?: string
+          trial_ends_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       tasks: {
         Row: {
           created_at: string
@@ -635,6 +932,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_xp: {
+        Args: {
+          p_amount: number
+          p_description?: string
+          p_source?: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
