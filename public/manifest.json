@@ -1,0 +1,13 @@
+{
+  "name": "THE FORGE",
+  "short_name": "FORGE",
+  "description": "Disiplin Ateştir — 24 Haftalık Dönüşüm",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#FF4500",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

@@ -104,6 +104,7 @@ const NavLink = ({ to, label, icon: Icon, isActive, unreadCount, onClick }: NavL
   <Link
     to={to}
     onClick={onClick}
+    aria-current={isActive ? "page" : undefined}
     className="relative group block"
   >
     <div
@@ -226,7 +227,7 @@ const DashboardLayout = () => {
       <div className="mx-5 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
 
       {/* Navigation */}
-      <nav className="relative z-10 flex-1 px-3 py-3 space-y-0.5 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+      <nav aria-label="Ana navigasyon" className="relative z-10 flex-1 px-3 py-3 space-y-0.5 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
         {links.map((link) => {
           const isActive = location.pathname === link.to ||
             (link.to !== "/dashboard" && link.to !== "/admin" && location.pathname.startsWith(link.to));
@@ -332,8 +333,9 @@ const DashboardLayout = () => {
       {/* ── Main Content Area ── */}
       <div className="flex-1 flex flex-col min-w-0 lg:pl-64">
         {/* Header */}
-        <header className="h-14 bg-background/60 backdrop-blur-xl border-b border-white/[0.06] flex items-center px-4 lg:px-6 sticky top-0 z-30">
+        <header role="banner" className="h-14 bg-background/60 backdrop-blur-xl border-b border-white/[0.06] flex items-center px-4 lg:px-6 sticky top-0 z-30">
           <button
+            aria-label="Menuyu ac"
             onClick={() => setSidebarOpen(true)}
             className="lg:hidden text-muted-foreground hover:text-foreground transition-colors mr-4 p-1 -ml-1"
           >
@@ -348,7 +350,7 @@ const DashboardLayout = () => {
         <OnboardingModal />
 
         {/* Page Content with Transitions */}
-        <main className="flex-1 p-4 lg:p-6 overflow-y-auto">
+        <main role="main" className="flex-1 p-4 lg:p-6 overflow-y-auto">
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}

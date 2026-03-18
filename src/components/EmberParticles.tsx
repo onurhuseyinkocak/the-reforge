@@ -184,6 +184,7 @@ const EmberParticles = () => {
   return (
     <canvas
       ref={canvasRef}
+      aria-hidden="true"
       className="fixed inset-0 pointer-events-none z-10"
       style={{ mixBlendMode: "screen", willChange: "transform" }}
     />

@@ -238,7 +238,7 @@ const Login = () => {
 
             {/* Email Field */}
             <motion.div variants={itemVariants} className="space-y-2">
-              <Label className="text-xs text-white/40 uppercase tracking-wider font-medium">
+              <Label htmlFor="login-email" className="text-xs text-white/40 uppercase tracking-wider font-medium">
                 Email
               </Label>
               <div className="relative group">
@@ -256,11 +256,13 @@ const Login = () => {
                   />
                 </div>
                 <Input
+                  id="login-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   onFocus={() => setFocused("email")}
                   onBlur={() => setFocused(null)}
+                  aria-describedby="email-error"
                   className="h-12 pl-14 pr-4 bg-white/[0.03] border-white/[0.08] text-white/90 placeholder:text-white/15 rounded-xl focus:border-[#FF4500]/40 focus:ring-1 focus:ring-[#FF4500]/20 focus:bg-white/[0.05] transition-all duration-300"
                   placeholder="ornek@email.com"
                 />
@@ -279,8 +281,8 @@ const Login = () => {
 
             {/* Password Field */}
             <motion.div variants={itemVariants} className="space-y-2">
-              <Label className="text-xs text-white/40 uppercase tracking-wider font-medium">
-                Şifre
+              <Label htmlFor="login-password" className="text-xs text-white/40 uppercase tracking-wider font-medium">
+                Sifre
               </Label>
               <div className="relative group">
                 <div
@@ -299,16 +301,19 @@ const Login = () => {
                   />
                 </div>
                 <Input
+                  id="login-password"
                   type={showPw ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   onFocus={() => setFocused("password")}
                   onBlur={() => setFocused(null)}
+                  aria-describedby="password-error"
                   className="h-12 pl-14 pr-12 bg-white/[0.03] border-white/[0.08] text-white/90 placeholder:text-white/15 rounded-xl focus:border-[#FF4500]/40 focus:ring-1 focus:ring-[#FF4500]/20 focus:bg-white/[0.05] transition-all duration-300"
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
+                  aria-label={showPw ? "Sifreyi gizle" : "Sifreyi goster"}
                   onClick={() => setShowPw(!showPw)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] flex items-center justify-center text-white/30 hover:text-white/60 transition-all duration-200"
                 >

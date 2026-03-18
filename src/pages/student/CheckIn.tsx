@@ -29,6 +29,7 @@ import {
   Lightbulb,
   CalendarDays,
   Zap,
+  ShieldCheck,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -250,6 +251,66 @@ const CheckIn = () => {
   };
 
   const streak = profile?.streak || 0;
+  const [freezesRemaining, setFreezesRemaining] = useState<number>(1);
+  const [freezeLoading, setFreezeLoading] = useState(false);
+  const [freezeUsed, setFreezeUsed] = useState(false);
+
+  // Load streak freeze data
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("profiles")
+      .select("streak_freezes_remaining, streak_freeze_used_at, streak_freeze_resets_at")
+      .eq("id", user.id)
+      .single()
+      .then(({ data }) => {
+        if (data) {
+          // Auto-reset freezes if a month has passed
+          const resetsAt = data.streak_freeze_resets_at ? new Date(data.streak_freeze_resets_at) : null;
+          if (!resetsAt || new Date() >= resetsAt) {
+            // Reset freeze for new month
+            const nextReset = new Date();
+            nextReset.setMonth(nextReset.getMonth() + 1);
+            nextReset.setDate(1);
+            nextReset.setHours(0, 0, 0, 0);
+            supabase
+              .from("profiles")
+              .update({
+                streak_freezes_remaining: 1,
+                streak_freeze_resets_at: nextReset.toISOString(),
+              })
+              .eq("id", user.id)
+              .then(() => {
+                setFreezesRemaining(1);
+                setFreezeUsed(false);
+              });
+          } else {
+            setFreezesRemaining(data.streak_freezes_remaining ?? 1);
+            setFreezeUsed((data.streak_freezes_remaining ?? 1) === 0);
+          }
+        }
+      });
+  }, [user]);
+
+  const handleStreakFreeze = async () => {
+    if (!user || freezesRemaining <= 0) return;
+    setFreezeLoading(true);
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        streak_freezes_remaining: 0,
+        streak_freeze_used_at: new Date().toISOString(),
+      })
+      .eq("id", user.id);
+    setFreezeLoading(false);
+    if (error) {
+      toast.error("Hata: " + error.message);
+    } else {
+      setFreezesRemaining(0);
+      setFreezeUsed(true);
+      toast.success("Streak donduruldu! Bugun check-in yapmasan bile streak'in korunacak.");
+    }
+  };
 
   const confettiParticles = useMemo(
     () => Array.from({ length: 40 }, (_, i) => i),
@@ -535,6 +596,69 @@ const CheckIn = () => {
                     style={{ opacity: 0.3 + (i / 30) * 0.7 }}
                   />
                 ))}
+              </div>
+
+              {/* Streak Freeze Button */}
+              <div className="relative z-10 px-4 pb-4">
+                <button
+                  onClick={handleStreakFreeze}
+                  disabled={freezesRemaining <= 0 || freezeLoading}
+                  className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl border backdrop-blur-md transition-all duration-300 ${
+                    freezesRemaining > 0 && !freezeUsed
+                      ? "bg-sky-400/[0.06] border-sky-400/20 hover:bg-sky-400/[0.12] hover:border-sky-400/30 cursor-pointer"
+                      : "bg-white/[0.02] border-white/[0.06] opacity-50 cursor-not-allowed"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                        freezesRemaining > 0 && !freezeUsed
+                          ? "bg-sky-400/15"
+                          : "bg-white/[0.04]"
+                      }`}
+                    >
+                      <ShieldCheck
+                        className={`w-4 h-4 ${
+                          freezesRemaining > 0 && !freezeUsed
+                            ? "text-sky-400"
+                            : "text-white/20"
+                        }`}
+                      />
+                    </div>
+                    <div className="text-left">
+                      <p
+                        className={`text-sm font-medium ${
+                          freezesRemaining > 0 && !freezeUsed
+                            ? "text-sky-300"
+                            : "text-white/30"
+                        }`}
+                      >
+                        Streak Dondur
+                      </p>
+                      <p className="text-[11px] text-white/30">
+                        {freezeUsed
+                          ? "Bu ay dondurma hakkini kullandin"
+                          : `${freezesRemaining} dondurma hakkin var`}
+                      </p>
+                    </div>
+                  </div>
+                  {freezeLoading && (
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="w-4 h-4 border-2 border-sky-400/30 border-t-sky-400 rounded-full"
+                    />
+                  )}
+                </button>
+                {freezeUsed && (
+                  <motion.p
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-[11px] text-sky-400/50 mt-2 text-center"
+                  >
+                    Bugun check-in yapmasan bile streak'in korunacak
+                  </motion.p>
+                )}
               </div>
             </Card>
           </motion.div>
