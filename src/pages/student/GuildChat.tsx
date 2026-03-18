@@ -190,7 +190,7 @@ export default function GuildChat() {
   const fetchMessages = useCallback(async () => {
     if (!guildId) return;
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('guild_messages')
         .select('*, profiles:user_id(full_name, avatar_url)')
         .eq('guild_id', guildId)

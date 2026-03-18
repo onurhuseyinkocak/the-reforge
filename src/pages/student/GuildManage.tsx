@@ -1313,7 +1313,7 @@ export default function GuildManage() {
     }
 
     try {
-      const { data, error: fetchError } = await supabase
+      const { data, error: fetchError } = await (supabase as any)
         .from("guilds")
         .select("*")
         .eq("slug", slug)

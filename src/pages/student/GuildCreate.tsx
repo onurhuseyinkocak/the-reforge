@@ -668,7 +668,6 @@ export default function GuildCreate() {
                   }`}
                   style={{
                     backgroundColor: color.value,
-                    ringColor: isSelected ? color.value : undefined,
                     boxShadow: isSelected
                       ? `0 0 16px ${color.value}66`
                       : "none",
